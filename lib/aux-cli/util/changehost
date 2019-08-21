@@ -1,0 +1,105 @@
+#!/bin/bash
+set -e
+
+help_menu() {
+    echo ""
+    echo "Usage:    changehost [OPTIONS]"
+    echo ""
+    echo "A tool that wraps the commands for changing the hostname permanently and temporarily."
+    echo ""
+    echo "Options:"
+    echo "-n    --hostname STRING   Takes a string to set as the new hostname."
+    echo "-r    --reboot            Automatically reboot after hostname change."
+    echo "-h    --help              Displays this help information."
+    echo ""
+    exit 1
+}
+
+err_msg1() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run changehost -h for help."
+    echo ""
+    exit 1
+}
+
+err_msg2() {
+    echo ""
+    echo "\"$2\" is an invalid argument for \"$1\"."
+    echo "Run changehost -h for help."
+    echo ""
+    exit 1
+}
+
+# Change hostname in /etc/hosts & /etc/hostname
+set_hostname() {
+    echo ""
+    echo "Changing hostname from $(hostname) to $1"
+    echo "It will take effect at next reboot."
+    echo ""
+    if hostnamectl >/dev/null 2>&1; then
+        if [ -e /etc/hosts ]; then
+            sudo sed -i "s/$(hostname)/$1/g" /etc/hosts
+        fi
+        sudo hostnamectl set-hostname "$1"
+        changed="true"
+    elif hostname >/dev/null 2>&1; then
+        if [ -e /etc/hosts ]; then
+            sudo sed -i "s/$(hostname)/$1/g" /etc/hosts
+        fi
+        if [ -e /etc/hostname ]; then
+            sudo sed -i "s/$(hostname)/$1/g" /etc/hostname
+        fi
+        sudo hostname "$1"
+        changed="true"
+    else
+        echo "Hostname was not changed. Your version of UNIX might not be currently supported."
+        changed="false"
+        return
+    fi
+}
+
+err_chk() {
+    args=(-n --hostname -r --reboot -h -help --help)
+    if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
+        err_msg2 "$1" "$2"
+    fi
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "You need to pass an argument to change the hostname."
+    help_menu
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -n | --hostname) #Set Hostname
+        err_chk "$1" "$2"
+        if [ "$(hostname)" == "$2" ]; then
+            echo "Your hostname is already $2."
+        else
+            set_hostname "$2"
+        fi
+        shift # past argument
+        shift # past value
+        ;;
+    -r | --reboot)
+        reboot="true"
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        help_menu
+        shift # past argument
+        ;;
+    *) # any option
+        err_msg1 "$1"
+        shift # past argument
+        ;;
+    esac
+done
+
+if [ "${changed}" = "true" ] && [ "${reboot}" = "true" ]; then
+    sudo reboot now
+fi

@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+# Install Zero Tier
+echo "DEBUG: Installing ZeroTier..."
+curl -s https://install.zerotier.com/ | sudo bash
+
+# Join Zero Tier Network
+#sudo zerotier-cli join $zt_network && sudo zerotier-cli info

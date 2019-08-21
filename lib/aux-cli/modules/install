@@ -1,0 +1,73 @@
+#!/bin/bash
+set -e
+
+# Change directory to the folder this file is in
+cd "$(dirname "${BASH_SOURCE}")"
+
+# TODO: Grab a list of all install scripts next to this file, maybe make a manifest or something?
+
+help_menu() {
+    echo ""
+    echo "Usage:    install [OPTIONS]"
+    echo ""
+    echo "A tool install modules/pods/packages for your pi."
+    echo ""
+    echo "Options:"
+    echo "pishrink      Installs a tool for shrinking pi images."
+    echo "raspiwifi     Installs a tool to enable/disable hotspot mode."
+    echo "rfid          Installs a collection of tools to work with RFID a reader/writer."
+    echo "zerotier      Installs a tool to do stuff."
+    echo ""
+    exit 1
+}
+
+err_msg() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run install -h for help."
+    echo ""
+    exit 1
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "You need to specify what to install."
+    help_menu
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    pishrink) #Set Hostname
+        . pishrink
+        shift # past argument
+        ;;
+    raspiwifi) #Set Hostname
+        . raspiwifi
+        shift # past argument
+        ;;
+    rfid) #Set Hostname
+        . rfid
+        shift # past argument
+        ;;
+    zerotier) #Set Hostname
+        . zerotier
+        shift # past argument
+        ;;
+    everything) #Set Hostname
+        . pishrink
+        . rfid
+        . zerotier
+        . raspiwifi
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        help_menu
+        shift # past argument
+        ;;
+    *) # any option
+        err_msg "$1"
+        shift # past argument
+        ;;
+    esac
+done

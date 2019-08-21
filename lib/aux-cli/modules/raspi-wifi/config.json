@@ -1,0 +1,13 @@
+{
+  "settings":{
+      "entered_ssid":"",
+      "wpa_enabled_choice":"N",
+      "wpa_entered_key":"password",
+      "auto_config_choice":"N",
+      "auto_config_delay":"300",
+      "server_port_choice":"8080",
+      "ssl_enabled_choice":"N",
+      "install_ans":"y",
+      "reboot_ans":"y"
+  }
+}

@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+# TODO: stop only aux related docker stuff
+docker stop $(docker ps -a -q)

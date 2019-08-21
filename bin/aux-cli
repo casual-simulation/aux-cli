@@ -1,0 +1,128 @@
+#!/bin/bash
+set -e
+
+commands=(install uninstall start stop restart update changehost backup help)
+
+help_menu() {
+    echo ""
+    echo "Usage:        aux-cli [COMMAND]"
+    echo ""
+    echo "Command line tools for AUX dealing more with the hardware/server than auxplayer itself."
+    echo ""
+    echo "COMMANDS:"
+    echo "install       Install pods/modules/packages to your pi that you can utilize with auxplayer."
+    echo "uninstall     Uninstall pods/modules/packages to your pi that you can utilize with auxplayer."
+    echo "start         Start the docker processes for the aux server."
+    echo "stop          Stop the docker processes for the aux server."
+    echo "restart       Restart docker processes for the aux server."
+    echo "update        Update to the latest version of aux server."
+    echo "changehost    Change the hostname of your pi. Applies after restart."
+    echo "backup        Creates a backup img of your pi."
+    echo "help          Displays this help information."
+    echo ""
+    echo "Run 'aux-cli COMMAND --help' for more information on a command."
+    echo ""
+    exit 1
+}
+
+err_msg1() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run 'aux-cli help' for help."
+    echo ""
+    exit 1
+}
+
+err_msg2() {
+    echo ""
+    echo "\"$2\" is an invalid argument for \"$1\"."
+    echo "Run 'aux-cli help' for help."
+    echo ""
+    exit 1
+}
+
+err_chk() {
+    if [[ ${commands[*]} =~ $2 ]] || [[ -z "$2" ]]; then
+        err_msg2 "$1" "$2"
+    fi
+}
+
+if [ $# -eq 0 ]; then
+    help_menu
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    install)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            install_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/modules/install "${install_array[@]}"
+        break
+        ;;
+    uninstall)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            uninstall_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/modules/uninstall "${uninstall_array[@]}"
+        break
+        ;;
+    start)
+        . /lib/aux-cli/util/start
+        break
+        ;;
+    stop)
+        . /lib/aux-cli/util/stop
+        break
+        ;;
+    restart)
+        . /lib/aux-cli/util/restart
+        break
+        ;;
+    update)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            update_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/util/update "${update_array[@]}"
+        break
+        ;;
+    changehost)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            host_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/util/changehost "${host_array[@]}"
+        break
+        ;;
+    backup)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            backup_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/util/backup "${backup_array[@]}"
+        break
+        ;;
+    help)
+        help_menu
+        shift # past argument
+        ;;
+    *) # any option
+        err_msg1 "$1"
+        shift # past argument
+        ;;
+    esac
+done

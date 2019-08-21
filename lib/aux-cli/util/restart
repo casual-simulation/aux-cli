@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+aux-cli stop
+aux-cli start

@@ -1,0 +1,66 @@
+#!/bin/bash
+set -e
+
+echo "Starting reboot operations."
+
+read_conf() {
+    . /etc/aux-cli.conf
+}
+
+mac_check() {
+    echo "Checking the MAC."
+    oldfour=$(grep -Eo "ssid=.*? ...." /etc/hostapd/hostapd.conf | tail -c 5)
+    newfour=$(tail -c 6 /sys/class/net/eth0/address | tr --delete :)
+}
+
+mac_set() {
+    if [ "$oldfour" != "$newfour" ]; then
+        sudo sed -i "s/$oldfour/$newfour/g" /etc/hostapd/hostapd.conf
+        reboot_required="true"
+        echo "MAC has been updated."
+    else
+        echo "MAC Address matches."
+    fi
+}
+
+hostname_check() {
+    echo "Checking the hostname"
+    oldhost=$(grep -Eo "ssid=.*" /etc/hostapd/hostapd.conf | sed 's/.\{5\}$//' | sed "s/ssid=//g")
+    oldhost2=$(grep -Eo "ssid_prefix=.*" /etc/raspiwifi/raspiwifi.conf | sed "s/ssid_prefix=//g")
+}
+
+hostname_set() {
+    if [ "$(hostname)" != "$oldhost" ]; then
+        sudo sed -i "s/$oldhost/$(hostname)/g" /etc/hostapd/hostapd.conf
+        reboot_required="true"
+    else
+        echo "OldHost matches NewHost."
+    fi
+    if [ "$(hostname)" != "$oldhost2" ]; then
+        sudo sed -i "s/$oldhost2/$(hostname)/g" /etc/raspiwifi/raspiwifi.conf
+        reboot_required="true"
+    else
+        echo "OldHost2 matches NewHost."
+    fi
+}
+
+reboot_check() {
+    if [ "$reboot_required" == "true" ]; then
+        sudo reboot now
+    fi
+}
+
+run_steps() {
+    reboot_required="false"
+    read_conf
+    if [ $raspiwifi == "true" ]; then
+        mac_check
+        mac_set
+        hostname_check
+        hostname_set
+    fi
+    aux-cli start
+    reboot_check
+}
+
+run_steps
