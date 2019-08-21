@@ -2,7 +2,8 @@
 set -e
 
 install_deps() {
-    if git >/dev/null 2>&1; then
+
+    if git --version >/dev/null 2>&1; then
         echo "GIT is already installed."
     else
         sudo apt-get install -y git
@@ -83,13 +84,13 @@ revert() {
 }
 
 run_steps() {
-    if aux-cli >/dev/null 2>&1; then
+    if [ -e /bin/aux-cli ]; then
         trap revert ERR
         echo "AUX-CLI is already installed."
         echo "Updating AUX-CLI..."
         update
     else
-        echo "DEBUG: Installing AUX-CLI..."
+        echo "Installing AUX-CLI..."
         install
     fi
 }
