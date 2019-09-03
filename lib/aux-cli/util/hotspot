@@ -1,0 +1,80 @@
+#!/bin/bash
+set -e
+
+help_menu() {
+    echo ""
+    echo "Usage:    hotspot [OPTIONS]"
+    echo ""
+    echo "A tool that wraps the commands for allowing internet to passthrough a wired connection if available."
+    echo ""
+    echo "Options:"
+    echo "-c    --check         Checks if you're in hotspot mode."
+    echo "-e    --enable        Enables hotspot mode."
+    echo "-d    --disable       Disables hotspot mode."
+    echo "-h    --help          Displays this help information."
+    echo ""
+    exit 1
+}
+
+err_msg() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run hotspot -h for help."
+    echo ""
+    exit 1
+}
+
+hotspot_check() {
+    if pgrep -x "hostapd" >/dev/null 2>&1; then
+        echo "You are in hotspot mode!"
+        if [ "$(cat /sys/class/net/eth0/operstate)" == "down" ]; then
+            echo "You need a wired internet connection while in Hotspot/AP Mode to use the internet."
+            return 1
+        fi
+        return 0
+    else
+        echo "You aren't in hotspot mode!"
+        return 1
+    fi
+}
+
+hotspot_enable() {
+    echo "Hotspot Enabled!"
+    sudo python3 /usr/lib/raspiwifi/reset_device/manual_reset.py
+}
+
+hotspot_disable() {
+    echo "Hotspot Disabled!"
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "You need to pass an argument."
+    help_menu
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -c | --check) #Set Hostname
+        hotspot_check
+        break # past argument
+        ;;
+    -e | --enable) #Set Hostname
+        hotspot_enable
+        break # past argument
+        ;;
+    -d | --disable) #Set Hostname
+        hotspot_disable
+        break # past argument
+        ;;
+    -h | -help | --help)
+        help_menu
+        break # past argument
+        ;;
+    *) # any option
+        err_msg "$1"
+        shift # past argument
+        ;;
+    esac
+done

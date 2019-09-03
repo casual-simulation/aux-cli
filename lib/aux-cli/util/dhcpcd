@@ -1,0 +1,70 @@
+#!/bin/bash
+set -e
+
+help_menu() {
+    echo ""
+    echo "Usage:    dhcpcd [OPTIONS]"
+    echo ""
+    echo "A tool that wraps the commands for allowing internet to passthrough a wired connection if available."
+    echo ""
+    echo "Options:"
+    echo "-s    --set           Allows internet passthrough."
+    echo "-u    --unset         Stops the internet passthrough."
+    echo "-h    --help          Displays this help information."
+    echo ""
+    exit 1
+}
+
+err_msg() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run dhcpcd -h for help."
+    echo ""
+    exit 1
+}
+
+dhcpcd_set() {
+    echo "Modifying dchpcd.conf"
+    echo "static domain_name_servers=8.8.8.8 8.8.4.4" | sudo tee -a /etc/dhcpcd.conf
+
+    echo "Reloading dhcpcd"
+    sudo systemctl daemon-reload
+    sudo systemctl restart dhcpcd
+}
+
+dhcpcd_unset() {
+    echo "Unmodifying dchpcd.conf"
+    sudo sed -i '/static domain_name_servers=8.8.8.8 8.8.4.4/d' /etc/dhcpcd.conf
+
+    echo "Reloading dhcpcd"
+    sudo systemctl daemon-reload
+    sudo systemctl restart dhcpcd
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "You need to pass an argument."
+    help_menu
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -s | --set) #Set Hostname
+        dhcpcd_set
+        break # past argument
+        ;;
+    -u | --unset) #Set Hostname
+        dhcpcd_unset
+        break # past argument
+        ;;
+    -h | -help | --help)
+        help_menu
+        break # past argument
+        ;;
+    *) # any option
+        err_msg "$1"
+        shift # past argument
+        ;;
+    esac
+done

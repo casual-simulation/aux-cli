@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-
-echo "Modifying dchpcd.conf"
-echo "static domain_name_servers=8.8.8.8 8.8.4.4" | sudo tee -a /etc/dhcpcd.conf
-
-echo "Reloading dhcpcd"
-sudo systemctl daemon-reload
-sudo systemctl restart dhcpcd

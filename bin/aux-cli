@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-commands=(install uninstall start stop restart update changehost backup help)
+commands=(install uninstall start stop restart update changehost dhcpcd hotspot backup help)
 
 help_menu() {
     echo ""
@@ -17,6 +17,8 @@ help_menu() {
     echo "restart       Restart docker processes for the aux server."
     echo "update        Update to the latest version of aux server."
     echo "changehost    Change the hostname of your pi. Applies after restart."
+    echo "dhcpcd        Wrapper for setting and unsetting dhcpcd settings."
+    echo "hotspot       Tool for managing hotspot mode."
     echo "backup        Creates a backup img of your pi."
     echo "help          Displays this help information."
     echo ""
@@ -104,6 +106,26 @@ while [[ $# -gt 0 ]]; do
             shift
         done
         . /lib/aux-cli/util/changehost "${host_array[@]}"
+        break
+        ;;
+    dhcp)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            dhcpcd_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/util/dhcpcd "${dhcpcd_array[@]}"
+        break
+        ;;
+    hotspot)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            hotspot_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/util/hotspot "${hotspot_array[@]}"
         break
         ;;
     backup)

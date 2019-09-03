@@ -5,10 +5,11 @@ help_menu() {
     echo ""
     echo "Usage:    update [OPTIONS]"
     echo ""
-    echo "A tool that wraps the commands for updating AUX-CLI and software installed via apt-get."
+    echo "A tool that wraps the commands for updating AUX and software installed via apt-get."
     echo ""
     echo "Options:"
-    echo "-a    --aux           Updates AUX-CLI to the latest version."
+    echo "-a    --aux           Updates AUX to the latest version."
+    echo "-c    --cli           Updates CLI to the latest version."
     echo "-p    --pi            Alias for apt-get update/upgrade"
     echo "-h    --help          Displays this help information."
     echo ""
@@ -25,26 +26,42 @@ err_msg() {
 
 update_aux() {
     # If hotspot mode is true, then do the work around
-    if . /lib/aux-cli/util/snippets/hotspot_check; then
-        . /lib/aux-cli/util/snippets/dhcpcd_set
+    if aux-cli hotspot -c; then
+        aux-cli dhcpcd -s
         sleep 10
         docker-compose pull && docker-compose up -d
         sleep 10
-        . /lib/aux-cli/util/snippets/dhcpcd_unset
+        aux-cli dhcpcd -u
     # Else, run as normal
     else
         docker-compose pull && docker-compose up -d
     fi
 }
 
+update_cli() {
+    # If hotspot mode is true, then do the work around
+    if aux-cli hotspot -c; then
+        aux-cli dhcpcd -s
+        sleep 10
+        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && bash install.sh
+        sudo rm -rf install.sh
+        sleep 10
+        aux-cli dhcpcd -u
+    # Else, run as normal
+    else
+        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && bash install.sh
+        sudo rm -rf install.sh
+    fi
+}
+
 update_pi() {
     # If hotspot mode is true, then do the work around
-    if . /lib/aux-cli/util/snippets/hotspot_check; then
-        . /lib/aux-cli/util/snippets/dhcpcd_set
+    if aux-cli hotspot -c; then
+        aux-cli dhcpcd -s
         sleep 10
         sudo apt-get update && apt-get upgrade -y
         sleep 10
-        . /lib/aux-cli/util/snippets/dhcpcd_unset
+        aux-cli dhcpcd -u
     # Else, run as normal
     else
         sudo apt-get update && apt-get upgrade -y
@@ -62,6 +79,10 @@ while [[ $# -gt 0 ]]; do
 
     -a | --aux) #Set Hostname
         update_aux
+        shift # past argument
+        ;;
+    -c | --cli) #Set Hostname
+        update_cli
         shift # past argument
         ;;
     -p | --pi) #Set Hostname

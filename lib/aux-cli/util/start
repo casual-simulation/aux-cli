@@ -8,8 +8,8 @@ if [ -e /data/db/mongod.lock ]; then
 fi
 
 # If hotspot mode is enabled, bypass it temporarily
-if . /lib/aux-cli/util/snippets/hotspot_check; then
-    . /lib/aux-cli/util/snippets/dhcpcd_set
+if aux-cli hotspot -c; then
+    aux-cli dhcpcd -s
 fi
 
 while [[ $(docker-compose up -d || echo "$error_msg") == "$error_msg" ]]; do
@@ -18,8 +18,8 @@ while [[ $(docker-compose up -d || echo "$error_msg") == "$error_msg" ]]; do
 done
 
 # If hotspot mode is enabled, bypass it temporarily
-if . /lib/aux-cli/util/snippets/hotspot_check; then
-    . /lib/aux-cli/util/snippets/dhcpcd_unset
+if aux-cli hotspot -c; then
+    aux-cli dhcpcd -u
 fi
 
 echo "Docker is started."

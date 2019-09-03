@@ -1,0 +1,50 @@
+#!/bin/bash
+set -e
+
+
+
+sudo apt-get install -y pi-bluetooth bluez bluez-test-scripts python-dbus
+sudo systemctl enable bluetooth
+sudo service bluetooth start
+sudo /etc/init.d/bluetooth restart
+sudo usermod -G bluetooth -a pi
+
+sudo cp /usr/share/doc/bluez-test-scripts/examples/bluezutils.py /usr/bin
+sudo cp /usr/share/doc/bluez-test-scripts/examples/simple-agent.gz /usr/bin
+sudo gunzip /usr/bin/simple-agent.gz
+sudo chmod +x /usr/bin/simple-agent
+sudo simple-agent
+
+
+
+
+test=$(grep "auth = ask(\"Authorize? (yes/no): \")" /usr/bin/simple-agent)
+test2="\t\t#auth = ask(\"Authorize? (yes/no): \")"
+sudo sed -i "s,$test,$test2,g" /usr/bin/simple-agent
+
+test=$(grep "if (auth == \"yes\"):" /usr/bin/simple-agent)
+test2="\t\t#if (auth == \"yes\"):"
+sudo sed -i "s,$test,$test2,g" /usr/bin/simple-agent
+
+test=$(grep "raise Rejected(\"Pairing rejected\")" /usr/bin/simple-agent)
+test2="\t\t#raise Rejected(\"Pairing rejected\")"
+sudo sed -i "s,$test,$test2,g" /usr/bin/simple-agent
+
+#prints the line number
+grep -n
+
+
+def RequestAuthorization(self, device):
+        print("RequestAuthorization (%s)" % (device))
+        #auth = ask("Authorize? (yes/no): ")
+        #if (auth == "yes"):
+        return
+        #raise Rejected("Pairing rejected")
+
+
+
+
+
+sudo /etc/init.d/bluetooth restart
+sudo service bluetooth status
+sudo service bluetooth start

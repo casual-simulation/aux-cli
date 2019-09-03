@@ -29,15 +29,15 @@ make_executable() { # TODO: make this less bad
     chmod +x /lib/aux-cli/modules/raspiwifi
     chmod +x /lib/aux-cli/modules/rfid
     chmod +x /lib/aux-cli/modules/zerotier
+    chmod +x /lib/aux-cli/modules/tethering
     chmod +x /lib/aux-cli/util/backup
     chmod +x /lib/aux-cli/util/changehost
     chmod +x /lib/aux-cli/util/restart
     chmod +x /lib/aux-cli/util/start
     chmod +x /lib/aux-cli/util/stop
     chmod +x /lib/aux-cli/util/update
-    chmod +x /lib/aux-cli/util/snippets/dhcpcd_set
-    chmod +x /lib/aux-cli/util/snippets/dhcpcd_unset
-    chmod +x /lib/aux-cli/util/snippets/hotspot_check
+    chmod +x /lib/aux-cli/util/dhcpcd
+    chmod +x /lib/aux-cli/util/hotspot
 }
 
 cleanup() {
