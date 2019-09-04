@@ -44,6 +44,9 @@ cleanup() {
     if [ -e /home/pi/aux-cli ]; then
         sudo rm -rf /home/pi/aux-cli
     fi
+    if [ -e /home/pi/aux-cli-bkp ]; then
+        sudo rm -rf /home/pi/aux-cli-bkp
+    fi
     if [ -e /bin/aux-cli-bkp ]; then
         sudo rm -rf /bin/aux-cli-bkp
     fi
@@ -53,6 +56,9 @@ cleanup() {
 }
 
 backup() {
+    if [ -e /home/pi/aux-cli ]; then
+        mv /home/pi/aux-cli /home/pi/aux-cli-bkp
+    fi
     mv /bin/aux-cli /bin/aux-cli-bkp
     mv /lib/aux-cli /lib/aux-cli-bkp
 }
@@ -67,8 +73,8 @@ install() { # Pretending we just got the files with the docker pull
 
 update() {
     install_deps
-    clone_repo
     backup
+    clone_repo
     deploy_files
     make_executable
     cleanup
@@ -76,9 +82,11 @@ update() {
 
 revert() {
     echo "Update failed. Reverting to previous version."
+    sudo rm -rf /home/pi/aux-cli
     sudo rm -rf /bin/aux-cli
     sudo rm -rf /lib/aux-cli
 
+    mv /home/pi/aux-cli-bkp /home/pi/aux-cli
     mv /bin/aux-cli-bkp /bin/aux-cli
     mv /lib/aux-cli-bkp /lib/aux-cli
 }
