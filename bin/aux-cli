@@ -38,7 +38,7 @@ err_msg1() {
 err_msg2() {
     echo ""
     echo "\"$2\" is an invalid argument for \"$1\"."
-    echo "Run '$1 help' for help."
+    echo "Run 'aux-cli $1 -h' for help."
     echo ""
     exit 1
 }
