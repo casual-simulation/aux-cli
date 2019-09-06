@@ -38,7 +38,7 @@ err_msg1() {
 err_msg2() {
     echo ""
     echo "\"$2\" is an invalid argument for \"$1\"."
-    echo "Run 'aux-cli help' for help."
+    echo "Run '$1 help' for help."
     echo ""
     exit 1
 }
@@ -108,7 +108,7 @@ while [[ $# -gt 0 ]]; do
         . /lib/aux-cli/util/changehost "${host_array[@]}"
         break
         ;;
-    dhcp)
+    dhcpcd)
         err_chk "$1" "$2"
         shift
         while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
