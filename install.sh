@@ -11,10 +11,11 @@ install_deps() {
 }
 
 clone_repo() {
-    git clone https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
+    git clone --single-branch --branch develop https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
+    # git clone https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
 }
 
-deploy_files() { # Pretending we just got the files with the docker pull
+deploy_files() { 
     sudo cp -rf /home/pi/aux-cli/bin /
     sudo cp -rf /home/pi/aux-cli/etc /
     sudo cp -rf /home/pi/aux-cli/lib /
@@ -63,7 +64,7 @@ backup() {
     mv /lib/aux-cli /lib/aux-cli-bkp
 }
 
-install() { # Pretending we just got the files with the docker pull
+install() { 
     install_deps
     clone_repo
     deploy_files
