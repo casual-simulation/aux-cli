@@ -58,10 +58,10 @@ cleanup() {
 
 backup() {
     if [ -e /home/pi/aux-cli ]; then
-        mv /home/pi/aux-cli /home/pi/aux-cli-bkp
+        sudo mv /home/pi/aux-cli /home/pi/aux-cli-bkp
     fi
-    mv /bin/aux-cli /bin/aux-cli-bkp
-    mv /lib/aux-cli /lib/aux-cli-bkp
+    sudo mv /bin/aux-cli /bin/aux-cli-bkp
+    sudo mv /lib/aux-cli /lib/aux-cli-bkp
 }
 
 install() { 
@@ -87,9 +87,9 @@ revert() {
     sudo rm -rf /bin/aux-cli
     sudo rm -rf /lib/aux-cli
 
-    mv /home/pi/aux-cli-bkp /home/pi/aux-cli
-    mv /bin/aux-cli-bkp /bin/aux-cli
-    mv /lib/aux-cli-bkp /lib/aux-cli
+    sudo mv /home/pi/aux-cli-bkp /home/pi/aux-cli
+    sudo mv /bin/aux-cli-bkp /bin/aux-cli
+    sudo mv /lib/aux-cli-bkp /lib/aux-cli
 }
 
 run_steps() {
