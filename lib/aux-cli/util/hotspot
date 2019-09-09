@@ -39,8 +39,8 @@ hotspot_check() {
 }
 
 hotspot_enable() {
-    echo "Hotspot Enabled!"
     sudo python3 /usr/lib/raspiwifi/reset_device/manual_reset.py
+    echo "Hotspot Enabled!"
 }
 
 hotspot_disable() {

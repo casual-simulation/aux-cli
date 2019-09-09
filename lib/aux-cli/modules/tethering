@@ -1,50 +1,89 @@
 #!/bin/bash
 set -e
 
+usb_tethering() {
+    # Connect via usb and trust after this runs
+    sudo apt-get install -y usbmuxd
+    sudo systemctl enable usbmuxd
+    sudo systemctl start usbmuxd
+}
 
+ble_setup() {
+    # Install dependencies
+    sudo apt-get install -y pi-bluetooth bluez bluez-test-scripts python-dbus
+    # Enable BLE
+    sudo systemctl enable bluetooth
+    # Start BLE
+    sudo service bluetooth start
+    # Restart BLE
+    sudo /etc/init.d/bluetooth restart
+    # Add user 'pi' as adin for BLE
+    sudo usermod -G bluetooth -a pi
+    # Move BLE samples into place
+    sudo cp /usr/share/doc/bluez-test-scripts/examples/bluezutils.py /usr/bin
+    sudo cp /usr/share/doc/bluez-test-scripts/examples/simple-agent.gz /usr/bin
+    sudo gunzip /usr/bin/simple-agent.gz
+    # Make sample executable
+    sudo chmod +x /usr/bin/simple-agent
 
-sudo apt-get install -y pi-bluetooth bluez bluez-test-scripts python-dbus
-sudo systemctl enable bluetooth
+    # Get line number of the first line of the definition
+    startln=$(grep -n "def RequestAuthorization(self, device):" /usr/bin/simple-agent | cut -f1 -d:)
+
+    # Modify sample
+    test=$(grep "auth = ask(\"Authorize? (yes/no): \")" /usr/bin/simple-agent)
+    test2="\t\t#auth = ask(\"Authorize? (yes/no): \")"
+    sudo sed -i "$((startln + 2))s,$test,$test2,g" /usr/bin/simple-agent
+
+    test=$(grep "if (auth == \"yes\"):" /usr/bin/simple-agent)
+    test2="\t\t#if (auth == \"yes\"):"
+    sudo sed -i "$((startln + 3))s,$test,$test2,g" /usr/bin/simple-agent
+
+    test="\\t\\t\\treturn"
+    test2="\\t\\treturn"
+    sudo sed -i "$((startln + 4))s,$test,$test2,g" /usr/bin/simple-agent
+
+    test=$(grep "raise Rejected(\"Pairing rejected\")" /usr/bin/simple-agent)
+    test2="\t\t#raise Rejected(\"Pairing rejected\")"
+    sudo sed -i "$((startln + 5))s,$test,$test2,g" /usr/bin/simple-agent
+
+    # needs the daemon reloaded after
+    sudo sed -i: 's|^Exec.*toothd$| \
+ExecStart=/usr/lib/bluetooth/bluetoothd -C \
+ExecStartPost=/usr/bin/sdptool add SP \
+ExecStartPost=/bin/hciconfig hci0 piscan \
+|g' /lib/systemd/system/bluetooth.service
+
+    sudo systemctl daemon-reload
+
+    old_dtimeout=$(grep DiscoverableTimeout /etc/bluetooth/main.conf)
+    new_dtimeout="DiscoverableTimeout = 0"
+    sudo sed -i "s/$old_dtimeout/$new_dtimeout/g" /etc/bluetooth/main.conf
+
+    old_ptimeout=$(grep PairableTimeout /etc/bluetooth/main.conf)
+    new_ptimeout="PairableTimeout = 0"
+    sudo sed -i "s/$old_ptimeout/$new_ptimeout/g" /etc/bluetooth/main.conf
+}
+
+ble_start() {
+    sudo simple-agent
+}
+
+sudo /etc/init.d/bluetooth restart
 sudo service bluetooth start
-sudo /etc/init.d/bluetooth restart
-sudo usermod -G bluetooth -a pi
-
-sudo cp /usr/share/doc/bluez-test-scripts/examples/bluezutils.py /usr/bin
-sudo cp /usr/share/doc/bluez-test-scripts/examples/simple-agent.gz /usr/bin
-sudo gunzip /usr/bin/simple-agent.gz
-sudo chmod +x /usr/bin/simple-agent
-sudo simple-agent
-
-
-
-
-test=$(grep "auth = ask(\"Authorize? (yes/no): \")" /usr/bin/simple-agent)
-test2="\t\t#auth = ask(\"Authorize? (yes/no): \")"
-sudo sed -i "s,$test,$test2,g" /usr/bin/simple-agent
-
-test=$(grep "if (auth == \"yes\"):" /usr/bin/simple-agent)
-test2="\t\t#if (auth == \"yes\"):"
-sudo sed -i "s,$test,$test2,g" /usr/bin/simple-agent
-
-test=$(grep "raise Rejected(\"Pairing rejected\")" /usr/bin/simple-agent)
-test2="\t\t#raise Rejected(\"Pairing rejected\")"
-sudo sed -i "s,$test,$test2,g" /usr/bin/simple-agent
-
-#prints the line number
-grep -n
-
-
-def RequestAuthorization(self, device):
-        print("RequestAuthorization (%s)" % (device))
-        #auth = ask("Authorize? (yes/no): ")
-        #if (auth == "yes"):
-        return
-        #raise Rejected("Pairing rejected")
-
-
-
-
-
-sudo /etc/init.d/bluetooth restart
 sudo service bluetooth status
-sudo service bluetooth start
+
+
+
+sudo hciconfig hci0 sspmode 1
+sudo hciconfig hci0 leadv 0
+sudo hciconfig hci0 inqdata "0c097261737062657272797069020a00091002006b1d460217050d03001801180e110c1115110b1100"
+sudo hciconfig hci0 piscan
+
+# simple agent
+capability = "NoInputNoOutput"
+
+def RequestPinCode(self, device):                    
+                print("RequestPinCode (%s)" % (device))      
+                return "1234"
+
+                
