@@ -17,7 +17,7 @@ help_menu() {
     echo "raspiwifi     Installs a tool to enable/disable hotspot mode."
     echo "rfid          Installs a collection of tools to work with RFID a reader/writer."
     echo "zerotier      Installs a tool to do stuff."
-    echo "tethering     Installs a collection of tools to allow tethering via usb or bluetooth."
+    # echo "tethering     Installs a collection of tools to allow tethering via usb or bluetooth."
     echo ""
     exit 1
 }
@@ -55,15 +55,15 @@ while [[ $# -gt 0 ]]; do
         . zerotier
         shift # past argument
         ;;
-    tethering) #Set Hostname
-        . tethering
-        shift # past argument
-        ;;
+    # tethering) #Set Hostname
+    #     . tethering
+    #     shift # past argument
+    #     ;;
     everything) #Set Hostname
         . pishrink
         . rfid
         . zerotier
-        . tethering
+        # . tethering
         . raspiwifi
         shift # past argument
         ;;

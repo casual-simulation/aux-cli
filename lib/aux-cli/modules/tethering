@@ -62,28 +62,50 @@ ExecStartPost=/bin/hciconfig hci0 piscan \
     old_ptimeout=$(grep PairableTimeout /etc/bluetooth/main.conf)
     new_ptimeout="PairableTimeout = 0"
     sudo sed -i "s/$old_ptimeout/$new_ptimeout/g" /etc/bluetooth/main.conf
+
+
+    sudo apt-get install pulseaudio-module-bluetooth
+
 }
 
 ble_start() {
     sudo simple-agent
 }
 
-sudo /etc/init.d/bluetooth restart
-sudo service bluetooth start
-sudo service bluetooth status
+dummy() {
+    sudo /etc/init.d/bluetooth restart
+    sudo service bluetooth start
+    sudo service bluetooth status
 
+    sudo hciconfig hci0 sspmode 1
+    sudo hciconfig hci0 leadv 0
+    sudo hciconfig hci0 inqdata "0c097261737062657272797069020a00091002006b1d460217050d03001801180e110c1115110b1100"
+    sudo hciconfig hci0 piscan
 
+    # simple agent
+    capability = "NoInputNoOutput"
 
-sudo hciconfig hci0 sspmode 1
-sudo hciconfig hci0 leadv 0
-sudo hciconfig hci0 inqdata "0c097261737062657272797069020a00091002006b1d460217050d03001801180e110c1115110b1100"
-sudo hciconfig hci0 piscan
+    # def RequestPinCode(self, device):
+    #                 print("RequestPinCode (%s)" % (device))
+    #                 return "1234"
 
-# simple agent
-capability = "NoInputNoOutput"
+}
 
-def RequestPinCode(self, device):                    
-                print("RequestPinCode (%s)" % (device))      
-                return "1234"
-
-                
+ble_setup2(){
+    # Install dependencies
+    sudo apt-get install -y pi-bluetooth bluez bluez-test-scripts python-dbus
+    # Enable BLE
+    sudo systemctl enable bluetooth
+    # Start BLE
+    sudo service bluetooth start
+    # Restart BLE
+    sudo /etc/init.d/bluetooth restart
+    # Add user 'pi' as adin for BLE
+    sudo usermod -G bluetooth -a pi
+    # Move BLE samples into place
+    sudo cp /usr/share/doc/bluez-test-scripts/examples/bluezutils.py /usr/bin
+    # Move our agent next to the bluez-utilz
+    sudo cp /lib/aux-cli/modules/bluez/aux-agent /usr/bin
+    # Make sample executable
+    sudo chmod +x /usr/bin/aux-agent
+}
