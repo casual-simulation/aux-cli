@@ -43,13 +43,13 @@ update_cli() {
     if aux-cli hotspot -c; then
         aux-cli dhcpcd -s
         sleep 10
-        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/develop/install.sh --output install.sh && sudo bash install.sh
+        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
         sudo rm -rf install.sh
         sleep 10
         aux-cli dhcpcd -u
     # Else, run as normal
     else
-        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/develop/install.sh --output install.sh && sudo bash install.sh
+        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
         sudo rm -rf install.sh
     fi
 }

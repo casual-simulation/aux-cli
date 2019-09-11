@@ -11,8 +11,8 @@ install_deps() {
 }
 
 clone_repo() {
-    git clone --single-branch --branch develop https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
-    # git clone https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
+    # git clone --single-branch --branch develop https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
+    git clone https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
 }
 
 deploy_files() { 
