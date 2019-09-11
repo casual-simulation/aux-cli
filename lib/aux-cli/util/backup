@@ -336,7 +336,7 @@ pi_backup() {
 pi_shrink() {
     if [ "${shrink}" == "true" ]; then
         echo "Shrinking the img: ${bkpPath} to: ${shkPath}."
-        sudo pishrink.sh -sr "${bkpPath}" "${shkPath}" || echo "Shrinking had issues..."
+        sudo pishrink.sh -r "${bkpPath}" "${shkPath}" || echo "Shrinking had issues..."
     fi
 }
 
