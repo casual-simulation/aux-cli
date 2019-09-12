@@ -63,7 +63,6 @@ ExecStartPost=/bin/hciconfig hci0 piscan \
     new_ptimeout="PairableTimeout = 0"
     sudo sed -i "s/$old_ptimeout/$new_ptimeout/g" /etc/bluetooth/main.conf
 
-
     sudo apt-get install pulseaudio-module-bluetooth
 
 }
@@ -91,7 +90,7 @@ dummy() {
 
 }
 
-ble_setup2(){
+ble_setup2() {
     # Install dependencies
     sudo apt-get install -y pi-bluetooth bluez bluez-test-scripts python-dbus
     # Enable BLE
@@ -108,4 +107,97 @@ ble_setup2(){
     sudo cp /lib/aux-cli/modules/bluez/aux-agent /usr/bin
     # Make sample executable
     sudo chmod +x /usr/bin/aux-agent
+}
+
+ble_setup3() {
+    /etc/systemd/network/pan-client.network
+[Match]
+Name=bnep*
+
+[Network]
+DHCP=yes
+
+    /etc/systemd/system/pan@.service
+[Unit]
+Description=Bluetooth Personal Area Network client
+
+[Service]
+Type=notify
+ExecStart=/usr/local/sbin/bt-pan --debug --systemd client %I --wait
+
+sudo nano /usr/local/sbin/bt-pan
+
+
+
+sudo systemctl daemon-reload
+sudo systemctl restart systemd-networkd
+sudo /etc/init.d/bluetooth restart
+sudo systemctl daemon-reload
+
+sudo bluetoothctl <<EOF
+agent on
+power on
+discoverable on
+pairable on
+default-agent 
+EOF
+
+
+sudo systemctl start pan@E0:B5:2D:09:3B:D8
+
+
+
+sudo rm -rf /etc/systemd/network/pan-client.network
+sudo rm -rf /etc/systemd/system/pan@.service
+sudo rm -rf /etc/systemd/system/pan.service
+sudo rm -rf /usr/local/sbin/pan
+sudo rm -rf /etc/systemd/network/pan.netdev
+sudo rm -rf /etc/systemd/network/pan.network
+sudo rm -rf /usr/local/sbin/bt-pan
+
+
+
+
+sudo apt-get install bluez-tools -y
+sudo nano /etc/systemd/network/pan0.netdev
+[NetDev]
+Name=pan0
+Kind=bridge
+sudo nano /etc/systemd/network/pan0.network
+[Match]
+Name=pan0
+
+[Network]
+Address=172.20.1.1/24
+DHCPServer=yes
+sudo nano /etc/systemd/system/bt-agent.service
+[Unit]
+Description=Bluetooth Auth Agent
+
+[Service]
+ExecStart=/usr/bin/bt-agent -c NoInputNoOutput
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+sudo nano /etc/systemd/system/bt-network.service
+[Unit]
+Description=Bluetooth NEP PAN
+After=pan0.network
+
+[Service]
+ExecStart=/usr/bin/bt-network -s nap pan0
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl enable systemd-networkd
+sudo systemctl enable bt-agent
+sudo systemctl enable bt-network
+sudo systemctl start systemd-networkd
+sudo systemctl start bt-agent
+sudo systemctl start bt-network
+sudo bt-adapter --set Discoverable 1
+
 }
