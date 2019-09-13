@@ -8,24 +8,32 @@ usb_tethering() {
     sudo systemctl start usbmuxd
 }
 
-ble_setup() {
+ble_tethering() {
 
-sudo apt-get install bluez-tools -y
+    sudo apt-get install bluez-tools -y
 
-sudo cp -rf /lib/aux-cli/modules/ble/pan0.netdev /etc/systemd/network
-sudo cp -rf /lib/aux-cli/modules/ble/pan0.network /etc/systemd/network
-sudo cp -rf /lib/aux-cli/modules/ble/bt-agent.service /etc/systemd/system
-sudo cp -rf /lib/aux-cli/modules/ble/bt-network.service /etc/systemd/system
+    sudo cp -rf /lib/aux-cli/modules/ble/pan0.netdev /etc/systemd/network
+    sudo cp -rf /lib/aux-cli/modules/ble/pan0.network /etc/systemd/network
+    sudo cp -rf /lib/aux-cli/modules/ble/bt-agent.service /etc/systemd/system
+    sudo cp -rf /lib/aux-cli/modules/ble/bt-network.service /etc/systemd/system
 
-sudo systemctl enable systemd-networkd
-sudo systemctl enable bt-agent
-sudo systemctl enable bt-network
-sudo systemctl start systemd-networkd
-sudo systemctl start bt-agent
-sudo systemctl start bt-network
-sudo bt-adapter --set Discoverable 1
-sudo bt-adapter --set DiscoverableTimeout 0
-sudo bt-adapter --set Pairable 1
-sudo bt-adapter --set PairableTimeout 0
+    sudo systemctl enable systemd-networkd
+    sudo systemctl enable bt-agent
+    sudo systemctl enable bt-network
+    sudo systemctl start systemd-networkd
+    sudo systemctl start bt-agent
+    sudo systemctl start bt-network
+
+    sudo bt-adapter --set PairableTimeout 0
+    sudo bt-adapter --set Pairable 1
+    sudo bt-adapter --set DiscoverableTimeout 0
+    sudo bt-adapter --set Discoverable 1
 
 }
+
+run_steps() {
+    usb_tethering
+    ble_tethering
+}
+
+run_steps
