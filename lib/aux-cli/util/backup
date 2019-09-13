@@ -329,7 +329,7 @@ pi_backup() {
     echo "Backing up the pi: ${boot_name} to: ${bkpPath}."
     sudo touch /boot/forcefsck                                      # Create trigger to force file system consistency check if image is restored
     sudo dd if="${boot_name}" of="${bkpPath}" bs=1M status=progress # Backup the pi
-    rm /boot/forcefsck
+    sudo rm /boot/forcefsck
 }
 
 # Shrink the pi img
