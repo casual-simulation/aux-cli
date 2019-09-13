@@ -11,38 +11,11 @@ usb_tethering() {
 ble_setup() {
 
 sudo apt-get install bluez-tools -y
-sudo nano /etc/systemd/network/pan0.netdev
-[NetDev]
-Name=pan0
-Kind=bridge
-sudo nano /etc/systemd/network/pan0.network
-[Match]
-Name=pan0
 
-[Network]
-Address=172.20.1.1/24
-DHCPServer=yes
-sudo nano /etc/systemd/system/bt-agent.service
-[Unit]
-Description=Bluetooth Auth Agent
-
-[Service]
-ExecStart=/usr/bin/bt-agent -c NoInputNoOutput
-Type=simple
-
-[Install]
-WantedBy=multi-user.target
-sudo nano /etc/systemd/system/bt-network.service
-[Unit]
-Description=Bluetooth NEP PAN
-After=pan0.network
-
-[Service]
-ExecStart=/usr/bin/bt-network -s nap pan0
-Type=simple
-
-[Install]
-WantedBy=multi-user.target
+sudo cp -rf /lib/aux-cli/modules/ble/pan0.netdev /etc/systemd/network
+sudo cp -rf /lib/aux-cli/modules/ble/pan0.network /etc/systemd/network
+sudo cp -rf /lib/aux-cli/modules/ble/bt-agent.service /etc/systemd/system
+sudo cp -rf /lib/aux-cli/modules/ble/bt-network.service /etc/systemd/system
 
 sudo systemctl enable systemd-networkd
 sudo systemctl enable bt-agent
@@ -51,5 +24,8 @@ sudo systemctl start systemd-networkd
 sudo systemctl start bt-agent
 sudo systemctl start bt-network
 sudo bt-adapter --set Discoverable 1
+sudo bt-adapter --set DiscoverableTimeout 0
+sudo bt-adapter --set Pairable 1
+sudo bt-adapter --set PairableTimeout 0
 
 }
