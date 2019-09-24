@@ -27,7 +27,7 @@ err_msg() {
 hotspot_check() {
     if pgrep -x "hostapd" >/dev/null 2>&1; then
         echo "You are in hotspot mode!"
-        if [ "$(cat /sys/class/net/eth0/operstate)" == "down" ]; then
+        if [ "$(cat /sys/class/net/eth0/operstate)" == "down" ]; then # TODO: Check for WiFi/Bluetooth Hotspot also.
             echo "You need a wired internet connection while in Hotspot/AP Mode to use the internet."
             return 1
         fi

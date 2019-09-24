@@ -24,8 +24,12 @@ err_msg() {
 }
 
 dhcpcd_set() {
+    if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
+        echo "DHCPCD has already been set."
+        return 1
+    fi
     echo "Modifying dchpcd.conf"
-    echo "static domain_name_servers=8.8.8.8 8.8.4.4" | sudo tee -a /etc/dhcpcd.conf
+    echo "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" | sudo tee -a /etc/dhcpcd.conf
 
     echo "Reloading dhcpcd"
     sudo systemctl daemon-reload
@@ -34,7 +38,7 @@ dhcpcd_set() {
 
 dhcpcd_unset() {
     echo "Unmodifying dchpcd.conf"
-    sudo sed -i '/static domain_name_servers=8.8.8.8 8.8.4.4/d' /etc/dhcpcd.conf
+    sudo sed -i '/static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4/d' /etc/dhcpcd.conf
 
     echo "Reloading dhcpcd"
     sudo systemctl daemon-reload
