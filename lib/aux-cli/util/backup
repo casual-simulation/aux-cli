@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-# TODO: make an aux and non-aux version
-
 # Default Variables
 hostn=$(hostname)                              # Hostname of RaspberryPi
 filename="${hostn}-bkp.img"                    # Image name
