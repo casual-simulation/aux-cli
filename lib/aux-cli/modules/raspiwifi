@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-# Change directory to the folder this file is in
-cd "$(dirname "${BASH_SOURCE}")"
+working_dir="$( cd "$(dirname "$0")" ; pwd -P )"
 
-# TODO: clone to default repo dir or makedir /home/pi/repos
+# Change directory to the folder this file is in
+cd "${working_dir}"
+
 sudo apt-get install -y git
 
 # Clone RaspiWiFi
@@ -15,9 +16,9 @@ fi
 
 # Add in our custom scripts to bypass interactivity
 echo "DEBUG: Modifying RaspiWiFi..."
-cp /lib/aux-cli/modules/raspi-wifi/initial_setup.py RaspiWiFi
-cp /lib/aux-cli/modules/raspi-wifi/config.json RaspiWiFi
-cp /lib/aux-cli/modules/raspi-wifi/reset_lib.py RaspiWiFi/libs/reset_device
+cp "${working_dir}/raspi-wifi/initial_setup.py" RaspiWiFi
+cp "${working_dir}/raspi-wifi/config.json" RaspiWiFi
+cp "${working_dir}/raspi-wifi/reset_lib.py" RaspiWiFi/libs/reset_device
 
 # Run the RaspiWiFi setup
 echo "DEBUG: Running RaspiWiFi..."
@@ -25,4 +26,4 @@ cd RaspiWiFi
 sudo python3 initial_setup.py
 
 # Clear out the repo afterwards
-# sudo rm -rf RaspiWiFi
+sudo rm -rf RaspiWiFi
