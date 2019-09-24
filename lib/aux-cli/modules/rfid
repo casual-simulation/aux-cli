@@ -11,10 +11,12 @@ if ! command lsmod | grep spi_ >/dev/null 2>&1; then
     echo "SPI is disabled."
     echo "Enabling now."
     printf "\n# Enable SPI\ndtparam=spi=on\n" | sudo tee -a /boot/config.txt
-else
-    read -p "SPI requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r
+
+    read -t 10 -p "SPI requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         sudo reboot now
     fi
+else
+    echo "SPI is already enabled."
 fi
