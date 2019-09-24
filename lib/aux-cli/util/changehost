@@ -102,4 +102,6 @@ done
 
 if [ "${changed}" = "true" ] && [ "${reboot}" = "true" ]; then
     sudo reboot now
+elif [ "${changed}" = "true" ] && [ "${reboot}" = "false" ]; then
+    echo "Hostname changes requires a reboot to take effect."
 fi
