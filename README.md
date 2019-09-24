@@ -5,7 +5,7 @@ AUX-CLI is a collection of tools to help expedite and control your environment o
 All you need to do is curl the install.sh file and run it.  
 
 ```bash
-curl https://raw.githubusercontent.com/casual-simulation/aux/master/install.sh --output install.sh && sudo bash install.sh
+curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
 ```
 
 If you are installing this independantly of AUX, make sure to install any/every components you need. A breakdown of the available commands are below.  
@@ -49,6 +49,7 @@ everything    Installs everything available
 ```
 
 ### uninstall
+NOTE: Uninstll currently does not function.  
 ```
 Usage:    uninstall [OPTIONS]
 
@@ -122,6 +123,7 @@ Options:
 ```
 
 ### hotspot
+NOTE: Disable does not currently work.  
 ```
 Usage:    hotspot [OPTIONS]
 
