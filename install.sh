@@ -15,30 +15,16 @@ clone_repo() {
     git clone https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
 }
 
-deploy_files() { 
+make_executable() {
+    for filename in $(find /home/pi/aux-cli -type f ! -name "*.*"); do
+        chmod +x "${filename}"
+    done
+}
+
+deploy_files() {
     sudo cp -rf /home/pi/aux-cli/bin /
     sudo cp -rf /home/pi/aux-cli/etc /
     sudo cp -rf /home/pi/aux-cli/lib /
-}
-
-make_executable() { # TODO: make this less bad
-    chmod +x /bin/aux-cli
-    chmod +x /lib/aux-cli/startup
-    chmod +x /lib/aux-cli/modules/install
-    chmod +x /lib/aux-cli/modules/uninstall
-    chmod +x /lib/aux-cli/modules/pishrink
-    chmod +x /lib/aux-cli/modules/raspiwifi
-    chmod +x /lib/aux-cli/modules/rfid
-    chmod +x /lib/aux-cli/modules/zerotier
-    chmod +x /lib/aux-cli/modules/tethering
-    chmod +x /lib/aux-cli/util/backup
-    chmod +x /lib/aux-cli/util/changehost
-    chmod +x /lib/aux-cli/util/restart
-    chmod +x /lib/aux-cli/util/start
-    chmod +x /lib/aux-cli/util/stop
-    chmod +x /lib/aux-cli/util/update
-    chmod +x /lib/aux-cli/util/dhcpcd
-    chmod +x /lib/aux-cli/util/hotspot
 }
 
 cleanup() {
@@ -64,11 +50,11 @@ backup() {
     sudo mv /lib/aux-cli /lib/aux-cli-bkp
 }
 
-install() { 
+install() {
     install_deps
     clone_repo
-    deploy_files
     make_executable
+    deploy_files
     cleanup
 }
 
@@ -76,8 +62,8 @@ update() {
     install_deps
     backup
     clone_repo
-    deploy_files
     make_executable
+    deploy_files
     cleanup
 }
 
