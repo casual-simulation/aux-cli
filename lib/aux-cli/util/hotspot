@@ -44,7 +44,23 @@ hotspot_enable() {
 }
 
 hotspot_disable() {
+    # From app.py def set_ap_client_mode()
+    sudo rm -f /etc/raspiwifi/host_mode || echo "/etc/raspiwifi/host_mode does not exist."
+    sudo rm /etc/cron.raspiwifi/aphost_bootstrapper || echo "/etc/cron.raspiwifi/aphost_bootstrapper does not exist."
+    sudo cp /usr/lib/raspiwifi/reset_device/static_files/apclient_bootstrapper /etc/cron.raspiwifi/
+    sudo chmod +x /etc/cron.raspiwifi/apclient_bootstrapper
+    sudo mv /etc/dnsmasq.conf.original /etc/dnsmasq.conf || echo "/etc/dnsmasq.conf.original"
+    sudo mv /etc/dhcpcd.conf.original /etc/dhcpcd.conf || echo "/etc/dhcpcd.conf.original"
+
     echo "Hotspot Disabled!"
+
+    read -p "Disabling Hotspot Mode requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        sudo reboot now
+    else
+        exit 1
+    fi
 }
 
 if [ $# -eq 0 ]; then

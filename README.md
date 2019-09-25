@@ -49,7 +49,7 @@ everything    Installs everything available
 ```
 
 ### uninstall
-NOTE: Uninstll currently does not function.  
+NOTE: Uninstall currently does not function.  
 ```
 Usage:    uninstall [OPTIONS]
 
@@ -123,7 +123,6 @@ Options:
 ```
 
 ### hotspot
-NOTE: Disable does not currently work.  
 ```
 Usage:    hotspot [OPTIONS]
 
