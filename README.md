@@ -93,8 +93,11 @@ A tool that wraps the commands for updating AUX and software installed via apt-g
 
 Options:
 -a    --aux           Updates AUX to the latest version.
+-A    --aux_auto      Toggle automatic updates on or off for AUX.
 -c    --cli           Updates CLI to the latest version.
--p    --pi            Alias for apt-get update/upgrade
+-C    --cli_auto      Toggle automatic updates on or off for CLI.
+-p    --pi            Updates the software for your RaspberryPi (apt-get).
+-P    --pi_auto       Toggle automatic updates on or off for your RaspberryPi (apt-get).
 -h    --help          Displays this help information.
 ```
 

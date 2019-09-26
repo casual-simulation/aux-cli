@@ -9,8 +9,11 @@ help_menu() {
     echo ""
     echo "Options:"
     echo "-a    --aux           Updates AUX to the latest version."
+    echo "-A    --aux_auto      Toggle automatic updates on or off for AUX."
     echo "-c    --cli           Updates CLI to the latest version."
-    echo "-p    --pi            Alias for apt-get update/upgrade"
+    echo "-C    --cli_auto      Toggle automatic updates on or off for CLI."
+    echo "-p    --pi            Updates the software for your RaspberryPi (apt-get)."
+    echo "-P    --pi_auto       Toggle automatic updates on or off for your RaspberryPi (apt-get)."
     echo "-h    --help          Displays this help information."
     echo ""
     exit 1
@@ -38,6 +41,23 @@ update_aux() {
     fi
 }
 
+automatic_update_aux() {
+    . /etc/aux-cli.conf
+    docker_compose="curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml"
+
+    if [ "${autoupdate_aux}" == "false" ]; then
+        echo "Enabling Automatic updates for AUX."
+        (crontab -l ; echo "0 * * * * $docker_compose") | crontab -
+        (crontab -l ; echo "0 * * * * aux-cli update -a") | crontab -
+        sudo sed -i "s/autoupdate_aux="false"/autoupdate_aux="true"/g" /etc/aux-cli.conf
+    else
+        echo "Disabling Automatic updates for AUX."
+        crontab -l | grep -v "$docker_compose" | crontab -
+        crontab -l | grep -v "aux-cli update -a" | crontab -
+        sudo sed -i "s/autoupdate_aux="true"/autoupdate_aux="false"/g" /etc/aux-cli.conf
+    fi
+}
+
 update_cli() {
     # If hotspot mode is true, then do the work around
     if aux-cli hotspot -c; then
@@ -51,6 +71,20 @@ update_cli() {
     else
         curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
         sudo rm -rf install.sh
+    fi
+}
+
+automatic_update_cli() {
+    . /etc/aux-cli.conf
+
+    if [ "${autoupdate_cli}" == "false" ]; then
+        echo "Enabling Automatic updates for AUX-CLI."
+        (crontab -l ; echo "0 * * * * aux-cli update -c") | crontab -
+        sudo sed -i "s/autoupdate_cli="false"/autoupdate_cli="true"/g" /etc/aux-cli.conf
+    else
+        echo "Disabling Automatic updates for AUX-CLI."
+        crontab -l | grep -v "aux-cli update -c" | crontab -
+        sudo sed -i "s/autoupdate_cli="true"/autoupdate_cli="false"/g" /etc/aux-cli.conf
     fi
 }
 
@@ -68,6 +102,20 @@ update_pi() {
     fi
 }
 
+automatic_update_pi() {
+    . /etc/aux-cli.conf
+
+    if [ "${autoupdate_pi}" == "false" ]; then
+        echo "Enabling Automatic updates for your RaspberryPi (apt-get)."
+        (crontab -l ; echo "0 * * * * aux-cli update -p") | crontab -
+        sudo sed -i "s/autoupdate_pi="false"/autoupdate_pi="true"/g" /etc/aux-cli.conf
+    else
+        echo "Disabling Automatic updates for your RaspberryPi (apt-get)."
+        crontab -l | grep -v "aux-cli update -p" | crontab -
+        sudo sed -i "s/autoupdate_pi="true"/autoupdate_pi="false"/g" /etc/aux-cli.conf
+    fi
+}
+
 if [ $# -eq 0 ]; then
     echo ""
     echo "You need to specify what to update."
@@ -77,16 +125,28 @@ fi
 while [[ $# -gt 0 ]]; do
     case "$1" in
 
-    -a | --aux) #Set Hostname
+    -a | --aux)
         update_aux
         shift # past argument
         ;;
-    -c | --cli) #Set Hostname
+    -A | --aux_auto)
+        automatic_update_aux
+        shift # past argument
+        ;;
+    -c | --cli)
         update_cli
         shift # past argument
         ;;
-    -p | --pi) #Set Hostname
+    -C | --cli_auto)
+        automatic_update_cli
+        shift # past argument
+        ;;
+    -p | --pi)
         update_pi
+        shift # past argument
+        ;;
+    -P | --pi_auto)
+        automatic_update_pi
         shift # past argument
         ;;
     -h | -help | --help)
