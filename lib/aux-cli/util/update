@@ -32,7 +32,7 @@ update_aux() {
     if aux-cli hotspot -c; then
         aux-cli dhcpcd -s
         sleep 10
-        curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml
+        sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml
         docker-compose pull && docker-compose up -d
         sleep 10
         aux-cli dhcpcd -u
