@@ -144,7 +144,7 @@ Usage:    backup.sh [OPTIONS]
 A tool that creates a complete backup image of your RaspberryPi with options to Shrink/Zip/Move/Upload it wherever you choose.
 
 OPTIONS:
--f    --filename STRING       Specify a filename to use. Default: auxstretch-bkp.img
+-f    --filename STRING       Specify a filename to use. Default: ${hostn}-bkp.img
 -m    --mountpoint STRING     Specify a mount point for your local storage device. Default: /mnt/usbstorage
 -s    --storage STRING        Specify a local storage device to backup to. The script will try to find one if unspecified.
 -l    --log STRING            Specify a location to output the log to. Default: /var/log/pi.backup.log
