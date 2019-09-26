@@ -48,8 +48,7 @@ tethering     Installs a collection of tools to allow tethering via usb or bluet
 everything    Installs everything available
 ```
 
-### uninstall
-NOTE: Uninstall currently does not function.  
+### uninstall 
 ```
 Usage:    uninstall [OPTIONS]
 

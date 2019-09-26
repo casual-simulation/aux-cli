@@ -31,9 +31,31 @@ ble_tethering() {
 
 }
 
-run_steps() {
+install() {
     usb_tethering
     ble_tethering
 }
 
-run_steps
+uninstall() {
+    sudo apt-get remove -y usbmuxd
+    sudo systemctl disable usbmuxd
+    sudo systemctl stop usbmuxd
+
+    sudo apt-get remove -y bluez-tools
+    sudo rm -rf /etc/systemd/network/pan0.netdev
+    sudo rm -rf /etc/systemd/network/pan0.network
+    sudo rm -rf /etc/systemd/system/bt-agent.service
+    sudo rm -rf /etc/systemd/system/bt-network.service
+    sudo systemctl disable systemd-networkd
+    sudo systemctl disable bt-agent
+    sudo systemctl disable bt-network
+    sudo systemctl stop systemd-networkd
+    sudo systemctl stop bt-agent
+    sudo systemctl stop bt-network
+}
+
+if [ "$1" == "uninstall" ]; then
+    uninstall
+else
+    install
+fi

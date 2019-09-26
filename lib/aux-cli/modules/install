@@ -17,7 +17,7 @@ help_menu() {
     echo ""
     echo "Usage:    install [OPTIONS]"
     echo ""
-    echo "A tool install modules/pods/packages for your pi."
+    echo "A tool to install modules/pods/packages for your pi."
     echo ""
     echo "Options:"
     echo "pishrink      Installs a tool for shrinking pi images."
@@ -25,6 +25,7 @@ help_menu() {
     echo "rfid          Installs a collection of tools to work with RFID a reader/writer."
     echo "zerotier      Installs a tool to do stuff."
     echo "tethering     Installs a collection of tools to allow tethering via usb or bluetooth."
+    echo "everything    Installs everything available"
     echo ""
     exit 1
 }

@@ -1,22 +1,44 @@
 #!/bin/bash
 set -e
 
-# Install rfid python tools
-echo "DEBUG: Setting up RFID Tools..."
-sudo apt-get install -y python3-pip python3-dev
-sudo pip3 install spidev mfrc522
+install() {
+    # Install rfid python tools
+    echo "DEBUG: Setting up RFID Tools..."
+    sudo apt-get install -y python3-pip python3-dev
+    sudo pip3 install spidev mfrc522
 
-# Enable SPI
-if ! command lsmod | grep spi_ >/dev/null 2>&1; then
-    echo "SPI is disabled."
-    echo "Enabling now."
-    printf "\n# Enable SPI\ndtparam=spi=on\n" | sudo tee -a /boot/config.txt
+    # Enable SPI
+    if ! command lsmod | grep spi_ >/dev/null 2>&1; then
+        echo "SPI is disabled."
+        echo "Enabling now."
+        printf "\n# Enable SPI\ndtparam=spi=on\n" | sudo tee -a /boot/config.txt
 
+        read -t 10 -p "SPI requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            sudo reboot now
+        fi
+    else
+        echo "SPI is already enabled."
+    fi
+}
+
+uninstall() {
+    sudo pip3 uninstall -y spidev mfrc522
+    sudo apt-get remove -y python3-pip python3-dev
+
+    sudo sed -i "s/# Enable SPI//g" /boot/config.txt
+    sudo sed -i "s/dtparam=spi=on//g" /boot/config.txt
+    
     read -t 10 -p "SPI requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         sudo reboot now
     fi
+}
+
+if [ "$1" == "uninstall" ]; then
+    uninstall
 else
-    echo "SPI is already enabled."
+    install
 fi

@@ -1,2 +1,85 @@
 #!/bin/bash
 set -e
+
+# Change directory to the folder this file is in
+cd "$(dirname "${BASH_SOURCE}")"
+
+help_menu() {
+    echo ""
+    echo "Usage:    uninstall [OPTIONS]"
+    echo ""
+    echo "A tool to uninstall modules/pods/packages for your pi."
+    echo ""
+    echo "Options:"
+    echo "pishrink      Uninstalls a tool for shrinking pi images."
+    echo "raspiwifi     Uninstalls a tool to enable/disable hotspot mode."
+    echo "rfid          Uninstalls a collection of tools to work with RFID a reader/writer."
+    echo "zerotier      Uninstalls a tool to do stuff."
+    echo "tethering     Uninstalls a collection of tools to allow tethering via usb or bluetooth."
+    echo "everything    Uninstalls everything available"
+    echo ""
+    exit 1
+}
+
+err_msg() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run uninstall -h for help."
+    echo ""
+    exit 1
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "You need to specify what to uninstall."
+    help_menu
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    pishrink)
+        . pishrink uninstall
+        shift # past argument
+        shift # past flag
+        ;;
+    raspiwifi)
+        . raspiwifi uninstall
+        shift # past argument
+        shift # past flag
+        ;;
+    rfid)
+        . rfid uninstall
+        shift # past argument
+        shift # past flag
+        ;;
+    zerotier)
+        . zerotier uninstall
+        shift # past argument
+        shift # past flag
+        ;;
+    tethering)
+        . tethering uninstall
+        shift # past argument
+        shift # past flag
+        ;;
+    everything)
+        . pishrink uninstall
+        . rfid uninstall
+        . zerotier uninstall
+        . tethering uninstall
+        . raspiwifi uninstall
+        shift # past argument
+        shift # past flag
+        ;;
+    -h | -help | --help)
+        help_menu
+        shift # past argument
+        ;;
+    *) # any option
+        err_msg "$1"
+        shift # past argument
+        ;;
+    esac
+done
+    

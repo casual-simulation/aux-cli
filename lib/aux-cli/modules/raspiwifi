@@ -1,33 +1,45 @@
 #!/bin/bash
 set -e
 
-working_dir=$(
-    cd $(dirname "${BASH_SOURCE}")
-    pwd -P
-)
+install() {
+    working_dir=$(
+        cd $(dirname "${BASH_SOURCE}")
+        pwd -P
+    )
 
-# Change directory to the folder this file is in
-cd "${working_dir}"
+    # Change directory to the folder this file is in
+    cd "${working_dir}"
 
-sudo apt-get install -y git
+    sudo apt-get install -y git
 
-# Clone RaspiWiFi
-if [ ! -d "${working_dir}/RaspiWiFi" ]; then
-    echo "DEBUG: Cloning RaspiWiFi..."
-    sudo mkdir "${working_dir}/RaspiWiFi"
-    sudo git clone https://github.com/jasbur/RaspiWiFi.git
+    # Clone RaspiWiFi
+    if [ ! -d "${working_dir}/RaspiWiFi" ]; then
+        echo "DEBUG: Cloning RaspiWiFi..."
+        sudo mkdir "${working_dir}/RaspiWiFi"
+        sudo git clone https://github.com/jasbur/RaspiWiFi.git
+    fi
+
+    # Add in our custom scripts to bypass interactivity
+    echo "DEBUG: Modifying RaspiWiFi..."
+    sudo cp "${working_dir}/raspi-wifi/initial_setup.py" RaspiWiFi
+    sudo cp "${working_dir}/raspi-wifi/config.json" RaspiWiFi
+    sudo cp "${working_dir}/raspi-wifi/reset_lib.py" RaspiWiFi/libs/reset_device
+
+    # Run the RaspiWiFi setup
+    echo "DEBUG: Running RaspiWiFi..."
+    cd RaspiWiFi
+    sudo python3 initial_setup.py
+
+    # Clear out the repo afterwards
+    sudo rm -rf "${working_dir}/RaspiWiFi"
+}
+
+uninstall() {
+    sudo python3 /usr/lib/raspiwifi/uninstall.py
+}
+
+if [ "$1" == "uninstall" ]; then
+    uninstall
+else
+    install
 fi
-
-# Add in our custom scripts to bypass interactivity
-echo "DEBUG: Modifying RaspiWiFi..."
-sudo cp "${working_dir}/raspi-wifi/initial_setup.py" RaspiWiFi
-sudo cp "${working_dir}/raspi-wifi/config.json" RaspiWiFi
-sudo cp "${working_dir}/raspi-wifi/reset_lib.py" RaspiWiFi/libs/reset_device
-
-# Run the RaspiWiFi setup
-echo "DEBUG: Running RaspiWiFi..."
-cd RaspiWiFi
-sudo python3 initial_setup.py
-
-# Clear out the repo afterwards
-sudo rm -rf "${working_dir}/RaspiWiFi"
