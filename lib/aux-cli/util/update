@@ -30,10 +30,8 @@ err_msg() {
 update_aux() {
     # If hotspot mode is true, then do the work around
     aux-cli dhcpcd -s
-    sleep 10
     sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml
     docker-compose pull && docker-compose up -d
-    sleep 10
     aux-cli dhcpcd -u
 }
 
@@ -57,10 +55,8 @@ automatic_update_aux() {
 update_cli() {
     # If hotspot mode is true, then do the work around
     aux-cli dhcpcd -s
-    sleep 10
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
     sudo rm -rf install.sh
-    sleep 10
     aux-cli dhcpcd -u
 }
 
@@ -84,9 +80,7 @@ automatic_update_cli() {
 update_pi() {
     # If hotspot mode is true, then do the work around
     aux-cli dhcpcd -s
-    sleep 10
     sudo apt-get update && apt-get upgrade -y
-    sleep 10
     aux-cli dhcpcd -u
 }
 

@@ -40,6 +40,7 @@ dhcpcd_set() {
         echo "Reloading dhcpcd"
         sudo systemctl daemon-reload
         sudo systemctl restart dhcpcd
+        sleep 10
     else
         echo "There's no need to dhcpcd set."
     fi
@@ -53,6 +54,7 @@ dhcpcd_unset() {
         echo "Reloading dhcpcd"
         sudo systemctl daemon-reload
         sudo systemctl restart dhcpcd
+        sleep 10
     else
         echo "DHCPCD wasn't set."
     fi
