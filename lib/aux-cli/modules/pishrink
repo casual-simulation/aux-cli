@@ -19,6 +19,8 @@ uninstall() {
 
 if [ "$1" == "uninstall" ]; then
     uninstall
-else
+fi
+
+if [ "$1" == "install" ]; then
     install
 fi
