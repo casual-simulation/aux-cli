@@ -6,13 +6,6 @@ cd "$(dirname "${BASH_SOURCE}")"
 
 # TODO: Grab a list of all install scripts next to this file, maybe make a manifest or something?
 
-internet_check() {
-    # If hotspot mode is enabled, bypass it temporarily
-    if aux-cli hotspot -c; then
-        aux-cli dhcpcd -s
-    fi
-}
-
 help_menu() {
     echo ""
     echo "Usage:    install [OPTIONS]"
@@ -48,32 +41,32 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
 
     pishrink)
-        internet_check
+        aux-cli dhcpcd -s
         . pishrink
         shift # past argument
         ;;
     raspiwifi)
-        internet_check
+        aux-cli dhcpcd -s
         . raspiwifi
         shift # past argument
         ;;
     rfid)
-        internet_check
+        aux-cli dhcpcd -s
         . rfid
         shift # past argument
         ;;
     zerotier)
-        internet_check
+        aux-cli dhcpcd -s
         . zerotier
         shift # past argument
         ;;
     tethering)
-        internet_check
+        aux-cli dhcpcd -s
         . tethering
         shift # past argument
         ;;
     everything)
-        internet_check
+        aux-cli dhcpcd -s
         . pishrink
         . rfid
         . zerotier
@@ -92,7 +85,4 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# If hotspot mode is enabled, bypass it temporarily
-if aux-cli hotspot -c; then
-    aux-cli dhcpcd -u
-fi
+aux-cli dhcpcd -u
