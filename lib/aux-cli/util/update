@@ -38,6 +38,7 @@ update_aux() {
         aux-cli dhcpcd -u
     # Else, run as normal
     else
+        sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml
         docker-compose pull && docker-compose up -d
     fi
 }
