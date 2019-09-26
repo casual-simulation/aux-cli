@@ -13,7 +13,7 @@ install() {
 }
 
 uninstall() {
-    echo "stuff"
+    sudo rm -rf /usr/local/bin/pishrink.sh
 }
 
 if [ "$1" == "uninstall" ]; then
