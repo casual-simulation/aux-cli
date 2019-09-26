@@ -32,6 +32,7 @@ update_aux() {
     if aux-cli hotspot -c; then
         aux-cli dhcpcd -s
         sleep 10
+        curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml
         docker-compose pull && docker-compose up -d
         sleep 10
         aux-cli dhcpcd -u
@@ -43,16 +44,13 @@ update_aux() {
 
 automatic_update_aux() {
     . /etc/aux-cli.conf
-    docker_compose="curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml"
 
     if [ "${autoupdate_aux}" == "false" ]; then
         echo "Enabling Automatic updates for AUX."
-        (crontab -l ; echo "0 * * * * $docker_compose") | crontab -
         (crontab -l ; echo "0 * * * * aux-cli update -a") | crontab -
         sudo sed -i "s/autoupdate_aux="false"/autoupdate_aux="true"/g" /etc/aux-cli.conf
     else
         echo "Disabling Automatic updates for AUX."
-        crontab -l | grep -v "$docker_compose" | crontab -
         crontab -l | grep -v "aux-cli update -a" | crontab -
         sudo sed -i "s/autoupdate_aux="true"/autoupdate_aux="false"/g" /etc/aux-cli.conf
     fi
