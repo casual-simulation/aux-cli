@@ -23,6 +23,7 @@ help_menu() {
     exit 1
 }
 
+
 err_msg() {
     echo ""
     echo "\"$1\" is an invalid argument."
@@ -41,7 +42,8 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
 
     pishrink)
-        aux-cli uninstall pishrink && aux-cli install pishrink
+        aux-cli uninstall pishrink
+        aux-cli install pishrink
         shift # past argument
         ;;
     raspiwifi)
