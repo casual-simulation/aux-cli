@@ -4,7 +4,7 @@ set -e
 install() {
     if ! [ -e /usr/local/bin/pishrink.sh ]; then
         echo "Installing PiShrink."
-        wget https://raw.githubusercontent.com/Drewsif/PiShrink/master/pishrink.sh
+        sudo wget https://raw.githubusercontent.com/Drewsif/PiShrink/master/pishrink.sh
         sudo chmod +x pishrink.sh
         sudo mv -f pishrink.sh /usr/local/bin
     else
