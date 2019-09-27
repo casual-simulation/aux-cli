@@ -19,6 +19,7 @@ Command line tools for AUX dealing more with the hardware/server than auxplayer 
 COMMANDS:  
 install       Install pods/modules/packages to your pi that you can utilize with auxplayer. 
 uninstall     Uninstall pods/modules/packages to your pi that you can utilize with auxplayer. 
+reinstall     Alias for the uninstall and install commands.
 start         Start the docker processes for the aux server. 
 stop          Stop the docker processes for the aux server. 
 restart       Restart docker processes for the aux server. 
@@ -61,6 +62,20 @@ rfid          Uninstalls a collection of tools to work with RFID a reader/writer
 zerotier      Uninstalls a tool to do stuff.
 tethering     Uninstalls a collection of tools to allow tethering via usb or bluetooth.
 everything    Uninstalls everything available
+```
+### reinstall
+```
+Usage:    reinstall [OPTIONS]
+
+A tool to reinstall modules/pods/packages for your pi.
+
+Options:
+pishrink      Reinstalls a tool for shrinking pi images.
+raspiwifi     Reinstalls a tool to enable/disable hotspot mode.
+rfid          Reinstalls a collection of tools to work with RFID a reader/writer.
+zerotier      Reinstalls a tool to do stuff.
+tethering     Reinstalls a collection of tools to allow tethering via usb or bluetooth.
+everything    Reinstalls everything available
 ```
 
 ### start
