@@ -44,11 +44,11 @@ automatic_update_aux() {
             crontab -l
             echo "0 * * * * aux-cli update -a"
         ) | crontab -
-        sudo sed -i "s/autoupdate_aux="false"/autoupdate_aux="true"/g" /etc/aux-cli.conf
+        sudo sed -i "s/autoupdate_aux=\"false\"/autoupdate_aux=\"true\"/g" /etc/aux-cli.conf
     else
         echo "Disabling Automatic updates for AUX."
         crontab -l | grep -v "aux-cli update -a" | crontab -
-        sudo sed -i "s/autoupdate_aux="true"/autoupdate_aux="false"/g" /etc/aux-cli.conf
+        sudo sed -i "s/autoupdate_aux=\"true\"/autoupdate_aux=\"false\"/g" /etc/aux-cli.conf
     fi
 }
 
@@ -69,11 +69,11 @@ automatic_update_cli() {
             crontab -l
             echo "0 * * * * aux-cli update -c"
         ) | crontab -
-        sudo sed -i "s/autoupdate_cli="false"/autoupdate_cli="true"/g" /etc/aux-cli.conf
+        sudo sed -i "s/autoupdate_cli=\"false\"/autoupdate_cli=\"true\"/g" /etc/aux-cli.conf
     else
         echo "Disabling Automatic updates for AUX-CLI."
         crontab -l | grep -v "aux-cli update -c" | crontab -
-        sudo sed -i "s/autoupdate_cli="true"/autoupdate_cli="false"/g" /etc/aux-cli.conf
+        sudo sed -i "s/autoupdate_cli=\"true\"/autoupdate_cli=\"false\"/g" /etc/aux-cli.conf
     fi
 }
 
@@ -93,11 +93,11 @@ automatic_update_pi() {
             crontab -l
             echo "0 * * * * aux-cli update -p"
         ) | crontab -
-        sudo sed -i "s/autoupdate_pi="false"/autoupdate_pi="true"/g" /etc/aux-cli.conf
+        sudo sed -i "s/autoupdate_pi=\"false\"/autoupdate_pi=\"true\"/g" /etc/aux-cli.conf
     else
         echo "Disabling Automatic updates for your RaspberryPi (apt-get)."
         crontab -l | grep -v "aux-cli update -p" | crontab -
-        sudo sed -i "s/autoupdate_pi="true"/autoupdate_pi="false"/g" /etc/aux-cli.conf
+        sudo sed -i "s/autoupdate_pi=\"true\"/autoupdate_pi=\"false\"/g" /etc/aux-cli.conf
     fi
 }
 
