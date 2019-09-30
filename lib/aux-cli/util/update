@@ -30,8 +30,8 @@ err_msg() {
 update_aux() {
     # If hotspot mode is true, then do the work around
     aux-cli dhcpcd -s
-    sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output docker-compose.yml
-    docker-compose pull && docker-compose up -d
+    sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output /home/pi/docker-compose.yml
+    docker-compose -f /home/pi/docker-compose.yml pull && docker-compose -f /home/pi/docker-compose.yml up -d
     aux-cli dhcpcd -u
 }
 
