@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot backup -h help -v version)
+commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot backup help version)
 
 help_menu() {
     echo ""
@@ -21,8 +21,8 @@ help_menu() {
     echo "dhcpcd            Wrapper for setting and unsetting dhcpcd settings."
     echo "hotspot           Tool for managing hotspot mode."
     echo "backup            Creates a backup img of your pi."
-    echo "help      -h      Displays this help information."
-    echo "version   -v      Displays the aux-cli version."
+    echo "help              Displays this help information."
+    echo "version           Displays the aux-cli version."
     echo ""
     echo "Run 'aux-cli COMMAND --help' for more information on a command."
     echo ""
@@ -150,11 +150,11 @@ while [[ $# -gt 0 ]]; do
         . /lib/aux-cli/util/backup "${backup_array[@]}"
         break
         ;;
-    -v | version)
+    version)
         . /lib/aux-cli/util/version
         shift # past argument
         ;;
-    -h | help)
+    help)
         help_menu
         shift # past argument
         ;;
