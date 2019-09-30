@@ -34,6 +34,7 @@ ble_tethering() {
 install() {
     usb_tethering
     ble_tethering
+    sudo sed -i "s/tethering=\"false\"/tethering=\"true\"/g" /etc/aux-cli.conf
 }
 
 uninstall() {
@@ -52,6 +53,7 @@ uninstall() {
     sudo systemctl stop systemd-networkd
     sudo systemctl stop bt-agent
     sudo systemctl stop bt-network
+    sudo sed -i "s/tethering=\"true\"/tethering=\"false\"/g" /etc/aux-cli.conf
 }
 
 if [ "$1" == "uninstall" ]; then

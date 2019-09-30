@@ -21,6 +21,7 @@ install() {
     else
         echo "SPI is already enabled."
     fi
+    sudo sed -i "s/rfid=\"false\"/rfid=\"true\"/g" /etc/aux-cli.conf
 }
 
 uninstall() {
@@ -35,6 +36,7 @@ uninstall() {
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         sudo reboot now
     fi
+    sudo sed -i "s/rfid=\"true\"/rfid=\"false\"/g" /etc/aux-cli.conf
 }
 
 if [ "$1" == "uninstall" ]; then

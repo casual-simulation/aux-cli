@@ -8,10 +8,13 @@ install() {
 
     # Join Zero Tier Network
     #sudo zerotier-cli join $zt_network && sudo zerotier-cli info
+
+    sudo sed -i "s/zerotier=\"false\"/zerotier=\"true\"/g" /etc/aux-cli.conf
 }
 
 uninstall() {
     sudo apt-get remove zerotier-one
+    sudo sed -i "s/zerotier=\"true\"/zerotier=\"false\"/g" /etc/aux-cli.conf
 }
 
 if [ "$1" == "uninstall" ]; then

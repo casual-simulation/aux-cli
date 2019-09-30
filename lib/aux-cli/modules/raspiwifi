@@ -32,10 +32,12 @@ install() {
 
     # Clear out the repo afterwards
     sudo rm -rf "${working_dir}/RaspiWiFi"
+    sudo sed -i "s/raspiwifi=\"false\"/raspiwifi=\"true\"/g" /etc/aux-cli.conf
 }
 
 uninstall() {
     sudo python3 /usr/lib/raspiwifi/uninstall.py
+    sudo sed -i "s/raspiwifi=\"true\"/raspiwifi=\"false\"/g" /etc/aux-cli.conf
 }
 
 if [ "$1" == "uninstall" ]; then
