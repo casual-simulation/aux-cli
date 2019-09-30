@@ -17,19 +17,19 @@ Usage:        aux-cli [COMMAND]
 Command line tools for AUX dealing more with the hardware/server than auxplayer itself.  
 
 COMMANDS:  
-install       Install pods/modules/packages to your pi that you can utilize with auxplayer. 
-uninstall     Uninstall pods/modules/packages to your pi that you can utilize with auxplayer. 
-reinstall     Alias for the uninstall and install commands.
-start         Start the docker processes for the aux server. 
-stop          Stop the docker processes for the aux server. 
-restart       Restart docker processes for the aux server. 
-update        Update to the latest version of aux server. 
-changehost    Change the hostname of your pi. Applies after restart. 
-dhcpcd        Wrapper for setting and unsetting dhcpcd settings. 
-hotspot       Tool for managing hotspot mode. 
-backup        Creates a backup img of your pi. 
-help          Displays this help information. 
-
+install           Install pods/modules/packages to your pi that you can utilize with auxplayer. 
+uninstall         Uninstall pods/modules/packages to your pi that you can utilize with auxplayer. 
+reinstall         Alias for the uninstall and install commands.
+start             Start the docker processes for the aux server. 
+stop              Stop the docker processes for the aux server. 
+restart           Restart docker processes for the aux server. 
+update            Update to the latest version of aux server. 
+changehost        Change the hostname of your pi. Applies after restart. 
+dhcpcd            Wrapper for setting and unsetting dhcpcd settings. 
+hotspot           Tool for managing hotspot mode. 
+backup            Creates a backup img of your pi. 
+help      -h      Displays this help information.
+version   -v      Displays the aux-cli version.
 Run 'aux-cli COMMAND --help' for more information on a command. 
 ```
 
