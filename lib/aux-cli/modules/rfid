@@ -25,8 +25,10 @@ install() {
 }
 
 uninstall() {
+    sudo apt autoremove
     sudo pip3 uninstall -y spidev mfrc522
     sudo apt-get remove -y python3-pip python3-dev
+    sudo apt autoremove
 
     sudo sed -i "s/# Enable SPI//g" /boot/config.txt
     sudo sed -i "s/dtparam=spi=on//g" /boot/config.txt

@@ -6,6 +6,10 @@ cd "$(dirname "${BASH_SOURCE}")"
 
 # TODO: Grab a list of all install scripts next to this file, maybe make a manifest or something?
 
+# for filename in $(find /lib/aux-cli/modules -type f ! -name "*.*" ! -name install ! -name install ! -name reinstall ! -name uninstall); do
+#     basename "${filename}"
+# done
+
 help_menu() {
     echo ""
     echo "Usage:    install [OPTIONS]"

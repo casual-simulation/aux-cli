@@ -38,11 +38,11 @@ install() {
 }
 
 uninstall() {
+    sudo apt autoremove
     sudo apt-get remove -y usbmuxd
-    sudo systemctl disable usbmuxd
-    sudo systemctl stop usbmuxd
-
     sudo apt-get remove -y bluez-tools
+    sudo apt autoremove
+    
     sudo rm -rf /etc/systemd/network/pan0.netdev
     sudo rm -rf /etc/systemd/network/pan0.network
     sudo rm -rf /etc/systemd/system/bt-agent.service
