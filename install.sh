@@ -25,7 +25,7 @@ update_conf() {
 
     while IFS='=' read -r key value; do
         ary2[$key]=$value
-    done <<<$(grep -v '^$\|^\s*\#' /home/pi/etc/aux-cli.conf)
+    done <<<$(grep -v '^$\|^\s*\#' /home/pi/aux-cli/etc/aux-cli.conf)
 
     for i in "${!ary2[@]}"; do
         if [[ ${ary1[$i]} ]]; then
