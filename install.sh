@@ -15,6 +15,44 @@ clone_repo() {
     git clone https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
 }
 
+update_conf() {
+    declare -A ary1
+    declare -A ary2
+
+    while IFS='=' read -r key value; do
+        ary1[$key]=$value
+    done <<<$(grep -v '^$\|^\s*\#' /etc/aux-cli.conf)
+
+    while IFS='=' read -r key value; do
+        ary2[$key]=$value
+    done <<<$(grep -v '^$\|^\s*\#' /home/pi/aux-cli.conf)
+
+    for i in "${!ary2[@]}"; do
+        if [[ ${ary1[$i]} ]]; then
+
+            # oldconf=$(grep -n "$i" /etc/aux-cli.conf)
+            # newconf=$(grep -n "$i" /home/pi/aux-cli.conf)
+            # if [ "$oldconf" == "$newconf" ]; then
+            #     echo yay $i
+            # else
+            #     line_number=$(grep -n "$i" /home/pi/aux-cli.conf | grep -Eo '^[^:]+')
+            #     num=$((line_number + 1))
+            #     sed -i "${num}i \n" /etc/aux-cli.conf
+            # fi
+
+            if [ "$i" == "version" ]; then
+                sed -i "s/version=\".*\"/version=${ary2[$i]}/g" /etc/aux-cli.conf
+            fi
+        fi
+
+        if [[ ! ${ary1[$i]} ]]; then
+            echo "no key  : $i"
+            line_number=$(grep -n "$i" /home/pi/aux-cli.conf | grep -Eo '^[^:]+')
+            sed -i "${line_number}i ${i}=${ary2[$i]}" /etc/aux-cli.conf
+        fi
+    done
+}
+
 make_executable() {
     for filename in $(find /home/pi/aux-cli -type f ! -name "*.*"); do
         chmod +x "${filename}"
@@ -23,7 +61,6 @@ make_executable() {
 
 deploy_files() {
     sudo cp -rf /home/pi/aux-cli/bin /
-    sudo cp -rf /home/pi/aux-cli/etc /
     sudo cp -rf /home/pi/aux-cli/lib /
 }
 
@@ -64,6 +101,7 @@ update() {
     clone_repo
     make_executable
     deploy_files
+    update_conf
     cleanup
 }
 
