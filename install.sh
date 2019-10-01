@@ -25,7 +25,7 @@ update_conf() {
 
     while IFS='=' read -r key value; do
         ary2[$key]=$value
-    done <<<$(grep -v '^$\|^\s*\#' /home/pi/aux-cli.conf)
+    done <<<$(grep -v '^$\|^\s*\#' /home/pi/etc/aux-cli.conf)
 
     for i in "${!ary2[@]}"; do
         if [[ ${ary1[$i]} ]]; then
@@ -46,7 +46,6 @@ update_conf() {
         fi
 
         if [[ ! ${ary1[$i]} ]]; then
-            echo "no key  : $i"
             line_number=$(grep -n "$i" /home/pi/aux-cli.conf | grep -Eo '^[^:]+')
             sed -i "${line_number}i ${i}=${ary2[$i]}" /etc/aux-cli.conf
         fi
