@@ -46,7 +46,7 @@ update_conf() {
         fi
 
         if [[ ! ${ary1[$i]} ]]; then
-            line_number=$(grep -n "$i" /home/pi/aux-cli.conf | grep -Eo '^[^:]+')
+            line_number=$(grep -n "$i" /home/pi/aux-cli/etc/aux-cli.conf | grep -Eo '^[^:]+')
             sed -i "${line_number}i ${i}=${ary2[$i]}" /etc/aux-cli.conf
         fi
     done
