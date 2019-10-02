@@ -48,11 +48,7 @@ uninstall() {
     sudo rm -rf /etc/systemd/system/bt-agent.service
     sudo rm -rf /etc/systemd/system/bt-network.service
     sudo systemctl disable systemd-networkd
-    sudo systemctl disable bt-agent
-    sudo systemctl disable bt-network
     sudo systemctl stop systemd-networkd
-    sudo systemctl stop bt-agent
-    sudo systemctl stop bt-network
     sudo sed -i "s/tethering=\"true\"/tethering=\"false\"/g" /etc/aux-cli.conf
 }
 
