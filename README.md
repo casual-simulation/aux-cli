@@ -28,8 +28,8 @@ changehost        Change the hostname of your pi. Applies after restart.
 dhcpcd            Wrapper for setting and unsetting dhcpcd settings. 
 hotspot           Tool for managing hotspot mode. 
 backup            Creates a backup img of your pi. 
-help      -h      Displays this help information.
-version   -v      Displays the aux-cli version.
+help              Displays this help information.
+version           Displays the aux-cli version.
 Run 'aux-cli COMMAND --help' for more information on a command. 
 ```
 
@@ -63,6 +63,7 @@ zerotier      Uninstalls a tool to do stuff.
 tethering     Uninstalls a collection of tools to allow tethering via usb or bluetooth.
 everything    Uninstalls everything available
 ```
+
 ### reinstall
 ```
 Usage:    reinstall [OPTIONS]
@@ -112,6 +113,7 @@ Options:
 -C    --cli_auto      Toggle automatic updates on or off for CLI.
 -p    --pi            Updates the software for your RaspberryPi (apt-get).
 -P    --pi_auto       Toggle automatic updates on or off for your RaspberryPi (apt-get).
+-y                    Bypass prompt to update.
 -h    --help          Displays this help information.
 ```
 
