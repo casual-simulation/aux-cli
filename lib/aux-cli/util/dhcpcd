@@ -24,49 +24,47 @@ err_msg() {
 }
 raspiwifi_check() {
     . /etc/aux-cli.conf
-    if ${raspiwifi} == "false"; then
+    if [ "${raspiwifi}" == "false" ]; then
         echo "RaspiWiFi is not installed. There is no reason to set/unset dhcpcd."
         return 1
     fi
 }
 
 dhcpcd_set() {
-    if raspiwifi_check; then
-        if aux-cli hotspot -c; then
-            if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
-                echo "DHCPCD has already been set."
-                return 1
-            fi
-            # if [ "$(cat /sys/class/net/eth0/operstate)" == "down" ]; then # TODO: Check for WiFi/Bluetooth Hotspot also.
-            #     echo "You need a wired internet connection while in Hotspot/AP Mode to use the internet."
-            #     return 1
-            # fi
-            echo "Modifying dchpcd.conf"
-            echo "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" | sudo tee -a /etc/dhcpcd.conf
-
-            echo "Reloading dhcpcd"
-            sudo systemctl daemon-reload
-            sudo systemctl restart dhcpcd
-            sleep 10
-        else
-            echo "There's no need to dhcpcd set."
+    raspiwifi_check
+    if aux-cli hotspot -c; then
+        if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
+            echo "DHCPCD has already been set."
+            return 1
         fi
+        # if [ "$(cat /sys/class/net/eth0/operstate)" == "down" ]; then # TODO: Check for WiFi/Bluetooth Hotspot also.
+        #     echo "You need a wired internet connection while in Hotspot/AP Mode to use the internet."
+        #     return 1
+        # fi
+        echo "Modifying dchpcd.conf"
+        echo "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" | sudo tee -a /etc/dhcpcd.conf
+
+        echo "Reloading dhcpcd"
+        sudo systemctl daemon-reload
+        sudo systemctl restart dhcpcd
+        sleep 10
+    else
+        echo "There's no need to dhcpcd set."
     fi
 }
 
 dhcpcd_unset() {
-    if raspiwifi_check; then
-        if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
-            echo "Unmodifying dchpcd.conf"
-            sudo sed -i '/static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4/d' /etc/dhcpcd.conf
+    raspiwifi_check
+    if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
+        echo "Unmodifying dchpcd.conf"
+        sudo sed -i '/static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4/d' /etc/dhcpcd.conf
 
-            echo "Reloading dhcpcd"
-            sudo systemctl daemon-reload
-            sudo systemctl restart dhcpcd
-            sleep 10
-        else
-            echo "DHCPCD wasn't set."
-        fi
+        echo "Reloading dhcpcd"
+        sudo systemctl daemon-reload
+        sudo systemctl restart dhcpcd
+        sleep 10
+    else
+        echo "DHCPCD wasn't set."
     fi
 }
 
