@@ -27,12 +27,12 @@ install() {
 
     # Run the RaspiWiFi setup
     echo "DEBUG: Running RaspiWiFi..."
-    cd RaspiWiFi
-    sudo python3 initial_setup.py
-
-    # Clear out the repo afterwards
-    sudo rm -rf "${working_dir}/RaspiWiFi"
     sudo sed -i "s/raspiwifi=\"false\"/raspiwifi=\"true\"/g" /etc/aux-cli.conf
+    cd RaspiWiFi
+    sudo python3 initial_setup.py # Triggers a reboot
+
+    # Clear out the repo afterwards - Never makes it here
+    sudo rm -rf "${working_dir}/RaspiWiFi"
 }
 
 uninstall() {

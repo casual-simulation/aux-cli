@@ -78,6 +78,8 @@ done
 
 version_check() {
     echo "Checking for newer versions of AUX-CLI..."
+    # If hotspot mode is true, then do the work around
+    aux-cli dhcpcd -s
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/aux-cli.conf --output /home/pi/aux-cli.conf
     new_version=$(grep "version=.*" aux-cli.conf)
     old_version=$(grep "version=.*" /etc/aux-cli.conf)
