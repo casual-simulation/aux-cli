@@ -67,6 +67,9 @@ cleanup() {
     if [ -e /home/pi/aux-cli ]; then
         sudo rm -rf /home/pi/aux-cli
     fi
+    if [ -e /home/pi/aux-cli.conf ]; then
+        sudo rm -rf /home/pi/aux-cli.conf
+    fi
     if [ -e /home/pi/aux-cli-bkp ]; then
         sudo rm -rf /home/pi/aux-cli-bkp
     fi
