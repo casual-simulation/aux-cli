@@ -142,7 +142,7 @@ dep_check() {
                 sudo apt-get install -y "${dep}"
             else
                 read -p "Install dependency '${dep}' by pressing 'y' or press anything else to exit." -n 1 -r
-                echo
+                echo # Gives us a newline
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
                     echo "Installing ${dep} now."
                     sudo apt-get install -y "${dep}"
@@ -161,7 +161,7 @@ dep_check() {
                 sudo apt-get install -y zip
             else
                 read -p "Install dependency 'zip' by pressing 'y' or press anything else to exit." -n 1 -r
-                echo
+                echo # Gives us a newline
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
                     echo "Installing Zip now."
                     sudo apt-get install -y zip
@@ -182,7 +182,7 @@ dep_check() {
                 sudo mv pishrink.sh /usr/local/bin
             else
                 read -p "Install dependency 'PiShrink' by pressing 'y' or press anything else to exit." -n 1 -r
-                echo
+                echo # Gives us a newline
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
                     echo "Installing PiShrink now."
                     wget https://raw.githubusercontent.com/framps/PiShrink/offer_filesystem_repair_option/pishrink.sh
@@ -281,7 +281,7 @@ storage_check() {
             echo "The specified storage device was too small."
             if [ "${valid_drives_exist}" == "true" ]; then
                 read -p "Press 'y' to use the largest drive \"${largest_name}\" or press anything else to exit." -n 1 -r
-                echo
+                echo # Gives us a newline
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
                     storage="${largest_name}"
                 else

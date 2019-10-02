@@ -88,7 +88,7 @@ version_check() {
             return 0
         else
             read -p "There is a newer version of AUX-CLI available. Press 'y' to update now, or press anything else to exit." -n 1 -r
-            echo
+            echo # Gives us a newline
             if [[ $REPLY =~ ^[Yy]$ ]]; then
                 return 0
             else

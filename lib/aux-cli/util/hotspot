@@ -51,7 +51,7 @@ hotspot_disable() {
     echo "Hotspot Disabled!"
 
     read -p "Disabling Hotspot Mode requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r
-    echo
+    echo # Gives us a newline
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         sudo reboot now
     else
