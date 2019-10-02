@@ -22,9 +22,16 @@ err_msg() {
     echo ""
     exit 1
 }
-
+raspiwifi_check() {
+    . /etc/aux-cli.conf
+    if ${raspiwifi} == "false"; then
+        echo "RaspiWiFi is not installed. There is no reason to set/unset dhcpcd."
+        return 1
+    fi
+}
 
 dhcpcd_set() {
+    raspiwifi_check
     if aux-cli hotspot -c; then
         if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
             echo "DHCPCD has already been set."
@@ -47,6 +54,7 @@ dhcpcd_set() {
 }
 
 dhcpcd_unset() {
+    raspiwifi_check
     if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
         echo "Unmodifying dchpcd.conf"
         sudo sed -i '/static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4/d' /etc/dhcpcd.conf

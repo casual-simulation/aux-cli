@@ -81,6 +81,7 @@ version_check() {
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/aux-cli.conf --output /home/pi/aux-cli.conf
     new_version=$(grep "version=.*" aux-cli.conf)
     old_version=$(grep "version=.*" /etc/aux-cli.conf)
+    sudo rm -rf /home/pi/aux-cli.conf
 
     if [[ $new_version > $old_version ]]; then
         if [ "${agree}" == "true" ]; then
