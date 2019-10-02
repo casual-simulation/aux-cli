@@ -38,10 +38,10 @@ install() {
 uninstall() {
     sudo apt autoremove
     if [ -e /usr/lib/raspiwifi/uninstall.py ]; then
+        sudo sed -i "s/raspiwifi=\"true\"/raspiwifi=\"false\"/g" /etc/aux-cli.conf
         sudo python3 /usr/lib/raspiwifi/uninstall.py
     fi
     sudo apt autoremove
-    sudo sed -i "s/raspiwifi=\"true\"/raspiwifi=\"false\"/g" /etc/aux-cli.conf
 }
 
 if [ "$1" == "uninstall" ]; then
