@@ -45,8 +45,8 @@ hotspot_disable() {
     sudo rm /etc/cron.raspiwifi/aphost_bootstrapper || echo "/etc/cron.raspiwifi/aphost_bootstrapper does not exist."
     sudo cp /usr/lib/raspiwifi/reset_device/static_files/apclient_bootstrapper /etc/cron.raspiwifi/
     sudo chmod +x /etc/cron.raspiwifi/apclient_bootstrapper
-    sudo mv /etc/dnsmasq.conf.original /etc/dnsmasq.conf || echo "/etc/dnsmasq.conf.original"
-    sudo mv /etc/dhcpcd.conf.original /etc/dhcpcd.conf || echo "/etc/dhcpcd.conf.original"
+    sudo mv /etc/dnsmasq.conf.original /etc/dnsmasq.conf || sudo cp /lib/aux-cli/modules/raspi-wifi/dnsmasq.conf /etc/dnsmasq.conf
+    sudo mv /etc/dhcpcd.conf.original /etc/dhcpcd.conf || sudo cp /lib/aux-cli/modules/raspi-wifi/dhcpcd.conf /etc/dhcpcd.conf
 
     echo "Hotspot Disabled!"
 
