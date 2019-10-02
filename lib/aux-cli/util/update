@@ -99,6 +99,7 @@ version_check() {
         fi
     else
         echo "You have the latest version of AUX-CLI."
+        aux-cli dhcpcd -u
         return 1
     fi
 }
