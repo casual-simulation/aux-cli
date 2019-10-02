@@ -76,16 +76,47 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+vercomp () {
+    if [[ $1 == $2 ]]; then
+        return 1
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++)); do
+        if [[ -z ${ver2[i]} ]]; then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            return 0
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 1
+        fi
+    done
+    return 0
+}
+
 version_check() {
     echo "Checking for newer versions of AUX-CLI..."
     # If hotspot mode is true, then do the work around
     aux-cli dhcpcd -s
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/aux-cli.conf --output /home/pi/aux-cli.conf
     new_version=$(grep "version=.*" aux-cli.conf)
+    new_version=${new_version##*=}
+    new_version=$(sed -e 's/^"//' -e 's/"$//' <<<$new_version)
+
     old_version=$(grep "version=.*" /etc/aux-cli.conf)
+    old_version=${old_version##*=}
+    old_version=$(sed -e 's/^"//' -e 's/"$//' <<<$old_version)
+
     sudo rm -rf /home/pi/aux-cli.conf
 
-    if [[ $new_version > $old_version ]]; then
+    if vercomp $new_version $old_version; then
         if [ "${agree}" == "true" ]; then
             return 0
         else
