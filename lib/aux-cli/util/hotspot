@@ -47,6 +47,7 @@ hotspot_disable() {
     sudo chmod +x /etc/cron.raspiwifi/apclient_bootstrapper
     sudo mv /etc/dnsmasq.conf.original /etc/dnsmasq.conf || sudo cp /lib/aux-cli/modules/raspi-wifi/dnsmasq.conf /etc/dnsmasq.conf
     sudo mv /etc/dhcpcd.conf.original /etc/dhcpcd.conf || sudo cp /lib/aux-cli/modules/raspi-wifi/dhcpcd.conf /etc/dhcpcd.conf
+    sudo mv /etc/wpa_supplicant/wpa_supplicant.conf.original /etc/wpa_supplicant/wpa_supplicant.conf || echo "You're original wpa_supplicant.conf is missing."
 
     echo "Hotspot Disabled!"
 
