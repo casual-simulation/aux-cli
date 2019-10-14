@@ -7,6 +7,41 @@ read_conf() {
     . /etc/aux-cli.conf
 }
 
+dnsmasq_checker() {
+    dnsmasq_conf="/etc/dnsmasq.conf"
+    if [ -e "${dnsmasq_conf}" ]; then
+        if sudo grep "dhcp-range=" "${dnsmasq_conf}"; then
+            sudo sed -i "s/dhcp-range=.*/dhcp-range=10.0.0.10,10.0.0.110,12h/g" "${dnsmasq_conf}"
+        else
+            echo "dhcp-range=10.0.0.10,10.0.0.110,12h" | sudo tee -a "${dnsmasq_conf}"
+        fi
+
+        if ! sudo grep "address=/auxplayer.com/10.0.0.1" "${dnsmasq_conf}"; then
+            echo "address=/auxplayer.com/10.0.0.1" | sudo tee -a "${dnsmasq_conf}"
+        fi
+    fi
+}
+
+wpa_checker() {
+    wpa_conf="/etc/wpa_supplicant/wpa_supplicant.conf"
+    if [ -e "${wpa_conf}" ]; then
+        if sudo grep "country=" "${wpa_conf}"; then
+            sudo sed -i "s/country=.*/country=US/g" "${wpa_conf}"
+        else
+            line_number=$(sudo grep -ne '^$' "${wpa_conf}" | grep -Eo '^[^:]+')
+            sudo sed -i "${line_number}i country=US" "${wpa_conf}"
+        fi
+
+        if sudo grep "scan_ssid=" "${wpa_conf}"; then
+            sudo sed -i "s/scan_ssid=.*/scan_ssid=1/g" "${wpa_conf}"
+        else
+            line_number=$(sudo grep -n "network=" "${wpa_conf}" | grep -Eo '^[^:]+')
+            line_number=$((line_number + 1))
+            sudo sed -i "${line_number}i \\ \\ \\ \\ scan_ssid=1" "${wpa_conf}"
+        fi
+    fi
+}
+
 mac_check() {
     echo "Checking the MAC."
     oldfour=$(grep -Eo "ssid=.*? ...." /etc/hostapd/hostapd.conf | tail -c 5)
@@ -53,6 +88,8 @@ reboot_check() {
 run_steps() {
     reboot_required="false"
     read_conf
+    dnsmasq_checker
+    wpa_checker
     if [ $raspiwifi == "true" ]; then
         mac_check
         mac_set

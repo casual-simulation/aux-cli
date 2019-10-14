@@ -60,6 +60,7 @@ make_executable() {
 
 deploy_files() {
     sudo cp -rf /home/pi/aux-cli/bin /
+    sudo cp -rf /home/pi/aux-cli/data /
     if [ ! -e /etc/aux-cli.conf ]; then
         sudo cp -rf /home/pi/aux-cli/etc /
     fi
