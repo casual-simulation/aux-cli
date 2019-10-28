@@ -22,6 +22,7 @@ help_menu() {
     echo "rfid          Installs a collection of tools to work with RFID a reader/writer."
     echo "zerotier      Installs a tool to do stuff."
     echo "tethering     Installs a collection of tools to allow tethering via usb or bluetooth."
+    echo "usbmount      Installs a tool for automatically mounting external storage to a specified directory."
     echo "everything    Installs everything available"
     echo ""
     exit 1
@@ -69,11 +70,17 @@ while [[ $# -gt 0 ]]; do
         . tethering
         shift # past argument
         ;;
+    usbmount)
+        aux-cli dhcpcd -s
+        . usbmount
+        shift # past argument
+        ;;
     everything)
         aux-cli dhcpcd -s
         . pishrink
         . rfid
         . zerotier
+        . usbmount
         . tethering
         . raspiwifi
         shift # past argument
