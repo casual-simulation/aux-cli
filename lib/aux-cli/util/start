@@ -1,15 +1,12 @@
 #!/bin/bash
 set -e
 
-error_msg="Docker Compose failed to start."
 echo "Starting Docker."
-if [ -e /data/db/mongod.lock ]; then
-    sudo rm -rf /data/db/mongod.lock
-fi
 
 # If hotspot mode is enabled, bypass it temporarily
 aux-cli dhcpcd -s
 
+error_msg="Docker Compose failed to start."
 while [[ $(docker-compose up -d || echo "$error_msg") == "$error_msg" ]]; do
     echo "Docker isn't started yet."
     sleep 1

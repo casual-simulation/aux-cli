@@ -48,6 +48,17 @@ install() {
     echo "Modifying /lib/systemd/system/systemd-udevd.service"
     sudo sed -i "s/^PrivateMounts=yes/PrivateMounts=no/g" /lib/systemd/system/systemd-udevd.service
 
+    line_number=$(sudo grep -n "# Try to use specifications in /etc/fstab first." "/usr/share/usbmount/usbmount" | grep -Eo '^[^:]+')
+    num=$((line_number + 1))
+    sudo sed -i "${num}s/if egrep -q/elif egrep -q/g" "/usr/share/usbmount/usbmount"
+
+    sudo sed -i "${line_number}i \\ \\ \\ \\ \\ \\ \\ \\ log info \"Device \$DEVNAME is labeled 'rootfs'; not mounting it\"" "/usr/share/usbmount/usbmount"
+    sudo sed -i "${line_number}i \\ \\ \\ \\ elif echo \$DEVINFO | grep \"LABEL=\"rootfs\"\"; then" "/usr/share/usbmount/usbmount"
+    sudo sed -i "${line_number}i \\ \\ \\ \\ # Don't automount boot usb again for uuid" "/usr/share/usbmount/usbmount"
+    sudo sed -i "${line_number}i \\ \\ \\ \\ \\ \\ \\ \\  log info \"Device \$DEVNAME is a boot partition; not mounting it\"" "/usr/share/usbmount/usbmount"
+    sudo sed -i "${line_number}i \\ \\ \\ \\ if echo \$DEVINFO | grep \"LABEL_FATBOOT=\"; then" "/usr/share/usbmount/usbmount"
+    sudo sed -i "${line_number}i \\ \\ \\ \\ # Don't automount boot usb again" "/usr/share/usbmount/usbmount"
+
     # Update /etc/aux-cli.conf
     sudo sed -i "s/usbmount=\"false\"/usbmount=\"true\"/g" /etc/aux-cli.conf
 }
