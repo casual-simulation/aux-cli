@@ -53,7 +53,7 @@ install() {
     sudo sed -i "${num}s/if egrep -q/elif egrep -q/g" "/usr/share/usbmount/usbmount"
 
     sudo sed -i "${line_number}i \\ \\ \\ \\ \\ \\ \\ \\ log info \"Device \$DEVNAME is labeled 'rootfs'; not mounting it\"" "/usr/share/usbmount/usbmount"
-    sudo sed -i "${line_number}i \\ \\ \\ \\ elif echo \$DEVINFO | grep \"LABEL=\"rootfs\"\"; then" "/usr/share/usbmount/usbmount"
+    sudo sed -i "${line_number}i \\ \\ \\ \\ elif echo \$DEVINFO | grep \"LABEL=\\\\\"rootfs\\\\\"\"; then" "/usr/share/usbmount/usbmount"
     sudo sed -i "${line_number}i \\ \\ \\ \\ # Don't automount boot usb again for uuid" "/usr/share/usbmount/usbmount"
     sudo sed -i "${line_number}i \\ \\ \\ \\ \\ \\ \\ \\  log info \"Device \$DEVNAME is a boot partition; not mounting it\"" "/usr/share/usbmount/usbmount"
     sudo sed -i "${line_number}i \\ \\ \\ \\ if echo \$DEVINFO | grep \"LABEL_FATBOOT=\"; then" "/usr/share/usbmount/usbmount"
