@@ -61,6 +61,8 @@ install() {
 
     # Update /etc/aux-cli.conf
     sudo sed -i "s/usbmount=\"false\"/usbmount=\"true\"/g" /etc/aux-cli.conf
+
+    cd "${PWD}"
 }
 
 uninstall() {
