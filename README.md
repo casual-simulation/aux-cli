@@ -171,3 +171,18 @@ OPTIONS:
 -y                            Bypass prompt to install dependencies.
 -h    --help                  Displays this help information.
 ```
+
+### version
+```
+Usage:    version [OPTIONS]
+
+A command that outputs the current aux-cli version.
+```
+
+
+### info
+```
+Usage:    info [OPTIONS]
+
+A command that outputs some potentially helpful system info.
+```
