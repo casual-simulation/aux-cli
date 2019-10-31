@@ -1,0 +1,68 @@
+#!/bin/bash
+set -e
+
+get_info() {
+    HOSTNAME=$(uname -n)
+    RASPBIANVER=$(cat /etc/debian_version)
+    KERNEL=$(uname -r)
+    CORES=$(grep -c ^processor /proc/cpuinfo)
+    ARCH=$(uname -m)
+    MEMUSED=$(free -m | grep "Mem" | awk {'print $3'})
+    MEMFREE=$(free -m | grep "Mem" | awk {'print $4'})
+
+    ETH0IP="$(ip addr list eth0 2>&1 | grep "inet " | cut -d' ' -f6 | cut -d/ -f1)"
+    WLAN0IP="$(ip addr list wlan0 2>&1 | grep "inet " | cut -d' ' -f6 | cut -d/ -f1)"
+    if [ "$ETH0IP" = "" ]; then
+        ETH0IP="unassigned"
+    fi
+    if [ "$WLAN0IP" = "" ]; then
+        WLAN0IP="unassigned"
+    fi
+    ETH0MAC="$(ip addr list eth0 2>&1 | grep "ether " | cut -d' ' -f6 | cut -d/ -f1)"
+    WLAN0MAC="$(ip addr list wlan0 2>&1 | grep "ether " | cut -d' ' -f6 | cut -d/ -f1)"
+    if [ "$ETH0MAC" = "" ]; then
+        ETH0MAC="no adapter"
+    fi
+    if [ "$WLAN0MAC" = "" ]; then
+        WLAN0MAC="no adapter"
+    fi
+
+    ROOTSIZE="$(df -h | grep /dev/root | awk '{print $2}')"
+    ROOTUSED="$(df | grep /dev/root | awk '{print $5}')"
+    ROOTAVAIL="$(df -h | grep /dev/root | awk '{print $4}')"
+
+    NOW=$(date +"%Y-%m-%d %T")
+    UPTIME="$(uptime -p)"
+
+    TEMP=$(awk '{printf "%3.1f\302\260C\n", $1/1000}' /sys/class/thermal/thermal_zone0/temp)
+
+    HOSTAPDVER=$(hostapd -v 2>&1 | awk 'NR==1 { print  $2 }' | cut -c2-)
+    WIRINGPI_VER=$(gpio -v 2>&1 | awk 'NR==1 { print  $3 }')
+    RPI_GPIO_VER=$(grep -iRl "RPi.GPIO-" /usr/local/lib/python3.7/dist-packages/ | awk -F "." '{print $3 "." $4 "." $5}' | cut -f 2 -d "-")
+}
+
+print_info(){
+    echo "The Hostname is: ${HOSTNAME}."
+    echo "The Raspbian Version is: ${RASPBIANVER}."
+    echo "The Kernel is: ${KERNEL}."
+    echo "The Core Count is: ${CORES}."
+    echo "The Architecture is: ${ARCH}."
+    echo "The Used Memory is: ${MEMUSED}."
+    echo "The Available Memory is: ${MEMFREE}."
+    echo "The eth0 IP is: ${ETH0IP}."
+    echo "The eth0 MAC Address is: ${ETH0MAC}."
+    echo "The wlan0 is: ${WLAN0IP}."
+    echo "The wlan0 MAC Address is: ${WLAN0MAC}."
+    echo "The Root Size is: ${ROOTSIZE}."
+    echo "The Root Used is: ${ROOTUSED}."
+    echo "The Root Capacity is: ${ROOTAVAIL}."
+    echo "The Date/Time is: ${NOW}."
+    echo "The Uptime is: ${UPTIME}."
+    echo "The Temperature is: ${TEMP}."
+    echo "The HostAPD Version is: ${HOSTAPDVER}."
+    echo "The Wiring Version is: ${WIRINGPI_VER}."
+    echo "The GPIO Version is: ${RPI_GPIO_VER}."
+}
+
+get_info
+print_info
