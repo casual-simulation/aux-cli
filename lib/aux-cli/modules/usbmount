@@ -1,9 +1,16 @@
 #!/bin/bash
 set -e
 
+RDIR=$(dirname "${BASH_SOURCE}")
+DIR=$(cd $RDIR;pwd)
+
+read_conf() {
+    . /etc/aux-cli.conf
+}
+
 install() {
     # Install dependencies for usbmount
-    echo "DEBUG: Setting up USB Auto-Mount..."
+    echo "DEBUG: Setting up USBMount..."
     sudo apt-get install -y git debhelper build-essential ntfs-3g exfat-fuse exfat-utils usbmount
 
     sudo mkdir -p /data
@@ -62,7 +69,7 @@ install() {
     # Update /etc/aux-cli.conf
     sudo sed -i "s/usbmount=\"false\"/usbmount=\"true\"/g" /etc/aux-cli.conf
 
-    cd "${PWD}"
+    cd "${DIR}"
 }
 
 uninstall() {
@@ -73,8 +80,18 @@ uninstall() {
     sudo sed -i "s/usbmount=\"true\"/usbmount=\"false\"/g" /etc/aux-cli.conf
 }
 
+read_conf
+
 if [ "$1" == "uninstall" ]; then
-    uninstall
+    if [ $usbmount == "true" ]; then
+        uninstall
+    else
+        echo "USBMount is not installed. Skipping uninstallation."
+    fi
 else
-    install
+    if [ $usbmount == "false" ]; then
+        install
+    else
+        echo "USBMount is already installed. Skipping installation."
+    fi
 fi

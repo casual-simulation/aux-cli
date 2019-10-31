@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+read_conf() {
+    . /etc/aux-cli.conf
+}
+
 install() {
     # Install Zero Tier
     echo "DEBUG: Installing ZeroTier..."
@@ -20,8 +24,18 @@ uninstall() {
     sudo sed -i "s/zerotier=\"true\"/zerotier=\"false\"/g" /etc/aux-cli.conf
 }
 
+read_conf
+
 if [ "$1" == "uninstall" ]; then
-    uninstall
+    if [ $zerotier == "true" ]; then
+        uninstall
+    else
+        echo "ZeroTier is not installed. Skipping uninstallation."
+    fi
 else
-    install
+    if [ $zerotier == "false" ]; then
+        install
+    else
+        echo "ZeroTier is already installed. Skipping installation."
+    fi
 fi

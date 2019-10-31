@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+read_conf() {
+    . /etc/aux-cli.conf
+}
+
 usb_tethering() {
     # Connect via usb and trust after this runs
     sudo apt-get install -y usbmuxd
@@ -52,8 +56,18 @@ uninstall() {
     sudo sed -i "s/tethering=\"true\"/tethering=\"false\"/g" /etc/aux-cli.conf
 }
 
+read_conf
+
 if [ "$1" == "uninstall" ]; then
-    uninstall
+    if [ $tethering == "true" ]; then
+        uninstall
+    else
+        echo "Tethering is not installed. Skipping uninstallation."
+    fi
 else
-    install
+    if [ $tethering == "false" ]; then
+        install
+    else
+        echo "Tethering is already installed. Skipping installation."
+    fi
 fi

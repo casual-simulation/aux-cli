@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+read_conf() {
+    . /etc/aux-cli.conf
+}
+
 install() {
     # Install rfid python tools
     echo "DEBUG: Setting up RFID Tools..."
@@ -41,8 +45,18 @@ uninstall() {
     sudo sed -i "s/rfid=\"true\"/rfid=\"false\"/g" /etc/aux-cli.conf
 }
 
+read_conf
+
 if [ "$1" == "uninstall" ]; then
-    uninstall
+    if [ $rfid == "true" ]; then
+        uninstall
+    else
+        echo "RFID is not installed. Skipping uninstallation."
+    fi
 else
-    install
+    if [ $rfid == "false" ]; then
+        install
+    else
+        echo "RFID is already installed. Skipping installation."
+    fi
 fi
