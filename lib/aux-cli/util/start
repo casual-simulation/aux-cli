@@ -3,15 +3,10 @@ set -e
 
 echo "Starting Docker."
 
-# If hotspot mode is enabled, bypass it temporarily
-aux-cli dhcpcd -s
-
 error_msg="Docker Compose failed to start."
 while [[ $(docker-compose up -d || echo "$error_msg") == "$error_msg" ]]; do
     echo "Docker isn't started yet."
     sleep 1
 done
-
-aux-cli dhcpcd -u
 
 echo "Docker is started."
