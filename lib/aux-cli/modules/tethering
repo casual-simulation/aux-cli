@@ -13,26 +13,15 @@ usb_tethering() {
 }
 
 ble_tethering() {
+    sudo apt-get install -y bluez-tools python-dbus python-gobject python-gobject-2 git
 
-    sudo apt-get install bluez-tools -y
+    old_dtimeout=$(grep DiscoverableTimeout /etc/bluetooth/main.conf)
+    new_dtimeout="DiscoverableTimeout = 0"
+    sudo sed -i "s/$old_dtimeout/$new_dtimeout/g" /etc/bluetooth/main.conf
 
-    sudo cp -rf /lib/aux-cli/modules/ble/pan0.netdev /etc/systemd/network
-    sudo cp -rf /lib/aux-cli/modules/ble/pan0.network /etc/systemd/network
-    sudo cp -rf /lib/aux-cli/modules/ble/bt-agent.service /etc/systemd/system
-    sudo cp -rf /lib/aux-cli/modules/ble/bt-network.service /etc/systemd/system
-
-    sudo systemctl enable systemd-networkd
-    sudo systemctl enable bt-agent
-    sudo systemctl enable bt-network
-    sudo systemctl start systemd-networkd
-    sudo systemctl start bt-agent
-    sudo systemctl start bt-network
-
-    sudo bt-adapter --set PairableTimeout 0
-    sudo bt-adapter --set Pairable 1
-    sudo bt-adapter --set DiscoverableTimeout 0
-    sudo bt-adapter --set Discoverable 1
-
+    old_ptimeout=$(grep PairableTimeout /etc/bluetooth/main.conf)
+    new_ptimeout="PairableTimeout = 0"
+    sudo sed -i "s/$old_ptimeout/$new_ptimeout/g" /etc/bluetooth/main.conf
 }
 
 install() {

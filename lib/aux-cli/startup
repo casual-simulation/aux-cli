@@ -12,6 +12,31 @@ read_conf() {
     . /etc/aux-cli.conf
 }
 
+start_bluetooth() {
+
+    sudo bluetoothctl <<EOF
+power on
+discoverable on
+pairable on
+EOF
+
+    STR=$(hostname)
+    HEXVAL=$(xxd -pu <<<"$STR")
+    HEXVAL=${HEXVAL::-2}
+    HEXLEN=${#HEXVAL}
+
+    while [ $HEXLEN -lt 22 ]; do
+        HEXVAL="${HEXVAL}0"
+        HEXLEN=${#HEXVAL}
+    done
+
+    INQ="0c09${HEXVAL}020a00091002006b1d460217050d03001801180e110c1115110b1100"
+
+    sudo hciconfig hci0 sspmode 1
+    sudo hciconfig hci0 inqdata $INQ
+    sudo /usr/bin/bt-agent -c NoInputNoOutput &
+}
+
 wlan_checker() {
     # Check if there is an extra wlan present and use it
     if grep wlan1 /proc/net/dev; then
@@ -105,6 +130,9 @@ run_steps() {
     wlan_checker
     dnsmasq_checker
     wpa_checker
+    if [ $tethering == "true" ]; then
+        start_bluetooth
+    fi
     if [ $raspiwifi == "true" ]; then
         mac_check
         mac_set
