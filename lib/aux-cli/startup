@@ -14,7 +14,8 @@ read_conf() {
 
 start_bluetooth() {
 
-    sudo bluetoothctl <<EOF
+    # Crontab is running as user 'pi' but this needs to run as user 'root'
+    sudo -u root bluetoothctl <<EOF
 power on
 discoverable on
 pairable on
@@ -28,9 +29,12 @@ EOF
     while [ $HEXLEN -lt 22 ]; do
         HEXVAL="${HEXVAL}0"
         HEXLEN=${#HEXVAL}
+        echo $HEXVAL
+        echo $HEXLEN
     done
 
     INQ="0c09${HEXVAL}020a00091002006b1d460217050d03001801180e110c1115110b1100"
+    echo $INQ
 
     sudo hciconfig hci0 sspmode 1
     sudo hciconfig hci0 inqdata $INQ
@@ -130,9 +134,6 @@ run_steps() {
     wlan_checker
     dnsmasq_checker
     wpa_checker
-    if [ $tethering == "true" ]; then
-        start_bluetooth
-    fi
     if [ $raspiwifi == "true" ]; then
         mac_check
         mac_set
@@ -144,6 +145,14 @@ run_steps() {
         sudo sed -i "s/first_run=\"true\"/first_run=\"false\"/g" /etc/aux-cli.conf
     fi
     reboot_check
+    # If we don't need a reboot, go into an infinite loop checking for bluetooth hotspot
+    if [ $tethering == "true" ]; then
+        start_bluetooth
+        while $bluetooth_hotspot; do
+            sudo python /lib/aux-cli/modules/ble/list-bt-devices.py
+            sleep 5
+        done
+    fi
 }
 
 run_steps
