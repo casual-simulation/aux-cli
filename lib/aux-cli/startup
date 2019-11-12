@@ -12,35 +12,6 @@ read_conf() {
     . /etc/aux-cli.conf
 }
 
-start_bluetooth() {
-
-    # Crontab is running as user 'pi' but this needs to run as user 'root'
-    sudo -u root bluetoothctl <<EOF
-power on
-discoverable on
-pairable on
-EOF
-
-    STR=$(hostname)
-    HEXVAL=$(xxd -pu <<<"$STR")
-    HEXVAL=${HEXVAL::-2}
-    HEXLEN=${#HEXVAL}
-
-    while [ $HEXLEN -lt 22 ]; do
-        HEXVAL="${HEXVAL}0"
-        HEXLEN=${#HEXVAL}
-        echo $HEXVAL
-        echo $HEXLEN
-    done
-
-    INQ="0c09${HEXVAL}020a00091002006b1d460217050d03001801180e110c1115110b1100"
-    echo $INQ
-
-    sudo hciconfig hci0 sspmode 1
-    sudo hciconfig hci0 inqdata $INQ
-    sudo /usr/bin/bt-agent -c NoInputNoOutput &
-}
-
 wlan_checker() {
     # Check if there is an extra wlan present and use it
     if grep wlan1 /proc/net/dev; then
@@ -128,31 +99,88 @@ reboot_check() {
     fi
 }
 
+usbmount_docker_check() {
+    if ! docker inspect -f '{{.State.Running}}' pi_server_1; then
+        echo "Docker is not up yet..."
+        sleep 2
+    else
+        echo "Docker is up!"
+        currentMounts=$(sudo mount | grep "/dev/sd[a-z][0-9]" | grep -vE "docker" | grep -vE "(/|/boot) " | awk '{print $1,$3}')
+        for i in "${!currentMounts[@]}"; do
+            echo "Unmounting USB Device: ${currentMounts[i]}"
+            sudo umount $(echo "${currentMounts[i]}" | awk '{print $2}')
+            echo "Mounting USB Device: ${currentMounts[i]}"
+            sudo mount $(echo "${currentMounts[i]}" | awk '{print $1,$2}')
+        done
+        echo "Done!"
+    fi
+}
+
+bluetooth_start() {
+
+    # Crontab is running as user 'pi' but this needs to run as user 'root'
+    sudo -u root bluetoothctl <<EOF
+power on
+discoverable on
+pairable on
+EOF
+
+    STR=$(hostname)
+    HEXVAL=$(xxd -pu <<<"$STR")
+    HEXVAL=${HEXVAL::-2}
+    HEXLEN=${#HEXVAL}
+
+    while [ $HEXLEN -lt 22 ]; do
+        HEXVAL="${HEXVAL}0"
+        HEXLEN=${#HEXVAL}
+        echo $HEXVAL
+        echo $HEXLEN
+    done
+
+    INQ="0c09${HEXVAL}020a00091002006b1d460217050d03001801180e110c1115110b1100"
+    echo $INQ
+
+    sudo hciconfig hci0 sspmode 1
+    sudo hciconfig hci0 inqdata $INQ
+    sudo /usr/bin/bt-agent -c NoInputNoOutput &
+}
+
+bluetooth_hotspot_check() {
+    while $bluetooth_hotspot; do
+        sudo python /lib/aux-cli/modules/ble/list-bt-devices.py &
+        sleep 5
+    done
+}
+
 run_steps() {
     reboot_required="false"
     read_conf
     wlan_checker
     dnsmasq_checker
     wpa_checker
+
     if [ $raspiwifi == "true" ]; then
         mac_check
         mac_set
         hostname_check
         hostname_set
+        reboot_check
     fi
+
     if [ $first_run == "true" ]; then
         aux-cli start
         sudo sed -i "s/first_run=\"true\"/first_run=\"false\"/g" /etc/aux-cli.conf
     fi
-    reboot_check
-    # If we don't need a reboot, go into an infinite loop checking for bluetooth hotspot
-    if [ $tethering == "true" ]; then
-        start_bluetooth
-        while $bluetooth_hotspot; do
-            sudo python /lib/aux-cli/modules/ble/list-bt-devices.py
-            sleep 5
-        done
+
+    if [ $usbmount == "true" ]; then
+        usbmount_docker_check
     fi
+
+    if [ $tethering == "true" ]; then
+        bluetooth_start
+        bluetooth_hotspot_check
+    fi
+    echo "testing 123" > /home/pi/cron.txt
 }
 
 run_steps
