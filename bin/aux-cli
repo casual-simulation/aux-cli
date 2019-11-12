@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot backup help version info)
+commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot backup help version info conf)
 
 help_menu() {
     echo ""
@@ -24,6 +24,7 @@ help_menu() {
     echo "help              Displays this help information."
     echo "version           Displays the aux-cli version."
     echo "info              Displays helpful information about you machine."
+    echo "conf              Manually edits /etc/aux-cli.conf with nano."
     echo ""
     echo "Run 'aux-cli COMMAND --help' for more information on a command."
     echo ""
@@ -157,6 +158,10 @@ while [[ $# -gt 0 ]]; do
         ;;
     info)
         . /lib/aux-cli/util/info
+        shift # past argument
+        ;;
+    conf)
+        . /lib/aux-cli/util/conf
         shift # past argument
         ;;
     help)

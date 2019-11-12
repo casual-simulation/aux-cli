@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+edit_conf() {
+    sudo nano /etc/aux-cli.conf
+}
+
+edit_conf
