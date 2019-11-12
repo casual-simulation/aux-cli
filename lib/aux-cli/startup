@@ -180,7 +180,6 @@ run_steps() {
         bluetooth_start
         bluetooth_hotspot_check
     fi
-    echo "testing 123" > /home/pi/cron.txt
 }
 
 run_steps
