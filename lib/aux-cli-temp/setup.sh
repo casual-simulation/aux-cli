@@ -28,8 +28,12 @@ fi
 ##### NeoPixel - WS281X LEDS
 ##### 74AHCT125 - Quad Level Shifter
 #######################################################
-sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
+sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel adafruit-circuitpython-dotstar
+
+#######################################################
+##### ##### DotStar - SK9822 LEDS
+#######################################################
+sudo pip3 install adafruit-circuitpython-dotstar
 
 
-
-
+echo "Done. You probably need to reboot, but who knows, I'm just a computer."
