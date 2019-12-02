@@ -17,9 +17,9 @@ install() {
 }
 
 uninstall() {
-    sudo apt autoremove
+    sudo apt autoremove -y
     sudo apt-get remove zerotier-one
-    sudo apt autoremove
+    sudo apt autoremove -y
     
     sudo sed -i "s/zerotier=\"true\"/zerotier=\"false\"/g" /etc/aux-cli.conf
 }

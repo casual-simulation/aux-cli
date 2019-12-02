@@ -31,10 +31,10 @@ install() {
 }
 
 uninstall() {
-    sudo apt autoremove
+    sudo apt autoremove -y
     sudo apt-get remove -y usbmuxd
     sudo apt-get remove -y bluez-tools
-    sudo apt autoremove
+    sudo apt autoremove -y
     
     sudo rm -rf /etc/systemd/network/pan0.netdev
     sudo rm -rf /etc/systemd/network/pan0.network

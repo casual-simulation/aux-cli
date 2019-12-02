@@ -73,9 +73,9 @@ install() {
 }
 
 uninstall() {
-    sudo apt autoremove
+    sudo apt autoremove -y
     sudo apt-get remove -y usbmount
-    sudo apt autoremove
+    sudo apt autoremove -y
 
     sudo sed -i "s/usbmount=\"true\"/usbmount=\"false\"/g" /etc/aux-cli.conf
 }
