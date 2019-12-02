@@ -77,6 +77,19 @@ uninstall() {
     sudo apt-get remove -y usbmount
     sudo apt autoremove -y
 
+    # Modify the /lib/systemd/system/systemd-udevd.service
+    echo "Modifying /lib/systemd/system/systemd-udevd.service"
+    sudo sed -i "s/^PrivateMounts=no/PrivateMounts=yes/g" /lib/systemd/system/systemd-udevd.service
+
+    # line_number=$(sudo grep -n "# Try to use specifications in /etc/fstab first." "/usr/share/usbmount/usbmount" | grep -Eo '^[^:]+')
+    # num=$((line_number + 1))
+    # sudo sed -i "${num}s/elif egrep -q/if egrep -q/g" "/usr/share/usbmount/usbmount"
+
+    # # Delete the range of stuff we added above
+    # line_number=$((line_number - 1))
+    # num_range=$((line_number - 5))
+    # sudo sed -ie "${num_range},${line_number}d" "/usr/share/usbmount/usbmount"
+
     sudo sed -i "s/usbmount=\"true\"/usbmount=\"false\"/g" /etc/aux-cli.conf
 }
 

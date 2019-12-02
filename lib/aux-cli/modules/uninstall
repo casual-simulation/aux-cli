@@ -60,7 +60,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     usbmount)
         aux-cli dhcpcd -s
-        . usbmount
+        . usbmount uninstall
         shift # past argument
         ;;
     everything)
