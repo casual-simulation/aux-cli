@@ -1,0 +1,62 @@
+#!/bin/bash
+set -e
+
+read_conf() {
+    . /etc/aux-cli.conf
+}
+
+install() {
+    # Install rfid python tools
+    echo "DEBUG: Setting up RFID Tools..."
+    sudo apt-get install -y python3-pip python3-dev
+    sudo pip3 install spidev mfrc522
+
+    # Enable SPI
+    if ! command lsmod | grep spi_ >/dev/null 2>&1; then
+        echo "SPI is disabled."
+        echo "Enabling now."
+        printf "\n# Enable SPI\ndtparam=spi=on\n" | sudo tee -a /boot/config.txt
+
+        read -t 10 -p "SPI requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r || echo "Moving on."
+        echo # Gives us a newline
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            sudo reboot now
+        fi
+    else
+        echo "SPI is already enabled."
+    fi
+    sudo sed -i "s/rfid=\"false\"/rfid=\"true\"/g" /etc/aux-cli.conf
+}
+
+uninstall() {
+    sudo apt autoremove -y
+    sudo pip3 uninstall -y spidev mfrc522
+    sudo apt-get remove -y python3-pip python3-dev
+    sudo apt autoremove -y
+
+    sudo sed -i "s/# Enable SPI//g" /boot/config.txt
+    sudo sed -i "s/dtparam=spi=on//g" /boot/config.txt
+    
+    read -t 10 -p "SPI requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r || echo "Moving on."
+    echo # Gives us a newline
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        sudo reboot now
+    fi
+    sudo sed -i "s/rfid=\"true\"/rfid=\"false\"/g" /etc/aux-cli.conf
+}
+
+read_conf
+
+if [ "$1" == "uninstall" ]; then
+    if [ $rfid == "true" ]; then
+        uninstall
+    else
+        echo "RFID is not installed. Skipping uninstallation."
+    fi
+else
+    if [ $rfid == "false" ]; then
+        install
+    else
+        echo "RFID is already installed. Skipping installation."
+    fi
+fi

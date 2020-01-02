@@ -1,0 +1,14 @@
+[Unit]
+Description=AUX USB Mount
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/bin/bash /lib/aux-cli/modules/aux-usbmount/aux-usbmount-startup
+
+[Install]
+WantedBy=multi-user.target
