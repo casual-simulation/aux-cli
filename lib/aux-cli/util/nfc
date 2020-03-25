@@ -1,0 +1,90 @@
+#!/bin/bash
+set -e
+
+# Default Variables
+config_wifi="false"
+ssid="RaspberryPi"
+password="password"
+
+help_menu() {
+    echo ""
+    echo "Usage:    nfc [OPTIONS]"
+    echo ""
+    echo "A tool for configuring NFC tags."
+    echo ""
+    echo "Options:"
+    echo "-s    --ssid          For WiFi credentials only: Configure the SSID."
+    echo "-p    --password      For WiFi credentials only: Configure the Password."
+    echo "-h    --help          Displays this help information."
+    echo ""
+    exit 1
+}
+
+err_msg1() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run nfc -h for help."
+    echo ""
+    exit 1
+}
+
+err_msg2() {
+    echo ""
+    echo "\"$2\" is an invalid argument for \"$1\"."
+    echo "Run nfc -h for help."
+    echo ""
+    exit 1
+}
+
+err_chk() {
+    if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
+        err_msg2 "$1" "$2"
+    fi
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "Running with defaults..."
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -s | --ssid)
+        config_wifi="true"
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            ssid="$2"
+            shift # past argument
+            shift # past value
+        else
+            echo "No ssid specified. Using default: \"RaspberryPi\""
+            shift # past argument
+        fi
+        ;;
+    -p | --password)
+        config_wifi="true"
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            password="$2"
+            shift # past argument
+            shift # past value
+        else
+            echo "No password specified. Using default: \"password\""
+            shift # past argument
+        fi
+        ;;
+    -h | -help | --help)
+        help_menu
+        shift # past argument
+        ;;
+    *) # any option
+        err_msg1 "$1"
+        shift # past argument
+        ;;
+    esac
+done
+
+if config_wifi; then
+    echo "Configuring NFC with WiFi credentials..."
+    sudo python3 /lib/aux-cli/modules/nfc-hat/nfc_write_wifi.py -s "$ssid" -p "$password"
+fi
+

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot backup help version info conf)
+commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot nfc backup help version info conf)
 
 help_menu() {
     echo ""
@@ -20,6 +20,7 @@ help_menu() {
     echo "changehost        Change the hostname of your pi. Applies after restart."
     echo "dhcpcd            Wrapper for setting and unsetting dhcpcd settings."
     echo "hotspot           Tool for managing hotspot mode."
+    echo "nfc               Tool for configuring NFC tags."
     echo "backup            Creates a backup img of your pi."
     echo "help              Displays this help information."
     echo "version           Displays the aux-cli version."
@@ -140,6 +141,16 @@ while [[ $# -gt 0 ]]; do
             shift
         done
         . /lib/aux-cli/util/hotspot "${hotspot_array[@]}"
+        break
+        ;;
+    nfc)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            nfc_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/util/nfc "${nfc_array[@]}"
         break
         ;;
     backup)
