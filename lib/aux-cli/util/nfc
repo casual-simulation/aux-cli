@@ -83,7 +83,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if config_wifi; then
+if $config_wifi; then
     echo "Configuring NFC with WiFi credentials..."
     sudo python3 /lib/aux-cli/modules/nfc-hat/nfc_write_wifi.py -s "$ssid" -p "$password"
 fi
