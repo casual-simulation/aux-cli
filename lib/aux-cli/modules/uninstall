@@ -11,12 +11,15 @@ help_menu() {
     echo "A tool to uninstall modules/pods/packages for your pi."
     echo ""
     echo "Options:"
-    echo "pishrink      Uninstalls a tool for shrinking pi images."
-    echo "raspiwifi     Uninstalls a tool to enable/disable hotspot mode."
-    echo "rfid          Uninstalls a collection of tools to work with RFID a reader/writer."
-    echo "zerotier      Uninstalls a tool to do stuff."
-    echo "tethering     Uninstalls a collection of tools to allow tethering via usb or bluetooth."
-    echo "everything    Uninstalls everything available"
+    echo "pishrink          Uninstalls a tool for shrinking pi images."
+    echo "raspiwifi         Uninstalls a tool to enable/disable hotspot mode."
+    echo "rfid              Uninstalls a collection of tools to work with RFID a reader/writer."
+    echo "zerotier          Uninstalls a tool to do stuff."
+    echo "tethering         Uninstalls a collection of tools to allow tethering via usb or bluetooth."
+    echo "usbmount          Uninstalls a tool for automatically mounting external storage to a specified directory."
+    echo "nfchat            Uninstalls a collection of tools to work with NFC a reader/writer"
+    echo "almosteverything  Uninstalls everything available except for RaspiWiFi."
+    echo "everything        Uninstalls everything available"
     echo ""
     exit 1
 }
@@ -63,11 +66,27 @@ while [[ $# -gt 0 ]]; do
         . usbmount uninstall
         shift # past argument
         ;;
+    nfchat)
+        aux-cli dhcpcd -s
+        . nfchat uninstall
+        shift # past argument
+        ;;
+    almosteverything)
+        aux-cli dhcpcd -s
+        . pishrink uninstall
+        . rfid uninstall
+        . zerotier uninstall
+        . usbmount uninstall
+        . nfchat uninstall
+        . tethering uninstall
+        shift # past argument
+        ;;
     everything)
         . pishrink uninstall
         . rfid uninstall
         . zerotier uninstall
         . usbmount uninstall
+        . nfchat uninstall
         . tethering uninstall
         . raspiwifi uninstall
         shift # past argument

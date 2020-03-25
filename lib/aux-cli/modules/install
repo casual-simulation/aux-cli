@@ -23,6 +23,7 @@ help_menu() {
     echo "zerotier          Installs a tool to do stuff."
     echo "tethering         Installs a collection of tools to allow tethering via usb or bluetooth."
     echo "usbmount          Installs a tool for automatically mounting external storage to a specified directory."
+    echo "nfchat            Installs a collection of tools to work with NFC a reader/writer"
     echo "almosteverything  Installs everything available except for RaspiWiFi."
     echo "everything        Installs everything available."
     echo ""
@@ -76,12 +77,18 @@ while [[ $# -gt 0 ]]; do
         . usbmount
         shift # past argument
         ;;
+    nfchat)
+        aux-cli dhcpcd -s
+        . nfchat
+        shift # past argument
+        ;;
     almosteverything)
         aux-cli dhcpcd -s
         . pishrink
         . rfid
         . zerotier
         . usbmount
+        . nfchat
         . tethering
         shift # past argument
         ;;
@@ -91,6 +98,7 @@ while [[ $# -gt 0 ]]; do
         . rfid
         . zerotier
         . usbmount
+        . nfchat
         . tethering
         . raspiwifi
         shift # past argument
