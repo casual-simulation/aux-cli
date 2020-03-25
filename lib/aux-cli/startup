@@ -18,9 +18,9 @@ wlan_checker() {
     # Check if there is an extra wlan present and use it
     if grep wlan1 /proc/net/dev; then
         echo "Found wlan1. Changing default from wlan0..."
-        sudo sed -i "s/interface=wlan0/interface=wlan1/g" "${dnsmasq_conf}"
-        sudo sed -i "s/interface=wlan0/interface=wlan1/g" "${hostapd_conf}"
-        sudo sed -i "s/interface wlan0/interface wlan1/g" "${dhcpcd_conf}"
+        sudo sed -i "s/^interface=wlan0/interface=wlan1/g" "${dnsmasq_conf}"
+        sudo sed -i "s/^interface=wlan0/interface=wlan1/g" "${hostapd_conf}"
+        sudo sed -i "s/^interface wlan0/interface wlan1/g" "${dhcpcd_conf}"
     fi
 }
 
@@ -29,8 +29,8 @@ dnsmasq_checker() {
     if [ -e "${dnsmasq_conf}" ]; then
         echo "Extending IP range and timeout for dnsmasq..."
         # Give a larger default range of IP Addresses with a longer timeout
-        if sudo grep "dhcp-range=" "${dnsmasq_conf}"; then
-            sudo sed -i "s/dhcp-range=.*/dhcp-range=10.0.0.10,10.0.0.110,12h/g" "${dnsmasq_conf}"
+        if sudo grep "^dhcp-range=" "${dnsmasq_conf}"; then
+            sudo sed -i "s/^dhcp-range=.*/dhcp-range=10.0.0.10,10.0.0.110,12h/g" "${dnsmasq_conf}"
         else
             echo "dhcp-range=10.0.0.10,10.0.0.110,12h" | sudo tee -a "${dnsmasq_conf}"
         fi
@@ -48,14 +48,14 @@ wpa_checker() {
     if [ -e "${wpa_conf}" ]; then
         echo "Found wpa_supplicant. Verifying country and scan_ssid values..."
         if sudo grep "country=" "${wpa_conf}"; then
-            sudo sed -i "s/country=.*/country=US/g" "${wpa_conf}"
+            sudo sed -i "s/^country=.*/country=US/g" "${wpa_conf}"
         else
             line_number=$(sudo grep -ne '^$' "${wpa_conf}" | grep -Eo '^[^:]+')
             sudo sed -i "${line_number}i country=US" "${wpa_conf}"
         fi
 
         if sudo grep "scan_ssid=" "${wpa_conf}"; then
-            sudo sed -i "s/scan_ssid=.*/scan_ssid=1/g" "${wpa_conf}"
+            sudo sed -i "s/^scan_ssid=.*/scan_ssid=1/g" "${wpa_conf}"
         else
             line_number=$(sudo grep -n "network=" "${wpa_conf}" | grep -Eo '^[^:]+')
             line_number=$((line_number + 1))
@@ -83,8 +83,8 @@ mac_set() {
 
 hostname_check() {
     echo "Checking the hostname..."
-    oldhost=$(grep -Eo "ssid=.*" /etc/hostapd/hostapd.conf | sed 's/.\{5\}$//' | sed "s/ssid=//g")
-    oldhost2=$(grep -Eo "ssid_prefix=.*" /etc/raspiwifi/raspiwifi.conf | sed "s/ssid_prefix=//g")
+    oldhost=$(grep -Eo "ssid=.*" /etc/hostapd/hostapd.conf | sed 's/.\{5\}$//' | sed "s/^ssid=//g")
+    oldhost2=$(grep -Eo "ssid_prefix=.*" /etc/raspiwifi/raspiwifi.conf | sed "s/^ssid_prefix=//g")
 }
 
 hostname_set() {

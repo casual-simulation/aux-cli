@@ -41,7 +41,7 @@ update_conf() {
             # fi
 
             if [ "$i" == "version" ]; then
-                sed -i "s/version=\".*\"/version=${ary2[$i]}/g" /etc/aux-cli.conf
+                sed -i "s/^version=\".*\"/version=${ary2[$i]}/g" /etc/aux-cli.conf
             fi
         fi
 

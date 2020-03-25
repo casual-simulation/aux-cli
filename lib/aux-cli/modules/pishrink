@@ -14,13 +14,13 @@ install() {
     else
         echo "PiShrink is already installed."
     fi
-    sudo sed -i "s/pishrink=\"false\"/pishrink=\"true\"/g" /etc/aux-cli.conf
+    sudo sed -i "s/^pishrink=\"false\"/pishrink=\"true\"/g" /etc/aux-cli.conf
 }
 
 uninstall() {
     echo "Uninstalling Pishrink."
     sudo rm -rf /usr/local/bin/pishrink.sh
-    sudo sed -i "s/pishrink=\"true\"/pishrink=\"false\"/g" /etc/aux-cli.conf
+    sudo sed -i "s/^pishrink=\"true\"/pishrink=\"false\"/g" /etc/aux-cli.conf
 }
 
 read_conf

@@ -18,7 +18,7 @@ sudo systemctl start pigpiod
 ##### Time of Flight Sensor - VL6180X
 #######################################################
 sudo pip3 install adafruit-circuitpython-vl6180x
-sudo sed -i "s/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g" /boot/config.txt
+sudo sed -i "s/^#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g" /boot/config.txt
 
 if ! sudo grep "i2c-dev" "/etc/modules"; then
     echo "i2c-dev" | sudo tee -a /etc/modules

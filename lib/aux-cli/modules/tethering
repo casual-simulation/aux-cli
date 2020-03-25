@@ -27,7 +27,7 @@ ble_tethering() {
 install() {
     usb_tethering
     ble_tethering
-    sudo sed -i "s/tethering=\"false\"/tethering=\"true\"/g" /etc/aux-cli.conf
+    sudo sed -i "s/^tethering=\"false\"/tethering=\"true\"/g" /etc/aux-cli.conf
 }
 
 uninstall() {
@@ -42,7 +42,7 @@ uninstall() {
     sudo rm -rf /etc/systemd/system/bt-network.service
     sudo systemctl disable systemd-networkd
     sudo systemctl stop systemd-networkd
-    sudo sed -i "s/tethering=\"true\"/tethering=\"false\"/g" /etc/aux-cli.conf
+    sudo sed -i "s/^tethering=\"true\"/tethering=\"false\"/g" /etc/aux-cli.conf
 }
 
 read_conf

@@ -31,7 +31,7 @@ install() {
 
     # Run the RaspiWiFi setup
     echo "DEBUG: Running RaspiWiFi..."
-    sudo sed -i "s/raspiwifi=\"false\"/raspiwifi=\"true\"/g" /etc/aux-cli.conf
+    sudo sed -i "s/^raspiwifi=\"false\"/raspiwifi=\"true\"/g" /etc/aux-cli.conf
     cd RaspiWiFi
     sudo python3 initial_setup.py # Triggers a reboot
 
@@ -42,7 +42,7 @@ install() {
 uninstall() {
     sudo apt autoremove -y
     if [ -e /usr/lib/raspiwifi/uninstall.py ]; then
-        sudo sed -i "s/raspiwifi=\"true\"/raspiwifi=\"false\"/g" /etc/aux-cli.conf
+        sudo sed -i "s/^raspiwifi=\"true\"/raspiwifi=\"false\"/g" /etc/aux-cli.conf
         sudo python3 /usr/lib/raspiwifi/uninstall.py
     fi
     sudo apt autoremove -y
