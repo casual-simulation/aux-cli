@@ -5,7 +5,7 @@ set -e
 hostn=$(hostname)                              # Hostname of RaspberryPi
 filename="${hostn}-bkp.img"                    # Image name
 mountpoint="/mnt/usbstorage"                   # External Storage - Path
-log="/var/log/aux-cli.pi.backup.log"                   # Path to log file
+log="/var/log/aux-cli.pi.backup.log"           # Path to log file
 filename_shrunk="${filename/.img/-shrunk.img}" # Image name shrunk
 overwrite="false"                              # Default overwriting files to false
 args=(-d --destination -f --filename -m --mountpoint -s --storage -l --log -S --shrink -Z --zip -o --overwrite -y -h -help --help)
