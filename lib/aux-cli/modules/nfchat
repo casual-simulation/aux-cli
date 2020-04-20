@@ -138,11 +138,15 @@ fi
 # After those Bytes, we have Page 3 Completely dedicated to the "Capability Container" (abbreviated: CC)
 # These should already be preprogrammed and setting the bits to 1 is also irreversible.
 
+# Byte 0 is function cluster code. E1h indicates that NFC-Forum defined data is stored in the data area. 
+# Byte 1 is the version number of NFC_Forum_Type_2_Tag document. For version 1.0V it's 10h.
 # Byte 2 in the capability container defines the available memory size for NDEF messages. 
-# | IC        | Value in Byte 2   | NDEF Memory Size
-# | NTAG213   | 12h               | 144 bytes /  36 Pages
-# | NTAG215   | 3Eh               | 496 bytes / 124 Pages
-# | NTAG216   | 6Dh               | 872 bytes / 218 Pages
+#   This is only the data section of the tag, not the whole tag. How to Calculate: 3E hex is 62 dec. 62*8=496
+#   | IC        | Value in Byte 2   | NDEF Memory Size
+#   | NTAG213   | 12h               | 144 bytes /  36 Pages
+#   | NTAG215   | 3Eh               | 496 bytes / 124 Pages
+#   | NTAG216   | 6Dh               | 872 bytes / 218 Pages
+# Byte 3 indicates read and write access capability if of the data area and CC area. (00h --> with read and write access granted without any security / 0Fh --> only read access granted)
 
 # Here is our current Page breakdown:
 
@@ -154,7 +158,22 @@ fi
 # 4
 
 
-# Now we are on Page 4, which is where we can begin to enter data. (Data)
+# If you have a NFC Forum Type 2 tag (like most current tags) you need two additional Bytes of information before your first Record.
+# TLV = Tag, Length, Value
+#   Tag - The Type of NFC Tag - Basically always 03h - Contains an NDEF message
+#   Length - The Length of the NDEF Message starting at the next Byte
+#   Value - The Rest of the NDEF Message (All Records combined)
+
+# Here is our current Page breakdown:
+
+# Page  Byte0   Byte1   Byte2   Byte3
+# 0     UID     UID     UID     Check    
+# 1     UID     UID     UID     UID
+# 2     Check   InData  Lock    Lock
+# 3     CC      CC      CC      CC
+# 4     Type    Length
+
+# Now, still on Page 4, we can begin to enter data. (Data)
 # Each tag has it's own range of Data Pages. This section is able to be restricted using a password.
 # | IC        | Page Range
 # | NTAG213   | 4-39
@@ -169,7 +188,7 @@ fi
 # 1     UID     UID     UID     UID
 # 2     Check   InData  Lock    Lock
 # 3     CC      CC      CC      CC
-# 4     Data    Data    Data    Data
+# 4     Type    Length  Data    Data
 # ...   Data    Data    Data    Data
 # 129   Data    Data    Data    Data
 
@@ -177,15 +196,105 @@ fi
 # NDEF Records are composed of a Header and a Payload.
 # The Header is going to describe a few details about the Payload that follows.
 
-# If you have a TLV type tag (like I do) you need two additional Bytes of information before your Header.
-# TLV = Tag, Length, Value
-#   Tag - The Type of NFC Tag
-#   Length - The Length of the NDEF Message starting at the next Byte
-#   Value - The Rest of the NDEF Header
+# QUICK NOTE: RFUI means reserved for future use - implemented. Write all bits and bytes denoted as RFUI as 0b. 
 
-# My Header = 03 58 da 17 3c 01
-#   Tag =                                   03 - NFC Forum Type 2
-#   Length =                                58 - 88 (Bytes) - Total Message Length (From the next Byte to the end of Payload minus trailing FE Bytes)
+# After all of the data, we get to the Dynamic Lock Bytes. Each byte has 8 bits. Each bit locks a section of data.
+# With the Block Locking bits (BL) set to 1, the corresponding page locking bits cannot be written anymore. This change is irreversable.
+# Here is the breakdown of those bytes:
+
+# Page 130, Byte 0
+# Bit 0 - Lock Page 16-31
+# Bit 1 - Lock Page 32-47
+# Bit 2 - Lock Page 48-63
+# Bit 3 - Lock Page 64-79
+# Bit 4 - Lock Page 80-95
+# Bit 5 - Lock Page 96-111
+# Bit 6 - Lock Page 112-127
+# Bit 7 - Lock Page 128-129
+# Page 130, Byte 1
+# Bit 0 - RFUI
+# Bit 1 - RFUI
+# Bit 2 - RFUI
+# Bit 3 - RFUI
+# Bit 4 - RFUI
+# Bit 5 - RFUI
+# Bit 6 - RFUI
+# Bit 7 - RFUI
+# Page 130, Byte 2
+# Bit 0 - BL 16-47
+# Bit 1 - BL 48-79
+# Bit 2 - BL 80-111
+# Bit 3 - BL 112-129
+# Bit 4 - RFUI
+# Bit 5 - RFUI
+# Bit 6 - RFUI
+# Bit 7 - RFUI
+
+
+# After the Dynamic Lock Bytes, we get to the Configuration Pages.
+# They are used to configure the memory access restriction and to configure the UID ASCII mirror feature
+
+# Mirror Byte
+# Page 131, byte 0, bit 0 - RFUI            0b
+# Page 131, byte 0, bit 1 - RFUI            0b
+# Page 131, byte 0, bit 2 - STRG_MOD_EN     0b: Strong Modulation Disabled | 1b: Strong Modulation Enabled
+# Page 131, byte 0, bit 3 - RFUI            0b
+# Page 131, byte 0, bit 4/5 - MIRROR_BYTE   The 2 bits define the byte position within the page defined by the MIRROR_PAGE byte (beginning of ASCII mirror)
+#                                           00b: position 0 | 01b: position 1 | 10b: position 2 | 11b: position 3
+# Page 131, byte 0, bit 6/7 - MIRROR_CONF   Defines which ASCII mirror shall be used, if the ASCII mirror is enabled by a valid the MIRROR_PAGE byte
+#                                           00b: No ASCII Mirror | 01b: UID ASCII Mirror | 10b: NFC Counter ASCII Mirror | 11b:  UID and NFC Counter ASCII Mirror
+
+# Mirror Page Byte  - Default: 00h | MIRROR_Page defines the page for the beginning of the ASCII mirroring. A value >03h enables the ASCII mirror feature.
+# Auth0 Byte        - Default: FFh | AUTH0 defines the page address from which the password verification is required.
+#                                    Valid address range for byte AUTH0 is from 00h to FFh.
+#                                    If AUTH0 is set to a page address which is higher than the last page from the user
+#                                    configuration, the password protection is effectively disabled.
+
+# Access Byte
+# Page 132, byte 0, bit 0/1/2 - AUTHLIM         001b-111b | Maximum number of negative password verification attempts
+# Page 132, byte 0, bit 3 - NFC_CNT_PWD_PROT    NFC counter password protection. If the NFC counter password protection is enabled, the NFC tag will only respond
+#                                               to a READ_CNT command with the NFC counter value after a valid password verification.
+#                                               0b: NFC Counter not Protected | 1b: NFC Counter Protected
+# Page 132, byte 0, bit 4 - NFC_CNT_EN          NFC counter configuration. If the NFC counter is enabled, the NFC counter will be automatically increased at
+#                                               the first READ or FAST_READ command after a power on reset
+#                                               0b: NFC Counter Disabled | 1b: NFC Counter Enabled
+# Page 132, byte 0, bit 5 - RFUI                0b
+# Page 132, byte 0, bit 6 - CFGLCK              Write locking bit for the user configuration. 
+#                                               0b: user configuration open to write access | 1b: user configuration permanently locked against write access, except PWD and PACK
+# Page 132, byte 0, bit 7 - PROT                One bit inside the ACCESS byte defining the memory protection
+#                                               0b: write access is protected by the password verification | 1b: read and write access is protected by the password verification
+
+# PWD Bytes - 32-bit password used for memory access protection
+# Pack Bytes - 16-bit password acknowledge used during the password verification process
+
+# Here is our current Page breakdown:
+
+# Page  Byte0   Byte1   Byte2   Byte3
+# 0     UID     UID     UID     Check    
+# 1     UID     UID     UID     UID
+# 2     Check   InData  Lock    Lock
+# 3     CC      CC      CC      CC
+# 4     Type    Length  Data    Data
+# ...   Data    Data    Data    Data
+# 129   Data    Data    Data    Data
+# 130   DLock   DLock   DLock   RFUI
+# 131   Mirror  RFUI    MirPag  Auth0
+# 132   Access  RFUI    RFUI    RFUI
+# 133   PWD     PWD     PWD     PWD
+# 134   PACK    PACK    RFUI    RFUI
+
+
+# Pages 0-3
+# 04 55 C1 18
+# 52 8E 60 80
+# 3C 48 00 00
+# E1 10 3E 00
+
+# Pre-Header = 03 58 
+#   Tag =                                   03 - Contains an NDEF Message
+#   Length =                                58 - 88 (Bytes) - Total Message Length (From the start of the first Header to the end of the last Payload minus trailing FE Bytes)
+
+# My Header = da 17 3c 01
 #   TNF & Flags 1 Byte =                    DA - 11011010 - (MB: True) (ME:True) (CF:False) (SR:True) (IL:True) (TNF:2 - MIME Type)
 #   Payload Type Length 1 Byte =            17 - 23 (Bytes) - Length of Type: application/vnd.wfa.wsc
 #   Payload Length 1 Byte =                 3c - 60 (Bytes) - Length of Payload: WiFi Credentials plus the gibberish minus trailing FE Bytes
@@ -216,3 +325,52 @@ fi
 
 # For the most part, we don't want to ever touch Pages 0, 1, 2 or 3.
 # Safely write from page 4 onwards
+
+
+
+
+
+
+#NOTES
+
+# Manufacturers
+# https://isotc.iso.org/livelink/livelink/fetch/-8915513/8915538/8915579/ISO_IEC_JTC1_SC17_Standing_Document_5_Register_of_IC_Manufacturers.pdf?nodeid=10432471&vernum=-2
+
+# Specs
+# https://www.shopnfc.com/en/content/6-nfc-tags-specs#ntag
+
+# https://www.nxp.com/docs/en/data-sheet/NTAG210_212.pdf
+# https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf
+# https://www.nxp.com/docs/en/data-sheet/NTAG213F_216F.pdf
+
+# https://www.mouser.com/datasheet/2/302/NT3H1101_1201-1127167.pdf
+
+
+
+# https://stackoverflow.com/questions/37002498/distinguish-ntag213-from-mf0icu2
+# +------------+------+---------+-----------+--------------+
+# | Chip       | Type | Subtype | Version   | Storage size |
+# +------------+------+---------+-----------+--------------+
+# | NTAG210    | 0x04 | 0x01    | 0x01 0x00 | 0x0B         |
+# | NTAG212    | 0x04 | 0x01    | 0x01 0x00 | 0x0E         |
+# | NTAG213    | 0x04 | 0x02    | 0x01 0x00 | 0x0F         |
+# | NTAG213F   | 0x04 | 0x04    | 0x01 0x00 | 0x0F         |
+# | NTAG215    | 0x04 | 0x02    | 0x01 0x00 | 0x11         |
+# | NTAG216    | 0x04 | 0x02    | 0x01 0x00 | 0x13         |
+# | NTAG216F   | 0x04 | 0x04    | 0x01 0x00 | 0x13         |
+# +------------+------+---------+-----------+--------------+
+# | NT3H1101   | 0x04 | 0x02    | 0x01 0x01 | 0x13         |
+# | NT3H1101W0 | 0x04 | 0x05    | 0x02 0x01 | 0x13         |
+# | NT3H2111W0 | 0x04 | 0x05    | 0x02 0x02 | 0x13         |
+# | NT3H2101   | 0x04 | 0x02    | 0x01 0x01 | 0x15         |
+# | NT3H1201W0 | 0x04 | 0x05    | 0x02 0x01 | 0x15         |
+# | NT3H2211W0 | 0x04 | 0x05    | 0x02 0x02 | 0x15         |
+# +------------+------+---------+-----------+--------------+
+# | MF0UL1101  | 0x03 | 0x01    | 0x01 0x00 | 0x0B         |
+# | MF0ULH1101 | 0x03 | 0x02    | 0x01 0x00 | 0x0B         |
+# | MF0UL2101  | 0x03 | 0x01    | 0x01 0x00 | 0x0E         |
+# | MF0ULH2101 | 0x03 | 0x02    | 0x01 0x00 | 0x0E         |
+# +------------+------+---------+-----------+--------------+
+
+# https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v12.0.0%2Fnfc_ndef_format_dox.html
+# https://community.nxp.com/thread/464994
