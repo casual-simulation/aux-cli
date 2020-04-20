@@ -96,6 +96,16 @@ MIFARE_CMD_INCREMENT                = 0xC1
 MIFARE_CMD_STORE                    = 0xC2
 MIFARE_ULTRALIGHT_CMD_WRITE         = 0xA2
 
+# NTAG Commands (Needs to be sent with _COMMAND_INCOMMUNICATETHRU not _COMMAND_INDATAEXCHANGE)
+NTAG_GET_VERSION                    = 0x60
+NTAG_READ                           = 0x30
+NTAG_FAST_READ                      = 0x3A
+NTAG_WRITE                          = 0xA2
+NTAG_COMPATIBILITY_WRITE            = 0xA0
+NTAG_READ_CNT                       = 0x39
+NTAG_PWD_AUTH                       = 0x1B
+NTAG_READ_SIG                       = 0x3C
+
 # Prefixes for NDEF Records (to identify record type)
 NDEF_URIPREFIX_NONE                 = 0x00
 NDEF_URIPREFIX_HTTP_WWWDOT          = 0x01
@@ -336,6 +346,20 @@ class PN532:
         if response is None:
             raise RuntimeError('Failed to detect the PN532')
         return tuple(response)
+
+    def get_ntag_version(self):
+        """Call NTAG GET_VERSION function.
+        """
+        # Send InCommunicateThru request.
+        response = self.call_function(_COMMAND_INCOMMUNICATETHRU,
+                                      response_length=9,
+                                      params=[NTAG_GET_VERSION])
+        # Check first response is 0x00 to show success.
+        if response[0]:
+            raise PN532Error(response[0])
+            return None
+        # slice off the first 0x00
+        return response[1:]
 
     def SAM_configuration(self):   # pylint: disable=invalid-name
         """Configure the PN532 to read MiFare cards."""
