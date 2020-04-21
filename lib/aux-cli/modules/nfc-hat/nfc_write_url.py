@@ -12,7 +12,8 @@ from itertools import zip_longest
 
 url = ''
 
-# Pass in Argument for URL
+################################ PASS ARGUMENTS ################################
+
 def main(argv):
     global url
     try:
@@ -29,6 +30,8 @@ def main(argv):
 
 
 main(sys.argv[1:])
+
+################################# NDEF BUILDER #################################
 
 # Need to get info in reverse order, then build string in correct order
 # Marks the end of configurable data.
@@ -93,6 +96,23 @@ tag_type = hex(3)[2:].zfill(2)
 ndef_msg_long = "{0}{1}{2}{3}".format(
     tag_type, ndef_msg_short_length, ndef_msg_short, end_marker)
 
+# Break into a list of 8 character strings
+pages = list(map(''.join, zip_longest(
+    *[iter(ndef_msg_long)]*8, fillvalue='0')))
+
+pages2 = []
+for i in range(len(pages)):
+    # Break each of those strings into a list of 2 character strings
+    out = [(pages[i][j:j+2]) for j in range(0, len(pages[i]), 2)]
+
+    # For each string in our new list, prefix it with '0x' and then convert it back to a hexadecimanl int
+    for k in range(len(out)):
+        out[k] = '0x' + out[k]
+        out[k] = int(out[k], 16)
+    # Then add those lists to a list
+    pages2.append(out)
+
+################################# PREP FOR NFC #################################
 
 pn532 = PN532_SPI(debug=False, reset=20, cs=4)
 #pn532 = PN532_I2C(debug=False, reset=20, req=16)
@@ -114,22 +134,8 @@ while True:
         break
 print('Found card with UID:', [hex(i) for i in uid])
 
-# Break into a list of 8 character strings
-pages = list(map(''.join, zip_longest(
-    *[iter(ndef_msg_long)]*8, fillvalue='0')))
 
-pages2 = []
-for i in range(len(pages)):
-    # Break each of those strings into a list of 2 character strings
-    out = [(pages[i][j:j+2]) for j in range(0, len(pages[i]), 2)]
-
-    # For each string in our new list, prefix it with '0x' and then convert it back to a hexadecimanl int
-    for k in range(len(out)):
-        out[k] = '0x' + out[k]
-        out[k] = int(out[k], 16)
-    # Then add those lists to a list
-    pages2.append(out)
-
+################################# WRITE TO NFC #################################
 try:
     for i in range(len(pages2)):
         # Start writing data at page/block 4
@@ -143,9 +149,15 @@ except nfc.PN532Error as e:
 # Zero out any blocks we didnt write data to
 write_end = len(pages2) + 3
 
-# data_end = 39   # NTAG213
-data_end = 129  # NTAG215
-# data_end = 225  # NTAG216
+if b'\x12' in pn532.ntag2xx_read_block(3):
+    data_end = 39
+    print('This is an NTAG213 tag.')
+elif b'\x3E' in pn532.ntag2xx_read_block(3):
+    data_end = 129
+    print('This is an NTAG215 tag.')
+elif b'\x6D' in pn532.ntag2xx_read_block(3):
+    data_end = 225
+    print('This is an NTAG216 tag.')
 
 while write_end < data_end:
     write_end += 1
