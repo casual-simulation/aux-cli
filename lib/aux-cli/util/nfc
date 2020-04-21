@@ -3,8 +3,10 @@ set -e
 
 # Default Variables
 config_wifi="false"
+config_url="false"
 ssid="RaspberryPi"
 password="password"
+url="https://google.com"
 
 help_menu() {
     echo ""
@@ -15,6 +17,7 @@ help_menu() {
     echo "Options:"
     echo "-s    --ssid          For WiFi credentials only: Configure the SSID."
     echo "-p    --password      For WiFi credentials only: Configure the Password."
+    echo "-u    --url           For URL only: Configure the URL."
     echo "-h    --help          Displays this help information."
     echo ""
     exit 1
@@ -72,6 +75,17 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
         fi
         ;;
+    -u | --url)
+        config_url="true"
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            url="$2"
+            shift # past argument
+            shift # past value
+        else
+            echo "No url specified. Using default: \"https://google.com\""
+            shift # past argument
+        fi
+        ;;
     -h | -help | --help)
         help_menu
         shift # past argument
@@ -88,3 +102,7 @@ if $config_wifi; then
     sudo python3 /lib/aux-cli/modules/nfc-hat/nfc_write_wifi.py -s "$ssid" -p "$password"
 fi
 
+if $config_url; then
+    echo "Configuring NFC with URL..."
+    sudo python3 /lib/aux-cli/modules/nfc-hat/nfc_write_url.py -u "$url"
+fi
