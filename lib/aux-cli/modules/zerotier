@@ -13,6 +13,21 @@ install() {
     # Join Zero Tier Network
     #sudo zerotier-cli join $zt_network && sudo zerotier-cli info
 
+    sudo sed -i '/^exit 0/d' /etc/rc.local
+
+    sudo tee -a "/etc/rc.local" > /dev/null <<EOT
+if [ -e /boot/zt]; then
+    zt_network=$(cat /boot/zt)
+    sudo zerotier-cli join \$zt_network
+    rm /boot/zt
+
+    if slack; then
+        slack $(sudo zerotier-cli info)
+    fi
+fi
+
+exit 0
+EOT
     sudo sed -i "s/^zerotier=\"false\"/zerotier=\"true\"/g" /etc/aux-cli.conf
 }
 
@@ -21,6 +36,8 @@ uninstall() {
     sudo apt-get remove zerotier-one
     sudo apt autoremove -y
     
+    # Remove section from /etc/rc.local
+
     sudo sed -i "s/^zerotier=\"true\"/zerotier=\"false\"/g" /etc/aux-cli.conf
 }
 

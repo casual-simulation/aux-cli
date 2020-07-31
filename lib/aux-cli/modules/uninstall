@@ -18,6 +18,7 @@ help_menu() {
     echo "tethering         Uninstalls a collection of tools to allow tethering via usb or bluetooth."
     echo "usbmount          Uninstalls a tool for automatically mounting external storage to a specified directory."
     echo "nfchat            Uninstalls a collection of tools to work with NFC a reader/writer"
+    echo "slack             Uninstalls a tool to message Slack from the command line."
     echo "almosteverything  Uninstalls everything available except for RaspiWiFi."
     echo "everything        Uninstalls everything available"
     echo ""
@@ -71,6 +72,11 @@ while [[ $# -gt 0 ]]; do
         . nfchat uninstall
         shift # past argument
         ;;
+    slack)
+        aux-cli dhcpcd -s
+        . slack uninstall
+        shift # past argument
+        ;;
     almosteverything)
         aux-cli dhcpcd -s
         . pishrink uninstall
@@ -78,6 +84,7 @@ while [[ $# -gt 0 ]]; do
         . zerotier uninstall
         . usbmount uninstall
         . nfchat uninstall
+        . slack uninstall
         . tethering uninstall
         shift # past argument
         ;;
@@ -87,6 +94,7 @@ while [[ $# -gt 0 ]]; do
         . zerotier uninstall
         . usbmount uninstall
         . nfchat uninstall
+        . slack uninstall
         . tethering uninstall
         . raspiwifi uninstall
         shift # past argument

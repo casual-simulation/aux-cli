@@ -24,6 +24,7 @@ help_menu() {
     echo "tethering         Installs a collection of tools to allow tethering via usb or bluetooth."
     echo "usbmount          Installs a tool for automatically mounting external storage to a specified directory."
     echo "nfchat            Installs a collection of tools to work with NFC a reader/writer"
+    echo "slack             Installs a tool to message Slack from the command line."
     echo "almosteverything  Installs everything available except for RaspiWiFi."
     echo "everything        Installs everything available."
     echo ""
@@ -82,6 +83,11 @@ while [[ $# -gt 0 ]]; do
         . nfchat
         shift # past argument
         ;;
+    slack)
+        aux-cli dhcpcd -s
+        . slack
+        shift # past argument
+        ;;
     almosteverything)
         aux-cli dhcpcd -s
         . pishrink
@@ -89,6 +95,7 @@ while [[ $# -gt 0 ]]; do
         . zerotier
         . usbmount
         . nfchat
+        . slack
         . tethering
         shift # past argument
         ;;
@@ -99,6 +106,7 @@ while [[ $# -gt 0 ]]; do
         . zerotier
         . usbmount
         . nfchat
+        . slack
         . tethering
         . raspiwifi
         shift # past argument
