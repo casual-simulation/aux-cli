@@ -6,7 +6,7 @@ read_conf() {
 }
 
 install() {
-    sudo cp /slack_msg/slack /usr/bin/slack
+    sudo cp slack_msg/slack /usr/bin/slack
     sudo chmod +x /usr/bin/slack
 
     sudo sed -i '/^exit 0/d' /etc/rc.local
