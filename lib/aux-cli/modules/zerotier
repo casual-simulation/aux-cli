@@ -17,12 +17,12 @@ install() {
 
     sudo tee -a "/etc/rc.local" > /dev/null <<EOT
 if [ -e /boot/zt]; then
-    zt_network=$(cat /boot/zt)
+    zt_network=\$(cat /boot/zt)
     sudo zerotier-cli join \$zt_network
     rm /boot/zt
 
     if slack; then
-        slack $(sudo zerotier-cli info)
+        slack \$(sudo zerotier-cli info)
     fi
 fi
 
