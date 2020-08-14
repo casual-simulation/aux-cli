@@ -67,6 +67,15 @@ deploy_files() {
     sudo cp -rf /home/pi/aux-cli/lib /
 }
 
+enable_gpio() {
+    if sudo grep "dtoverlay=gpio-no-irq" "/boot/config.txt"; then
+        echo "dtoverlay=gpio-no-irq" | sudo tee -a /boot/config.txt
+    fi
+    if sudo grep "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" "/etc/udev/rules.d/20-gpiomem.rules"; then
+        echo "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" | sudo tee -a /etc/udev/rules.d/20-gpiomem.rules
+    fi
+}
+
 cleanup() {
     if [ -e /home/pi/aux-cli ]; then
         sudo rm -rf /home/pi/aux-cli
@@ -95,6 +104,7 @@ install() {
     clone_repo
     make_executable
     deploy_files
+    enable_gpio
     cleanup
 }
 
@@ -104,6 +114,7 @@ update() {
     clone_repo
     make_executable
     deploy_files
+    enable_gpio
     update_conf
     cleanup
 }
