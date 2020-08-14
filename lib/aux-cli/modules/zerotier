@@ -16,14 +16,16 @@ install() {
     sudo sed -i '/^exit 0/d' /etc/rc.local
 
     sudo tee -a "/etc/rc.local" > /dev/null <<EOT
-if [ -e /boot/zt]; then
+if [ -e /boot/zt ]; then
     zt_network=\$(cat /boot/zt)
-    sudo zerotier-cli join \$zt_network
+    touch "/var/lib/zerotier-one/networks.d/\${zt_network}.conf"
     rm /boot/zt
 
-    if slack; then
-        slack \$(sudo zerotier-cli info)
-    fi
+
+#    if [ -e /usr/bin/slack ]; then
+#        info=\$(zerotier-cli info)
+#        sudo -u root slack "Computer \${info} sent a request to join the network \${zt_network}."
+#    fi
 fi
 
 exit 0

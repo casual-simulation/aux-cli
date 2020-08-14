@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ####################################################################################
 # Slack Bash console script for sending messages.
