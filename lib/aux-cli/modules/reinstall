@@ -17,6 +17,9 @@ help_menu() {
     echo "raspiwifi     Reinstalls a tool to enable/disable hotspot mode."
     echo "rfid          Reinstalls a collection of tools to work with RFID a reader/writer."
     echo "zerotier      Reinstalls a tool to do stuff."
+    echo "usbmount      Reinstalls a tool for automatically mounting external storage to a specified directory."
+    echo "nfchat        Reinstalls a collection of tools to work with NFC a reader/writer"
+    echo "slack         Reinstalls a tool to message Slack from the command line."
     echo "tethering     Reinstalls a collection of tools to allow tethering via usb or bluetooth."
     echo "everything    Reinstalls everything available"
     echo ""
@@ -61,6 +64,21 @@ while [[ $# -gt 0 ]]; do
         aux-cli install zerotier
         shift # past argument
         ;;
+    usbmount)
+        aux-cli uninstall usbmount
+        aux-cli install usbmount
+        shift # past argument
+        ;;
+    nfchat)
+        aux-cli uninstall nfchat
+        aux-cli install nfchat
+        shift # past argument
+        ;;
+    slack)
+        aux-cli uninstall slack
+        aux-cli install slack
+        shift # past argument
+        ;;
     tethering)
         aux-cli uninstall tethering
         aux-cli install tethering
@@ -78,6 +96,15 @@ while [[ $# -gt 0 ]]; do
 
         aux-cli uninstall zerotier
         aux-cli install zerotier
+
+        aux-cli uninstall usbmount
+        aux-cli install usbmount
+
+        aux-cli uninstall nfchat
+        aux-cli install nfchat
+
+        aux-cli uninstall slack
+        aux-cli install slack
 
         aux-cli uninstall tethering
         aux-cli install tethering
