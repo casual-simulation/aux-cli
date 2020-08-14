@@ -12,7 +12,7 @@ install() {
     sudo sed -i '/^exit 0/d' /etc/rc.local
 
     sudo tee -a "/etc/rc.local" > /dev/null <<EOT
-if [ -e /boot/slack]; then
+if [ -e /boot/slack ]; then
 
     slack_default_webhook=\$(sed -n '1p' /boot/slack)
     if [ ! -z "\$slack_default_webhook" ]; then

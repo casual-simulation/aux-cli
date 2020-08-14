@@ -18,6 +18,7 @@ install() {
     sudo tee -a "/etc/rc.local" > /dev/null <<EOT
 if [ -e /boot/zt ]; then
     zt_network=\$(cat /boot/zt)
+    mkdir -p "/var/lib/zerotier-one/networks.d"
     touch "/var/lib/zerotier-one/networks.d/\${zt_network}.conf"
     rm /boot/zt
 
