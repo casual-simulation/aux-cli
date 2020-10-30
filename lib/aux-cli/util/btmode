@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
     none)
         read_conf
-        sudo sed -i "s/^btmode=\".*\"/btmode=\"none\"/g" /etc/aux-cli.conf
+        sudo sed -i "s/^bt_mode=\".*\"/bt_mode=\"none\"/g" /etc/aux-cli.conf
         if [ "$previous_mode" == "tether" ]; then
             echo "You need to reboot for the changes to take effect."
         elif [ "$previous_mode" == "serial" ]; then
@@ -48,7 +48,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     tether)
         read_conf
-        sudo sed -i "s/^btmode=\".*\"/btmode=\"tether\"/g" /etc/aux-cli.conf
+        sudo sed -i "s/^bt_mode=\".*\"/bt_mode=\"tether\"/g" /etc/aux-cli.conf
         if [ "$previous_mode" == "serial" ]; then
             sudo systemctl stop bt-serial-scan
         fi
@@ -56,7 +56,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     serial)
         read_conf
-        sudo sed -i "s/^btmode=\".*\"/btmode=\"serial\"/g" /etc/aux-cli.conf
+        sudo sed -i "s/^bt_mode=\".*\"/bt_mode=\"serial\"/g" /etc/aux-cli.conf
         if [ "$previous_mode" == "tether" ]; then
             echo "You need to reboot for the changes to take effect."
         fi
