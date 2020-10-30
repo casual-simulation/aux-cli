@@ -8,6 +8,11 @@ install_deps() {
     else
         sudo apt-get install -y git
     fi
+
+    # TODO: Not sure where to throw this for now. 
+    # Gives errors if we don't install with base install for some reason.
+    sudo mkdir -p /data
+    sudo mkdir -p /data/drives
 }
 
 clone_repo() {
@@ -29,17 +34,6 @@ update_conf() {
 
     for i in "${!ary2[@]}"; do
         if [[ ${ary1[$i]} ]]; then
-
-            # oldconf=$(grep -n "$i" /etc/aux-cli.conf)
-            # newconf=$(grep -n "$i" /home/pi/aux-cli.conf)
-            # if [ "$oldconf" == "$newconf" ]; then
-            #     echo yay $i
-            # else
-            #     line_number=$(grep -n "$i" /home/pi/aux-cli.conf | grep -Eo '^[^:]+')
-            #     num=$((line_number + 1))
-            #     sed -i "${num}i \n" /etc/aux-cli.conf
-            # fi
-
             if [ "$i" == "version" ]; then
                 sed -i "s/^version=\".*\"/version=${ary2[$i]}/g" /etc/aux-cli.conf
             fi
@@ -68,12 +62,27 @@ deploy_files() {
 }
 
 enable_gpio() {
-    if sudo grep "dtoverlay=gpio-no-irq" "/boot/config.txt"; then
+    sudo sed -i "s/^#dtoverlay=gpio-no-irq/dtoverlay=gpio-no-irq/g" /boot/config.txt
+    if ! sudo grep "dtoverlay=gpio-no-irq" "/boot/config.txt"; then
         echo "dtoverlay=gpio-no-irq" | sudo tee -a /boot/config.txt
     fi
-    if sudo grep "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" "/etc/udev/rules.d/20-gpiomem.rules"; then
+    if ! sudo grep "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" "/etc/udev/rules.d/20-gpiomem.rules"; then
         echo "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" | sudo tee -a /etc/udev/rules.d/20-gpiomem.rules
     fi
+}
+
+enable_uart(){
+    # If it finds UART, make sure it's on
+    sudo sed -i "s/^#enable_uart=1/enable_uart=1/g" /boot/config.txt
+    sudo sed -i "s/^#enable_uart=0/enable_uart=1/g" /boot/config.txt
+    sudo sed -i "s/^enable_uart=0/enable_uart=1/g" /boot/config.txt
+
+    if ! sudo grep "enable_uart=1" "/boot/config.txt"; then
+        printf "\n# Enable UART\nenable_uart=1\n" | sudo tee -a /boot/config.txt
+    fi
+
+    # Disable Serial Console from tying up the process
+    sudo sed -i "s/console=serial0,115200 //g" /boot/cmdline.txt
 }
 
 cleanup() {
@@ -105,6 +114,7 @@ install() {
     make_executable
     deploy_files
     enable_gpio
+    enable_uart
     cleanup
 }
 
@@ -115,6 +125,7 @@ update() {
     make_executable
     deploy_files
     enable_gpio
+    enable_uart
     update_conf
     cleanup
 }

@@ -1,0 +1,14 @@
+[Unit]
+Description=Bluetooth Serial Scan
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/env bash /lib/aux-cli/modules/ble/bt-serial-scan.sh
+
+[Install]
+WantedBy=multi-user.target

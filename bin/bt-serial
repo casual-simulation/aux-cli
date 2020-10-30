@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+. /etc/bt-serial.conf
+
+sudo rfcomm connect "$1" $brush01_mac 1 &
+
+while ! (sudo rfcomm -a | grep $brush01_mac); do 
+    sleep 1
+    echo "Not Connected Yet."
+done

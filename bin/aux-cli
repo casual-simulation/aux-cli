@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot nfc backup help version info conf)
+commands=(install uninstall reinstall start stop restart update changehost dhcpcd hotspot nfc backup btmode version info conf help)
 
 help_menu() {
     echo ""
@@ -22,10 +22,11 @@ help_menu() {
     echo "hotspot           Tool for managing hotspot mode."
     echo "nfc               Tool for configuring NFC tags."
     echo "backup            Creates a backup img of your pi."
-    echo "help              Displays this help information."
     echo "version           Displays the aux-cli version."
     echo "info              Displays helpful information about you machine."
     echo "conf              Manually edits /etc/aux-cli.conf with nano."
+    echo "btmode            Sets the aux-cli bluetooth mode."
+    echo "help              Displays this help information."
     echo ""
     echo "Run 'aux-cli COMMAND --help' for more information on a command."
     echo ""
@@ -174,6 +175,16 @@ while [[ $# -gt 0 ]]; do
     conf)
         . /lib/aux-cli/util/conf
         shift # past argument
+        ;;
+    btmode)
+        err_chk "$1" "$2"
+        shift
+        while [[ $# -gt 0 ]] && [[ ! ${commands[*]} =~ $1 ]]; do
+            btmode_array+=("$1")
+            shift
+        done
+        . /lib/aux-cli/util/btmode "${btmode_array[@]}"
+        break
         ;;
     help)
         help_menu

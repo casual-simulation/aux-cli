@@ -180,7 +180,9 @@ dep_check() {
             aux-cli dhcpcd -s
             if [ "${agree}" == "true" ]; then
                 echo "Installing PiShrink now."
-                wget https://raw.githubusercontent.com/framps/PiShrink/offer_filesystem_repair_option/pishrink.sh
+                wget https://code.lewman.com/andrew/PiShrink/raw/master/pishrink.sh
+                # wget https://raw.githubusercontent.com/Drewsif/PiShrink/master/pishrink.sh
+                # wget https://raw.githubusercontent.com/framps/PiShrink/offer_filesystem_repair_option/pishrink.sh
                 sudo chmod +x pishrink.sh
                 sudo mv pishrink.sh /usr/local/bin
             else

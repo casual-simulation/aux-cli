@@ -1,0 +1,52 @@
+#!/bin/bash
+set -e
+
+help_menu() {
+    echo ""
+    echo "Usage:    btmode [OPTIONS]"
+    echo ""
+    echo "A tool for configuring the bluetooth mode."
+    echo ""
+    echo "Options:"
+    echo "none              Disable all aux-cli bluetooth modes."
+    echo "tether            Enables bluetooth tethering."
+    echo "serial            Enables bluetooth serial connection."
+    echo "-h    --help      Displays this help information."
+    echo ""
+    exit 1
+}
+
+err_msg1() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run btmode -h for help."
+    echo ""
+    exit 1
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "btmode requires at least one argument."
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    none)
+        sudo sed -i "s/^btmode=\".*\"/btmode=\"none\"/g" /etc/aux-cli.conf
+        ;;
+    tether)
+        sudo sed -i "s/^btmode=\".*\"/btmode=\"tether\"/g" /etc/aux-cli.conf
+        ;;
+    serial)
+        sudo sed -i "s/^btmode=\".*\"/btmode=\"serial\"/g" /etc/aux-cli.conf
+        ;;
+    -h | -help | --help)
+        help_menu
+        shift # past argument
+        ;;
+    *) # any option
+        err_msg1 "$1"
+        shift # past argument
+        ;;
+    esac
+done

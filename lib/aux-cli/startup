@@ -141,7 +141,9 @@ power on
 discoverable on
 pairable on
 EOF
+}
 
+bluetooth_broadcast() {
     echo "Converting hostname to hex for broadcasting..."
     STR=$(hostname)
     HEXVAL=$(xxd -pu <<<"$STR")
@@ -193,12 +195,13 @@ run_steps() {
         sudo sed -i "s/first_run=\"true\"/first_run=\"false\"/g" /etc/aux-cli.conf
     fi
 
-    if [ $usbmount == "true" ]; then
-        usbmount_docker_check
+    if [ $tethering == "true" ] && [ $bt_mode == "serial" ]; then
+        systemctl start bt-serial-scan
     fi
 
-    if [ $tethering == "true" ]; then
+    if [ $tethering == "true" ] && [ $bt_mode == "tether" ]; then
         bluetooth_start
+        bluetooth_broadcast
         bluetooth_hotspot_check
     fi
 }
