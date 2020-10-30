@@ -86,6 +86,11 @@ enable_uart(){
     sudo sed -i "s/console=serial0,115200 //g" /boot/cmdline.txt
 }
 
+enable_web_server(){
+    sudo systemctl enable aux-cli-web
+    sudo systemctl start aux-cli-web
+}
+
 cleanup() {
     if [ -e /home/pi/aux-cli ]; then
         sudo rm -rf /home/pi/aux-cli
@@ -116,6 +121,7 @@ install() {
     deploy_files
     enable_gpio
     enable_uart
+    enable_web_server
     cleanup
 }
 
@@ -127,6 +133,7 @@ update() {
     deploy_files
     enable_gpio
     enable_uart
+    enable_web_server
     update_conf
     cleanup
 }

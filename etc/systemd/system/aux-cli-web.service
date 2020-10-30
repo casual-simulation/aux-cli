@@ -1,5 +1,5 @@
 [Unit]
-Description=Bluetooth Serial Connect
+Description=Docker to Host Communication
 After=network.target
 StartLimitIntervalSec=0
 
