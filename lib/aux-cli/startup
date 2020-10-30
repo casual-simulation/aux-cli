@@ -195,7 +195,7 @@ run_steps() {
         sudo sed -i "s/first_run=\"true\"/first_run=\"false\"/g" /etc/aux-cli.conf
     fi
 
-    if [ $tethering == "true" ] && [ $bt_mode == "serial" ]; then
+    if [ $bt_mode == "serial" ]; then
         systemctl start bt-serial-scan
     fi
 
