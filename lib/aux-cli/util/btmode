@@ -44,6 +44,7 @@ while [[ $# -gt 0 ]]; do
         elif [ "$previous_mode" == "serial" ]; then
             sudo systemctl stop bt-serial-scan
         fi
+        shift # past argument
         ;;
     tether)
         read_conf
@@ -51,6 +52,7 @@ while [[ $# -gt 0 ]]; do
         if [ "$previous_mode" == "serial" ]; then
             sudo systemctl stop bt-serial-scan
         fi
+        shift # past argument
         ;;
     serial)
         read_conf
@@ -59,6 +61,7 @@ while [[ $# -gt 0 ]]; do
             echo "You need to reboot for the changes to take effect."
         fi
         sudo systemctl start bt-serial-scan
+        shift # past argument
         ;;
     -h | -help | --help)
         help_menu
