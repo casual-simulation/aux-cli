@@ -5,7 +5,7 @@
 
 
 # If there are no known devices
-if [ $device01_mac == "" ]; then
+if [ "$device01_mac" == "" ]; then
 
     # Discover devices
     while [[ $(hcitool scan | grep "RNBT") == "" ]]; do
