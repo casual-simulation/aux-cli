@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=pi
-ExecStart=/usr/bin/env bash /lib/aux-cli/modules/ble/bt-serial-scan.sh
+ExecStart=/usr/bin/env bash /bin/bt-serial-scan
 
 [Install]
 WantedBy=multi-user.target
