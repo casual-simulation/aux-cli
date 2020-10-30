@@ -59,6 +59,7 @@ deploy_files() {
         sudo cp -rf /home/pi/aux-cli/etc /
     fi
     sudo cp -rf /home/pi/aux-cli/lib /
+    sudo cp -rf /home/pi/aux-cli/srv /
 }
 
 enable_gpio() {
