@@ -84,6 +84,7 @@ enable_uart(){
 
     # Disable Serial Console from tying up the process
     sudo sed -i "s/console=serial0,115200 //g" /boot/cmdline.txt
+    sudo sed -i "s/console=ttyAMA0,115200 //g" /boot/cmdline.txt
 }
 
 enable_web_server(){
