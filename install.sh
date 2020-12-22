@@ -53,13 +53,29 @@ make_executable() {
 }
 
 deploy_files() {
-    sudo cp -rf /home/pi/aux-cli/bin /
-    sudo cp -rf /home/pi/aux-cli/data /
-    if [ ! -e /etc/aux-cli.conf ]; then
-        sudo cp -rf /home/pi/aux-cli/etc /
+    if [ ! -e /bin ]; then
+        sudo mkdir /bin
     fi
-    sudo cp -rf /home/pi/aux-cli/lib /
-    sudo cp -rf /home/pi/aux-cli/srv /
+    sudo cp -rf /home/pi/aux-cli/bin/* /bin
+
+    if [ ! -e /data ]; then
+        sudo mkdir /data
+    fi
+    sudo cp -rf /home/pi/aux-cli/data/* /data
+
+    if [ ! -e /lib ]; then
+        sudo mkdir /lib
+    fi
+    sudo cp -rf /home/pi/aux-cli/lib/* /lib
+
+    if [ ! -e /srv ]; then
+        sudo mkdir /srv
+    fi
+    sudo cp -rf /home/pi/aux-cli/srv/* /srv
+
+    if [ ! -e /etc/aux-cli.conf ]; then
+        sudo cp -rf /home/pi/aux-cli/etc/* /etc
+    fi
 }
 
 enable_gpio() {
