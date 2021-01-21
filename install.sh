@@ -25,7 +25,7 @@ update_conf() {
             available=($(jq '.[] | select(.available == true) | .name' $bkp_config)) 
 
             # Write those to the new config
-            for command in available; do
+            for command in "${available[@]}"; do
                 jq --arg com "$command" '(.[] | select( .name == $com ) | .available) = true' $new_config | sudo tee $tmp
                 sudo mv -f $tmp $new_config
             done
@@ -37,15 +37,15 @@ update_conf() {
             disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config)) 
 
             # Write those to the new config
-            for component in installed; do
+            for component in "${installed[@]}"; do
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp
                 sudo mv -f $tmp $new_config
             done
-            for component in enabled; do
+            for component in "${enabled[@]}"; do
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp
                 sudo mv -f $tmp $new_config
             done
-            for component in disabled; do
+            for component in "${disabled[@]}"; do
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp
                 sudo mv -f $tmp $new_config
             done
