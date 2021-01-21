@@ -30,7 +30,7 @@ update_conf() {
                 sudo mv -f $tmp $new_config
             done
 
-        else if [ $new_config == "/etc/auxcli/components.json" ]; then
+        elif [ $new_config == "/etc/auxcli/components.json" ]; then
             # Get array of installed things
             installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config)) 
             enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config))  
@@ -50,7 +50,7 @@ update_conf() {
                 sudo mv -f $tmp $new_config
             done
 
-        else if [ $new_config == "/etc/auxcli/config.json" ]; then
+        elif [ $new_config == "/etc/auxcli/config.json" ]; then
             # Get new version number
             new_ver=$(jq '.[].version' $new_config)
 
@@ -62,7 +62,7 @@ update_conf() {
             jq --arg ver "$new_ver" '(.[].version) = $ver' $new_config | sudo tee $tmp
             sudo mv -f $tmp $new_config
 
-        else if [ $new_config == "/etc/auxcli/devices.json" ]; then
+        elif [ $new_config == "/etc/auxcli/devices.json" ]; then
             jq -s '.[0] * .[1]' $new_config $bkp_config
         else 
             echo "Config: $bkp_config is not being saved at all."
