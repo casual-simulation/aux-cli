@@ -374,3 +374,106 @@ fi
 
 # https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v12.0.0%2Fnfc_ndef_format_dox.html
 # https://community.nxp.com/thread/464994
+
+
+
+
+
+
+
+"""
+4 or 7 Byte
+MIFARE Classic® EV1 1k
+MIFARE Classic® EV1 4k
+
+7 Byte
+NTAG213
+NTAG215
+NTAG216
+
+NTAG203
+NTAG210
+NTAG212
+
+NTAG413
+NTAG424
+
+ST25TA512B
+ST25TA02KB
+ST25TA16K
+ST25TA64K
+
+MIFARE Ultralight® EV1
+
+8 Byte
+ICODE® SLIX-L
+ICODE® SLIX
+ICODE® SLIX-S
+ICODE® SLIX 2
+
+
+
+
+string tagType = detect_tag_type.py # Returns Type as String
+
+# Extra Commands
+aux-cli nfc -i --info
+    sudo python3 ${tagType}.py info
+        # have all the functions in here
+        # or, have separate files with reusable functions
+aux-cli nfc -r --read
+
+# TNF 0 - Empty
+aux-cli nfc -c --clear # Clears user data
+aux-cli nfc -r --reset # Clears user data and also tries to reset the tag to defaults
+
+# TNF 1 Records
+aux-cli nfc -t --write-text <text> | <file>
+aux-cli nfc -u --write-uri <uri>
+aux-cli nfc -p --write-poster <bunch of stuff>
+aux-cli nfc -s --write-sig <bunch of stuff>
+aux-cli nfc -h --write-handover <bunch of stuff>
+aux-cli nfc -w --write-wifi <ssid> <password>
+
+# TNF 2 - MIME Type Records
+aux-cli nfc -m --write-mime <bunch of stuff>
+
+# TNF 3 - Absolute-URL records
+
+# TNF 4 - External type records
+
+# TNF 5 - Unknown type records
+
+# TNF 6 - Unchanged type records
+
+
+
+
+
+Slowly narrow down the tag options
+
+Check UID
+
+if len4
+    set tag_type mifare
+elif len7
+    set tag_type ntag
+
+
+coolscript - to lock tag
+    if tag_type mifare
+        do mifare stuff
+    if tag_type ntag
+        case ICM1
+            do ICM1 stuff
+        case ICM2
+            do ICM2 stuff
+        case ICM3 | ICM4
+            do ICM3 stuff
+
+
+
+
+
+
+"""
