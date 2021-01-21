@@ -60,7 +60,7 @@ err_check() {
 
 run_cmd() {
     # Set the first argument to be the command and then shift past it
-    command_path=$(jq --arg cmd "$1" '.[] | select( .name == $cmd ) | .command_path' $commands_config)
+    command_path=$(jq --arg cmd "$1" -r '.[] | select( .name == $cmd ) | .command_path' $commands_config)
     shift
 
     # Add all other arguments to an array
