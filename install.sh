@@ -62,8 +62,8 @@ update_conf() {
             jq --arg ver "$new_ver" '(.[].version) = $ver' $new_config | sudo tee $tmp
             sudo mv -f $tmp $new_config
 
-        elif [ $new_config == "/etc/auxcli/devices.json" ]; then
-            jq -s '.[0] * .[1]' $new_config $bkp_config
+        # elif [ $new_config == "/etc/auxcli/devices.json" ]; then
+        #     jq -s '.[0] * .[1]' $new_config $bkp_config
         else 
             echo "Config: $bkp_config is not being saved at all."
         fi
