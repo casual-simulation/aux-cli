@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+config_path=($(jq -r '.[] | select( .name == "backup" ) | .config_path' /etc/auxcli/commands.json))
+
 # Default Variables
 hostn=$(hostname)                              # Hostname of RaspberryPi
 filename="${hostn}-bkp.img"                    # Image name

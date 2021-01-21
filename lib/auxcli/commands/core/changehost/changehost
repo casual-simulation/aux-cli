@@ -1,12 +1,14 @@
 #!/bin/bash
 set -e
 
-args_short=($(jq -r '.[].arg_short' config.json))
-args_long=($(jq -r '.[].arg_long' config.json))
+config_path=($(jq -r '.[] | select( .name == "changehost" ) | .config_path' /etc/auxcli/commands.json))
+
+args_short=($(jq -r '.[].arg_short' $config_path))
+args_long=($(jq -r '.[].arg_long' $config_path))
 args=("${args_short[@]}" "${args_long[@]}")
 
 # readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' config.json)
+readarray -t args_desc < <(jq '.[].short_desc' $config_path)
 
 usage() {
     printf "\nUsage:    auxcli changehost [OPTIONS]\n\n"
@@ -59,7 +61,7 @@ set_hostname() {
             sudo sed -i "s/$host/$2/g" /etc/hosts
         fi
         sudo hostnamectl set-hostname "$2"
-        changed="true"
+        changed=true
         printf "\nHostname has been changed from $host to $2\n"
         printf "Hostname changes requires a reboot to take effect.\n"
     elif hostname >/dev/null 2>&1; then
@@ -70,12 +72,12 @@ set_hostname() {
             sudo sed -i "s/$host/$2/g" /etc/hostname
         fi
         sudo hostname "$2"
-        changed="true"
+        changed=true
         printf "\nHostname has been changed from $host to $2\n"
         printf "Hostname changes requires a reboot to take effect.\n"
     else
         printf "Hostname was not changed. Your version of UNIX might not be currently supported.\n"
-        changed="false"
+        changed=false
         exit 1
     fi
 }
@@ -90,7 +92,9 @@ while [[ $# -gt 0 ]]; do
         shift # past value
         ;;
     -r | --reboot)
-        sudo reboot now
+        if $changed; then
+            sudo reboot now
+        fi
         shift # past argument
         ;;
     -h | -help | --help)

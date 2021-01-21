@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
-args_short=($(jq -r '.[].arg_short' config.json))
-args_long=($(jq -r '.[].arg_long' config.json))
+config_path=($(jq -r '.[] | select( .name == "nfc" ) | .config_path' /etc/auxcli/commands.json))
+
+args_short=($(jq -r '.[].arg_short' $config_path))
+args_long=($(jq -r '.[].arg_long' $config_path))
 args=("${args_short[@]}" "${args_long[@]}")
 
 # Default Variables
@@ -10,7 +12,7 @@ config_wifi="false"
 config_url="false"
 
 # readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' config.json)
+readarray -t args_desc < <(jq '.[].short_desc' $config_path)
 
 usage() {
     printf "\nUsage:    auxcli nfc [OPTIONS]\n\n"

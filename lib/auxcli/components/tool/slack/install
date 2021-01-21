@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-sudo cp slack_msg/slack /usr/bin/slack
+install_path=($(jq -r '.[] | select( .name == "slack" ) | .install_path' /etc/auxcli/components.json))
+
+sudo cp $install_path/slack_msg/slack /usr/bin/slack
 sudo chmod +x /usr/bin/slack
 
 sudo sed -i '/^exit 0/d' /etc/rc.local

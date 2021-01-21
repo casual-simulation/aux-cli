@@ -1,11 +1,13 @@
 #!/bin/bash
 set -e
 
+install_path=($(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc/auxcli/components.json))
+
 # Add in our custom scripts to bypass interactivity
 echo "DEBUG: Modifying RaspiWiFi..."
-sudo cp "initial_setup.py" RaspiWiFi
-sudo cp "config.json" RaspiWiFi
-sudo cp "reset_lib.py" RaspiWiFi/libs/reset_device
+sudo cp "$install_path/initial_setup.py" $install_path/RaspiWiFi
+sudo cp "$install_path/config.json" $install_path/RaspiWiFi
+sudo cp "$install_path/reset_lib.py" $install_path/RaspiWiFi/libs/reset_device
 
 # Enable services before we hit a reboot
 sudo systemctl enable auxcli-dnsmasq-checker
@@ -26,5 +28,5 @@ sudo mv -f $tmp $new_config
 
 # Run the RaspiWiFi setup
 echo "DEBUG: Running RaspiWiFi..."
-cd RaspiWiFi
+cd $install_path/RaspiWiFi
 sudo python3 initial_setup.py # Triggers a reboot
