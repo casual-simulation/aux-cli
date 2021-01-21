@@ -7,7 +7,6 @@
       "auto_config_delay":"300",
       "server_port_choice":"8080",
       "ssl_enabled_choice":"N",
-      "install_ans":"y",
-      "reboot_ans":"y"
+      "install_ans":"y"
   }
 }

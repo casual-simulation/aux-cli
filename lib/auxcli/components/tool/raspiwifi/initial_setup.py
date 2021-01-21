@@ -17,7 +17,6 @@ auto_config_delay = (data["settings"]["auto_config_delay"])
 server_port_choice = (data["settings"]["server_port_choice"])
 ssl_enabled_choice = (data["settings"]["ssl_enabled_choice"])
 install_ans = (data["settings"]["install_ans"])
-reboot_ans = (data["settings"]["reboot_ans"])
 
 if os.getuid():
     sys.exit('You need root access to install!')
@@ -82,8 +81,3 @@ print("#####################################")
 print()
 print()
 print("Initial setup is complete. A reboot is required to start in WiFi configuration mode...")
-if(reboot_ans == ''):
-	reboot_ans = input("Would you like to do that now? [y/N]: ")
-
-if reboot_ans.lower() == 'y':
-	os.system('reboot')
