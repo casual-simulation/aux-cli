@@ -112,9 +112,9 @@ cleanup() {
 }
 
 backup() {
-    sudo mv /bin/auxcli /bin/auxcli-bkp
-    sudo mv /lib/auxcli /lib/auxcli-bkp
-    sudo mv /etc/auxcli /etc/auxcli-bkp
+    sudo mv -f /bin/auxcli /bin/auxcli-bkp
+    sudo mv -f /lib/auxcli /lib/auxcli-bkp
+    sudo mv -f /etc/auxcli /etc/auxcli-bkp
 }
 
 install() {
