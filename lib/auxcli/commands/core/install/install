@@ -6,6 +6,8 @@ PATH=$PATH:/lib/auxcli/commands/helper
 
 components_config="/etc/auxcli/components.json"
 components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
+components_type=($(jq -r '.[].type' /etc/auxcli/components.json))
+components_reboot=($(jq -r '.[].requires_reboot' /etc/auxcli/components.json))
 
 # readarray splits each newline into one element in the array
 readarray -t components_desc < <(jq '.[].short_desc' $components_config)
@@ -59,23 +61,49 @@ install_component(){
 
         # Install all the things
         for ((i = 0; i < ${#components[@]}; i++)); do
-            auxcli install "${components[$i]}"
+            if [ "${components_type[$i]}" == "tool" ]; then
+                if ${components_reboot[$i]}; then
+                    # Write Reboot Required
+                    config="/etc/auxcli/config.json"
+                    tmp="/etc/auxcli/config.json.tmp"
+                    jq '(.[].reboot_required) = true' $config | sudo tee $tmp
+                    sudo mv -f $tmp $config
+                fi
+                auxcli install "${components[$i]}"
+            fi
         done
-        
+
     else
         if installed "raspiwifi"; then
             auxcli dhcpcd -s
             while [[ $# -gt 0 ]]; do
+                if requires-reboot $1; then
+                    # Write Reboot Required
+                    config="/etc/auxcli/config.json"
+                    tmp="/etc/auxcli/config.json.tmp"
+                    jq '(.[].reboot_required) = true' $config | sudo tee $tmp
+                    sudo mv -f $tmp $config
+                fi
                 . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
                 shift
             done
             auxcli dhcpcd -u
         else
             while [[ $# -gt 0 ]]; do
+                if requires-reboot $1; then
+                    # Write Reboot Required
+                    config="/etc/auxcli/config.json"
+                    tmp="/etc/auxcli/config.json.tmp"
+                    jq '(.[].reboot_required) = true' $config | sudo tee $tmp
+                    sudo mv -f $tmp $config
+                fi
                 . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
                 shift
             done
         fi
+    fi
+    if jq -r '.reboot_required' /etc/auxcli/config.json; then
+        echo "A reboot is required"
     fi
 }
 
