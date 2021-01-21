@@ -17,7 +17,7 @@ update_conf() {
     for bkp_config in $(find /lib/auxcli-bkp /etc/auxcli-bkp -name '*.json'); do 
 
         # Get the new_config from modifying the bkp_config
-        new_config="${$bkp_config/auxcli-bkp/auxcli}"
+        new_config="${bkp_config/auxcli-bkp/auxcli}"
         tmp="$new_config.tmp"
 
         if [ $new_config == "/etc/auxcli/commands.json" ]; then
