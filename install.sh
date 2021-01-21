@@ -52,14 +52,14 @@ update_conf() {
 
         elif [ $new_config == "/etc/auxcli/config.json" ]; then
             # Get new version number
-            new_ver=$(jq '.[].version' $new_config)
+            new_ver=$(jq '.version' $new_config)
 
             # Merge
             jq -s '.[0] * .[1]' $new_config $bkp_config | sudo tee $tmp
             sudo mv -f $tmp $new_config
 
             # Write new version back onto the new file
-            jq --arg ver "$new_ver" '(.[].version) = $ver' $new_config | sudo tee $tmp
+            jq --arg ver "$new_ver" '(.version) = $ver' $new_config | sudo tee $tmp
             sudo mv -f $tmp $new_config
 
         # elif [ $new_config == "/etc/auxcli/devices.json" ]; then
