@@ -17,7 +17,7 @@ usage() {
     for ((i = 0; i < ${#components[@]}; i++)); do
         if enabled ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
-        else if ! enabled ${components[$i]}; then
+        elif ! enabled ${components[$i]}; then
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         fi
     done
