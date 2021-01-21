@@ -1,0 +1,69 @@
+led_aux_wave3:
+  alias: AUX Wave3
+  sequence:
+  - service: persistent_notification.create
+    data_template:
+      message: >
+        {% for entity_id in states.group.led_red.attributes.entity_id %}
+        {{- entity_id }}
+        
+        {% endfor %}
+      notification_id: '1234'
+      title: Sample notification
+  - service: homeassistant.toggle
+    data_template:
+      entity_id: group.led_all
+      
+        # {% for thing in switch %}
+        #   "{{- thing}}"
+        # {% endfor %}
+        
+    #   'switch.led_green01,switch.led_green_02,switch.led_green_03'
+    #   "switch.all_switches"
+    #   "{{ states.switch|map(attribute='entity_id') }}"
+    
+    #   entity_id: switch.led_green_03
+#   - service: rest_command.aux_webhook_led
+#     data_template:
+#       name: led_green_03
+#       state: '{{ states("switch.led_green_03") }}'
+    
+    
+        # WORKS - Message
+        # {% for entity_id in states.group.led_red.attributes.entity_id %}
+        # thing 1: {{- entity_id }}: {{ states(entity_id) }}
+        
+        # {% endfor %}
+        
+        
+        # WORKS - Toggle
+        # - switch.led_green_03
+        # - switch.led_green_02
+        # - switch.led_green_01
+        # - switch.led_yellow_03
+        # - switch.led_yellow_02
+        # - switch.led_yellow_01
+        # - switch.led_red_03
+        # - switch.led_red_02
+        # - switch.led_red_01
+        
+        
+        # - group.led_green
+        # - group.led_yellow
+        # - group.led_red
+        
+        
+        # - group.led_all
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        

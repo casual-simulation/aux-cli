@@ -1,0 +1,34 @@
+#!/bin/bash
+set -e
+
+# TODO: Need to undo all of this?
+# sudo apt-get install -y bluez-tools python-dbus python-gobject python-gobject-2
+
+# old_dtimeout=$(grep DiscoverableTimeout /etc/bluetooth/main.conf)
+# new_dtimeout="DiscoverableTimeout = 0"
+# sudo sed -i "s/$old_dtimeout/$new_dtimeout/g" /etc/bluetooth/main.conf
+
+# old_ptimeout=$(grep PairableTimeout /etc/bluetooth/main.conf)
+# new_ptimeout="PairableTimeout = 0"
+# sudo sed -i "s/$old_ptimeout/$new_ptimeout/g" /etc/bluetooth/main.conf
+
+
+sudo apt-get remove -y bluez-tools
+
+sudo rm -rf /etc/systemd/network/pan0.netdev
+sudo rm -rf /etc/systemd/network/pan0.network
+sudo rm -rf /etc/systemd/system/bt-agent.service
+sudo rm -rf /etc/systemd/system/bt-network.service
+sudo systemctl disable systemd-networkd
+sudo systemctl stop systemd-networkd
+    
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+jq '(.[] | select (.name == "tethering-ble") | .installed) = false' $config | sudo tee $tmp
+sudo mv -f $tmp $config
+
+
+if [ $(jq -r '.btmode' /etc/auxcli/config.json) == "tether" ]; then
+    auxcli btmode "none"
+fi

@@ -2,143 +2,126 @@
 set -e
 
 install_deps() {
-
-    if git --version >/dev/null 2>&1; then
-        echo "GIT is already installed."
-    else
-        sudo apt-get install -y git
-    fi
-
-    # TODO: Not sure where to throw this for now. 
-    # Gives errors if we don't install with base install for some reason.
-    sudo mkdir -p /data
-    sudo mkdir -p /data/drives
+    sudo apt-get install -y git jq
 }
 
 clone_repo() {
-    # git clone --single-branch --branch develop https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
-    git clone https://github.com/casual-simulation/aux-cli.git /home/pi/aux-cli
+    # git clone --single-branch --branch develop https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
+    git clone https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
 }
 
 update_conf() {
-    declare -A ary1
-    declare -A ary2
+    # Have a larger one-time use instead of making a process to check for installed/available
 
-    while IFS='=' read -r key value; do
-        ary1[$key]=$value
-    done <<<$(grep -v '^$\|^\s*\#' /etc/aux-cli.conf)
+    # Find config files from these backups
+    for bkp_config in $(find /lib/auxcli-bkp /etc/auxcli-bkp -name '*.json'); do 
 
-    while IFS='=' read -r key value; do
-        ary2[$key]=$value
-    done <<<$(grep -v '^$\|^\s*\#' /home/pi/aux-cli/etc/aux-cli.conf)
+        # Get the new_config from modifying the bkp_config
+        new_config="${$bkp_config/auxcli-bkp/auxcli}"
+        tmp="$new_config.tmp"
 
-    for i in "${!ary2[@]}"; do
-        if [[ ${ary1[$i]} ]]; then
-            if [ "$i" == "version" ]; then
-                sed -i "s/^version=\".*\"/version=${ary2[$i]}/g" /etc/aux-cli.conf
-            fi
+        if [ $new_config == "/etc/auxcli/commands.json" ]; then
+            # Get array of available things
+            available=($(jq '.[] | select(.available == true) | .name' $bkp_config)) 
+
+            # Write those to the new config
+            for command in available; do
+                jq --arg com "$command" '(.[] | select( .name == $com ) | .available) = true' $new_config | sudo tee $tmp
+                sudo mv -f $tmp $new_config
+            done
+
+        else if [ $new_config == "/etc/auxcli/components.json" ]; then
+            # Get array of installed things
+            installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config)) 
+            enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config))  
+            disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config)) 
+
+            # Write those to the new config
+            for component in installed; do
+                jq --arg com "$component" '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp
+                sudo mv -f $tmp $new_config
+            done
+            for component in enabled; do
+                jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp
+                sudo mv -f $tmp $new_config
+            done
+            for component in disabled; do
+                jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp
+                sudo mv -f $tmp $new_config
+            done
+
+        else if [ $new_config == "/etc/auxcli/config.json" ]; then
+            # Get new version number
+            new_ver=$(jq '.[].version' $new_config)
+
+            # Merge
+            jq -s '.[0] * .[1]' $new_config $bkp_config | sudo tee $tmp
+            sudo mv -f $tmp $new_config
+
+            # Write new version back onto the new file
+            jq --arg ver "$new_ver" '(.[].version) = $ver' $new_config | sudo tee $tmp
+            sudo mv -f $tmp $new_config
+
+        else if [ $new_config == "/etc/auxcli/devices.json" ]; then
+            jq -s '.[0] * .[1]' $new_config $bkp_config
+        else 
+            echo "Config: $bkp_config is not being saved at all."
         fi
-
-        if [[ ! ${ary1[$i]} ]]; then
-            line_number=$(grep -n "$i" /home/pi/aux-cli/etc/aux-cli.conf | grep -Eo '^[^:]+')
-            sed -i "${line_number}i ${i}=${ary2[$i]}" /etc/aux-cli.conf
-        fi
-    done
-}
-
-make_executable() {
-    for filename in $(find /home/pi/aux-cli -type f ! -name "*.*"); do
-        chmod +x "${filename}"
     done
 }
 
 deploy_files() {
-    if [ ! -e /bin ]; then
-        sudo mkdir /bin
+    if [ ! -e /data/drives ]; then
+        sudo mkdir -p /data/drives
     fi
-    sudo cp -rf /home/pi/aux-cli/bin/* /bin
-
-    if [ ! -e /data ]; then
-        sudo mkdir /data
-    fi
-    sudo cp -rf /home/pi/aux-cli/data/* /data
-
-    if [ ! -e /lib ]; then
-        sudo mkdir /lib
-    fi
-    sudo cp -rf /home/pi/aux-cli/lib/* /lib
 
     if [ ! -e /srv ]; then
         sudo mkdir /srv
     fi
-    sudo cp -rf /home/pi/aux-cli/srv/* /srv
+    
+    sudo cp -rf /home/pi/auxcli/data/* /data
+    sudo cp -rf /home/pi/auxcli/srv/* /srv
 
-    if [ ! -e /etc/aux-cli.conf ]; then
-        sudo cp -rf /home/pi/aux-cli/etc/* /etc
-    fi
+    sudo cp -rf /home/pi/auxcli/bin/* /bin
+    sudo cp -rf /home/pi/auxcli/lib/* /lib
+    sudo cp -rf /home/pi/auxcli/etc/* /etc
+
 }
 
-enable_gpio() {
-    sudo sed -i "s/^#dtoverlay=gpio-no-irq/dtoverlay=gpio-no-irq/g" /boot/config.txt
-    if ! sudo grep "dtoverlay=gpio-no-irq" "/boot/config.txt"; then
-        echo "dtoverlay=gpio-no-irq" | sudo tee -a /boot/config.txt
-    fi
-    if ! sudo grep "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" "/etc/udev/rules.d/20-gpiomem.rules"; then
-        echo "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" | sudo tee -a /etc/udev/rules.d/20-gpiomem.rules
-    fi
-}
-
-enable_uart(){
-    # If it finds UART, make sure it's on
-    sudo sed -i "s/^#enable_uart=1/enable_uart=1/g" /boot/config.txt
-    sudo sed -i "s/^#enable_uart=0/enable_uart=1/g" /boot/config.txt
-    sudo sed -i "s/^enable_uart=0/enable_uart=1/g" /boot/config.txt
-
-    if ! sudo grep "enable_uart=1" "/boot/config.txt"; then
-        printf "\n# Enable UART\nenable_uart=1\n" | sudo tee -a /boot/config.txt
-    fi
-
-    # Disable Serial Console from tying up the process
-    sudo sed -i "s/console=serial0,115200 //g" /boot/cmdline.txt
-    sudo sed -i "s/console=ttyAMA0,115200 //g" /boot/cmdline.txt
-}
-
-enable_web_server(){
-    sudo systemctl enable aux-cli-web
-    sudo systemctl start aux-cli-web
+enable_services(){
+    sudo systemctl enable auxcli-web
+    sudo systemctl start auxcli-web  
 }
 
 cleanup() {
-    if [ -e /home/pi/aux-cli ]; then
-        sudo rm -rf /home/pi/aux-cli
+    if [ -e /home/pi/auxcli ]; then
+        sudo rm -rf /home/pi/auxcli
     fi
-    if [ -e /home/pi/aux-cli-bkp ]; then
-        sudo rm -rf /home/pi/aux-cli-bkp
+    if [ -e /home/pi/auxcli-bkp ]; then
+        sudo rm -rf /home/pi/auxcli-bkp
     fi
-    if [ -e /bin/aux-cli-bkp ]; then
-        sudo rm -rf /bin/aux-cli-bkp
+    if [ -e /bin/auxcli-bkp ]; then
+        sudo rm -rf /bin/auxcli-bkp
     fi
-    if [ -e /lib/aux-cli-bkp ]; then
-        sudo rm -rf /lib/aux-cli-bkp
+    if [ -e /lib/auxcli-bkp ]; then
+        sudo rm -rf /lib/auxcli-bkp
+    fi
+    if [ -e /etc/auxcli-bkp ]; then
+        sudo rm -rf /etc/auxcli-bkp
     fi
 }
 
 backup() {
-    if [ -e /home/pi/aux-cli ]; then
-        sudo mv /home/pi/aux-cli /home/pi/aux-cli-bkp
-    fi
-    sudo mv /bin/aux-cli /bin/aux-cli-bkp
-    sudo mv /lib/aux-cli /lib/aux-cli-bkp
+    sudo mv /bin/auxcli /bin/auxcli-bkp
+    sudo mv /lib/auxcli /lib/auxcli-bkp
+    sudo mv /etc/auxcli /etc/auxcli-bkp
 }
 
 install() {
     install_deps
     clone_repo
-    make_executable
     deploy_files
-    enable_gpio
-    enable_uart
-    enable_web_server
+    enable_services
     cleanup
 }
 
@@ -146,34 +129,31 @@ update() {
     install_deps
     backup
     clone_repo
-    make_executable
     deploy_files
-    enable_gpio
-    enable_uart
-    enable_web_server
+    enable_services
     update_conf
     cleanup
 }
 
 revert() {
     echo "Update failed. Reverting to previous version."
-    sudo rm -rf /home/pi/aux-cli
-    sudo rm -rf /bin/aux-cli
-    sudo rm -rf /lib/aux-cli
+    sudo rm -rf /bin/auxcli
+    sudo rm -rf /lib/auxcli
+    sudo rm -rf /etc/auxcli
 
-    sudo mv /home/pi/aux-cli-bkp /home/pi/aux-cli
-    sudo mv /bin/aux-cli-bkp /bin/aux-cli
-    sudo mv /lib/aux-cli-bkp /lib/aux-cli
+    sudo mv /bin/auxcli-bkp /bin/auxcli
+    sudo mv /lib/auxcli-bkp /lib/auxcli
+    sudo mv /etc/auxcli-bkp /lib/auxcli
 }
 
 run_steps() {
-    if [ -e /bin/aux-cli ]; then
+    if [ -e /bin/auxcli ]; then
         trap revert ERR
-        echo "AUX-CLI is already installed."
-        echo "Updating AUX-CLI..."
+        echo "AUXCLI is already installed."
+        echo "Updating AUXCLI..."
         update
     else
-        echo "Installing AUX-CLI..."
+        echo "Installing AUXCLI..."
         install
     fi
 }

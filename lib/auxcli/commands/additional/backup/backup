@@ -1,0 +1,381 @@
+#!/bin/bash
+set -e
+
+# Default Variables
+hostn=$(hostname)                              # Hostname of RaspberryPi
+filename="${hostn}-bkp.img"                    # Image name
+mountpoint="/mnt/usbstorage"                   # External Storage - Path
+log="/var/log/auxcli.pi.backup.log"           # Path to log file
+filename_shrunk="${filename/.img/-shrunk.img}" # Image name shrunk
+overwrite="false"                              # Default overwriting files to false
+args=(-d --destination -f --filename -m --mountpoint -s --storage -l --log -S --shrink -Z --zip -o --overwrite -y -h -help --help)
+
+usage() {
+    echo ""
+    echo "Usage:    backup.sh [OPTIONS]"
+    echo ""
+    echo "A tool that creates a complete backup image of your RaspberryPi with options to Shrink/Zip/Move/Upload it wherever you choose."
+    echo ""
+    echo "OPTIONS:"
+    # echo "-d    --destination STRING    Specify a final destination for the backup."
+    echo "-f    --filename STRING       Specify a filename to use. Default: ${hostn}-bkp.img"
+    echo "-m    --mountpoint STRING     Specify a mount point for your local storage device. Default: /mnt/usbstorage"
+    echo "-s    --storage STRING        Specify a local storage device to backup to. The script will try to find one if unspecified."
+    echo "-l    --log STRING            Specify a location to output the log to. Default: /var/log/auxcli.pi.backup.log"
+    echo "-S    --shrink STRING         Enable shrinking. Optional: Specify a string to append to the filename. Default: \"-shrunk\" Shrinking requires a device with at least 2x the storage space as your boot drive. NOTE: Sometimes drives are labeled incorrectly so double check. Actual storage might be slightly over or under the storage advertised. So 2x 4GB might not fit on an 8GB USB."
+    echo "-Z    --zip                   Enable zipping the backup before moving it to its final destination. For simplicity's sake, it follows the storage requirements for shrinking."
+    echo "-o    --overwrite             Overwrite any files as needed."
+    echo "-y                            Bypass prompt to install dependencies."
+    echo "-h    --help                  Displays this help information."
+    echo ""
+    exit 1
+}
+
+err_msg1() {
+    echo ""
+    echo "\"$1\" is an invalid argument."
+    echo "Run backup.sh -h for help."
+    echo ""
+    exit 1
+}
+
+err_msg2() {
+    echo ""
+    echo "\"$2\" is an invalid argument for \"$1\"."
+    echo "Run backup.sh -h for help."
+    echo ""
+    exit 1
+}
+
+err_chk() {
+    if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
+        err_msg2 "$1" "$2"
+    fi
+}
+
+if [ $# -eq 0 ]; then
+    echo ""
+    echo "Running with defaults..."
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -d | --destination)
+        err_chk "$1" "$2"
+        destination=$2
+        shift # past argument
+        shift # past value
+        ;;
+    -f | --filename)
+        err_chk "$1" "$2"
+        filename=$2
+        shift # past argument
+        shift # past value
+        ;;
+    -m | --mountpoint)
+        err_chk "$1" "$2"
+        mountpoint=$2
+        shift # past argument
+        shift # past value
+        ;;
+    -s | --storage)
+        err_chk "$1" "$2"
+        storage=$2
+        shift # past argument
+        shift # past value
+        ;;
+    -l | --log)
+        err_chk "$1" "$2"
+        log=$2
+        shift # past argument
+        shift # past value
+        ;;
+    -S | --shrink)
+        shrink="true"
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            shrink_suffix="$2"
+            shift # past argument
+            shift # past value
+        else
+            echo "No suffix specified. Using default: \"-shrunk\""
+            shift # past argument
+        fi
+        ;;
+    -Z | --zip)
+        zip="true"
+        shift # past argument
+        ;;
+    -o | --overwrite)
+        overwrite="true"
+        shift # past argument
+        ;;
+    -y)
+        agree="true"
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    *) # any option
+        err_msg1 "$1"
+        shift # past argument
+        ;;
+    esac
+done
+
+start_logging() {
+    exec 3>&1 4>&2
+    trap 'exec 2>&4 1>&3' 0 1 2 3
+    exec 1>"${log}" 2>&1
+}
+
+dep_check() {
+    deps=(exfat-fuse exfat-utils)
+    echo "Checking Dependencies..."
+    for dep in "${deps[@]}"; do
+        if ! dpkg -l | grep "${dep}" >/dev/null 2>&1; then
+            echo "${dep} is missing!"
+            auxcli dhcpcd -s
+            if [ "${agree}" == "true" ]; then
+                echo "Installing ${dep} now."
+                sudo apt-get install -y "${dep}"
+            else
+                read -p "Install dependency '${dep}' by pressing 'y' or press anything else to exit." -n 1 -r
+                echo # Gives us a newline
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    echo "Installing ${dep} now."
+                    sudo apt-get install -y "${dep}"
+                else
+                    exit 1
+                fi
+            fi
+        fi
+    done
+
+    if [ "${zip}" == "true" ]; then
+        if ! zip -h >/dev/null 2>&1; then
+            echo "Zip is missing!"
+            auxcli dhcpcd -s
+            if [ "${agree}" == "true" ]; then
+                echo "Installing Zip now."
+                sudo apt-get install -y zip
+            else
+                read -p "Install dependency 'zip' by pressing 'y' or press anything else to exit." -n 1 -r
+                echo # Gives us a newline
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    echo "Installing Zip now."
+                    sudo apt-get install -y zip
+                else
+                    exit 1
+                fi
+            fi
+        fi
+    fi
+
+    if [ "${shrink}" == "true" ]; then
+        if ! [ -e /usr/local/bin/pishrink.sh ]; then
+            echo "PiShrink is missing!"
+            auxcli dhcpcd -s
+            if [ "${agree}" == "true" ]; then
+                echo "Installing PiShrink now."
+                wget https://code.lewman.com/andrew/PiShrink/raw/master/pishrink.sh
+                # wget https://raw.githubusercontent.com/Drewsif/PiShrink/master/pishrink.sh
+                # wget https://raw.githubusercontent.com/framps/PiShrink/offer_filesystem_repair_option/pishrink.sh
+                sudo chmod +x pishrink.sh
+                sudo mv pishrink.sh /usr/local/bin
+            else
+                read -p "Install dependency 'PiShrink' by pressing 'y' or press anything else to exit." -n 1 -r
+                echo # Gives us a newline
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    echo "Installing PiShrink now."
+                    wget https://raw.githubusercontent.com/framps/PiShrink/offer_filesystem_repair_option/pishrink.sh
+                    sudo chmod +x pishrink.sh
+                    sudo mv pishrink.sh /usr/local/bin
+                else
+                    exit 1
+                fi
+            fi
+        fi
+    fi
+    auxcli dhcpcd -u
+}
+
+storage_list() {
+    mapfile -t drivearray < <(sudo fdisk -l | grep "^Disk /dev/.*: .*GiB, .*")
+
+    for i in "${!drivearray[@]}"; do
+        drivename=$(echo "${drivearray[i]}" | awk '{print $2}' | tr -d ":")
+        drivenames+=("${drivename}")
+    done
+
+    for i in "${!drivearray[@]}"; do
+        drivesize=$(echo "${drivearray[i]}" | awk '{print $5}')
+        drivesizes+=("${drivesize}")
+    done
+}
+
+storage_largest() {
+    largest=${drivesizes[0]} position=0
+    for i in "${!drivesizes[@]}"; do
+        ((${drivesizes[i]} > largest)) && largest=${drivesizes[i]} position=$i
+    done
+
+    largest_name="${drivenames[$position]}"
+    largest_size="${drivesizes[$position]}"
+}
+
+storage_compare() {
+    double_boot=$(expr $boot_size \* 2)
+
+    if [ "${shrink}" == "true" ] || [ "${zip}" == "true" ]; then
+        if [ "${1}" -gt "${boot_size}" ]; then
+            # echo "${2} is larger than ${boot_name}."
+            if [ "${1}" -lt "${double_boot}" ]; then
+                # echo "${2} is not twice as large as ${boot_name} though. A larger storage device is required."
+                return 1
+            else
+                return 0
+            fi
+        else
+            return 1
+        fi
+    else
+        if [ "${1}" -gt "${boot_size}" ]; then
+            # echo "${2} is larger than ${boot_name}."
+            return 0
+        else
+            return 1
+        fi
+    fi
+
+}
+
+# Find usable storage devices
+storage_check() {
+    echo "Checking Storage Devices..."
+    boot_name=$(mount | grep -E '(/|/boot) ' | awk '{print $1,$2,$3}' | grep -E ".*/boot" | sed 's/.\{11\}$//')
+    boot_size=$(sudo fdisk -l "${boot_name}" | grep "^Disk ${boot_name}: .*" | awk '{print $5}')
+    storage_list
+    storage_largest
+
+    # Size of Custom Drive
+    if [ ! "${storage}" == "" ]; then
+        custom_size=$(sudo fdisk -l "${storage}" | grep "^Disk ${storage}: .*" | awk '{print $5}')
+    fi
+
+    # Exit if Boot Drive is the Largest Drive
+    if [ "${largest_name}" == "${boot_name}" ]; then
+        echo "Your boot device \"${boot_name}\" is your largest drive. An additional, larger, storage device is required."
+        exit 1
+    fi
+
+    # Exit if Largest is not large enough
+    if storage_compare "${largest_size}" "${largest_name}"; then
+        valid_drives_exist="true"
+    else
+        echo "There are no attached storage devices that are large enough."
+        exit 1
+    fi
+
+    # Set storage to specified drive or fall back to the largest drive
+    if [ ! "${storage}" == "" ]; then
+        if storage_compare "${custom_size}" "${storage}"; then
+            storage="${storage}"
+        else
+            echo "The specified storage device was too small."
+            if [ "${valid_drives_exist}" == "true" ]; then
+                read -p "Press 'y' to use the largest drive \"${largest_name}\" or press anything else to exit." -n 1 -r
+                echo # Gives us a newline
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    storage="${largest_name}"
+                else
+                    exit 1
+                fi
+            fi
+        fi
+    else
+        if [ "${valid_drives_exist}" == "true" ]; then
+            storage="${largest_name}"
+        fi
+    fi
+}
+
+# Mount drive and set permissions
+mount_storage() {
+    echo "Mounting Storage..."
+    if ! mount | grep "${storage}2" >/dev/null 2>&1; then
+        if [ ! -d "${mountpoint}" ]; then
+            sudo mkdir "${mountpoint}"
+            sudo chown -R pi:pi "${mountpoint}"
+            sudo chmod -R 775 "${mountpoint}"
+        fi
+        sudo mount "${storage}2" "${mountpoint}"
+    else
+        echo "${mountpoint} is already mounted."
+    fi
+}
+
+overwrite_check() {
+    overwritable_files=("${bkpPath}" "${shkPath}" "${filename}.zip" "${filename_shrunk}.zip")
+
+    for i in "${!overwritable_files[@]}"; do
+        if [ -e "${overwritable_files[i]}" ] && [ "${overwrite}" == "false" ]; then
+            echo "${overwritable_files[i]} already exists. Enable overwriting with '-o' or '--overwrite'."
+            exit 1
+        fi
+    done
+}
+
+# Backup the pi
+pi_backup() {
+    echo "Backing up the pi: ${boot_name} to: ${bkpPath}."
+    sudo touch /boot/forcefsck                                      # Create trigger to force file system consistency check if image is restored
+    sudo dd if="${boot_name}" of="${bkpPath}" bs=1M status=progress # Backup the pi
+    sudo rm /boot/forcefsck
+}
+
+# Shrink the pi img
+pi_shrink() {
+    if [ "${shrink}" == "true" ]; then
+        echo "Shrinking the img: ${bkpPath} to: ${shkPath}."
+        sudo pishrink.sh -r "${bkpPath}" "${shkPath}" || echo "Shrinking had issues..."
+    fi
+}
+
+# Zip the shrunk pi img
+pi_zip() {
+    if [ "${zip}" == "true" ]; then
+        if [ "${shrink}" == "true" ]; then
+            echo "Zipping the img: ${filename_shrunk} to: ${filename_shrunk}.zip."
+            cd "${mountpoint}"                                     # Change directory to the img location so it doesnt zip extra layers
+            sudo zip "${filename_shrunk}.zip" "${filename_shrunk}" # Zip the img
+            cd "$(dirname "${BASH_SOURCE}")"                       # Change directory back to BASH_SOURCE
+        else
+            echo "Zipping the img: ${filename} to: ${filename}.zip."
+            cd "${mountpoint}"                       # Change directory to the img location so it doesnt zip extra layers
+            sudo zip "${filename}.zip" "${filename}" # Zip the img
+            cd "$(dirname "${BASH_SOURCE}")"         # Change directory back to BASH_SOURCE
+        fi
+    fi
+}
+
+run_steps() {
+    echo "Starting..."
+    if [ "${shrink}" == "true" ] && [ ! "${shrink_suffix}" == "" ]; then
+        filename_shrunk="${filename/.img/${shrink_suffix}.img}"
+    fi
+    bkpPath="${mountpoint}/${filename}"        # Full path to the backup image
+    shkPath="${mountpoint}/${filename_shrunk}" # Full path to the backup image shrunk
+    # start_logging
+    dep_check
+    storage_check
+    mount_storage
+    overwrite_check
+    pi_backup
+    pi_shrink
+    pi_zip
+}
+
+run_steps

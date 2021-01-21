@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+echo "Uninstalling Pishrink."
+sudo rm -rf /usr/local/bin/pishrink.sh
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+
+jq '(.[] | select (.name == "pishrink") | .installed) = false' $config | sudo tee $tmp
+sudo mv -f $tmp $new_config

@@ -1,0 +1,83 @@
+#!/bin/bash
+set -e
+
+# Temporarily add this dir to the path so we can use helper commands
+PATH=$PATH:/lib/auxcli/commands/helper
+
+commands_config="/etc/auxcli/commands.json"
+commands=($(jq -r '.[].name' $commands_config))
+commands+=("help")
+
+# readarray splits each newline into one element in the array
+readarray -t commands_desc < <(jq '.[].short_desc' $commands_config)
+commands_desc+=("Displays this usage information.")
+
+usage() {
+    printf "\nUsage:        auxcli [COMMAND]\n\n"
+    printf "Command line tools for AUX dealing more with the hardware/server than auxplayer itself.\n\n"
+    printf "COMMANDS:\n"
+    for ((i = 0; i < ${#commands[@]}; i++)); do
+        if [[ ${commands[*]} =~ "help" ]]; then
+            printf "\t    %-24s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
+        elif available ${commands[$i]} || [[ ${commands[*]} =~ "help" ]]; then
+            # \t        Tab
+            # %-24s     Left-Aligned column 20 spaces wide that contains the first 's' string
+            # \t        Tabs
+            # %s        The second string passed as an argument
+            # \n        Newline
+            printf "\t[x] %-24s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
+        else
+            printf "\t[ ] %-24s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
+        fi
+    done
+    printf "\nRun 'auxcli COMMAND --help' for more information on a command.\n\n"
+    exit 1
+}
+
+err_check() {
+    # First error check
+    # Show the usage menu if there aren't any arguments after `auxcli`
+    # or if the command is "help"
+    if [ $# -eq 0 ] || [ $1 == "help" ]; then
+        usage
+    fi
+
+    # Second error check
+    # Throw an error messege if the first argument isn't a command
+    if [[ ! ${commands[*]} =~ $1 ]]; then
+        printf "\n\"$1\" is not a valid command.\n"
+        printf "Run 'auxcli help' for help.\n\n"
+        exit 1
+    fi
+
+    # Third error check
+    # Throw an error messege if the first argument isn't an available command
+    if ! available $1; then
+        printf "\nThe \"$1\" command is not available. Install the correct component first.\n\n"
+        exit 1
+    fi
+}
+
+run_cmd() {
+    # Set the first argument to be the command and then shift past it
+    command_path=$(jq --arg cmd "$1" '.[] | select( .name == $cmd ) | .command_path' $commands_config)
+    shift
+
+    # Add all other arguments to an array
+    while [[ $# -gt 0 ]]; do
+        command_args+=("$1")
+        shift
+    done
+
+    # If there are no arguments for the command, just run the command
+    if [ ${#command_args[@]} -eq 0 ]; then
+        printf "Running command\n"
+        . "${command_path}"
+    else
+        printf "Command with args\n"
+        . "${command_path}" "${command_args[@]}"
+    fi
+}
+
+err_check "$@"
+run_cmd "$@"

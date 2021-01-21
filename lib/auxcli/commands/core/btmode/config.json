@@ -1,0 +1,26 @@
+[
+    {
+        "arg_short": "",
+        "arg_long": "none",
+        "type": "STRING",
+        "short_desc": "Disable all auxcli bluetooth modes."
+    },
+    {
+        "arg_short": "",
+        "arg_long": "tether",
+        "type": "STRING",
+        "short_desc": "Enables bluetooth tethering."
+    },
+    {
+        "arg_short": "",
+        "arg_long": "serial",
+        "type": "STRING",
+        "short_desc": "Enables bluetooth serial connection."
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information."
+    }
+]

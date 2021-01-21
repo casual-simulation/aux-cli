@@ -1,0 +1,72 @@
+led_green_wave:
+  alias: Green Light Wave
+  sequence:
+  - entity_id: switch.led_green_03
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_green_03
+    service: homeassistant.toggle
+  - entity_id: switch.led_green_02
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_green_02
+    service: homeassistant.toggle
+  - entity_id: switch.led_green_01
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_green_01
+    service: homeassistant.toggle
+led_yellow_wave:
+  alias: Yellow Light Wave
+  sequence:
+  - entity_id: switch.led_yellow_03
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_yellow_03
+    service: homeassistant.toggle
+  - entity_id: switch.led_yellow_02
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_yellow_02
+    service: homeassistant.toggle
+  - entity_id: switch.led_yellow_01
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_yellow_01
+    service: homeassistant.toggle
+led_red_wave:
+  alias: Red Light Wave
+  sequence:
+  - entity_id: switch.led_red_03
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_red_03
+    service: homeassistant.toggle
+  - entity_id: switch.led_red_02
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_red_02
+    service: homeassistant.toggle
+  - entity_id: switch.led_red_01
+    service: homeassistant.toggle
+  - delay:
+      milliseconds: 50
+  - entity_id: switch.led_red_01
+    service: homeassistant.toggle
+led_rainbow_wave:
+  alias: Rainbow Wave
+  sequence:
+  - data: {}
+    service: script.led_green_wave
+  - wait_template: '{{ is_state(''script.led_green_wave'', ''off'') }}'
+  - service: script.led_yellow_wave
+  - wait_template: '{{ is_state(''script.led_yellow_wave'', ''off'') }}'
+  - service: script.led_red_wave

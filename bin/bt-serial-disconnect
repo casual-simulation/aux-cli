@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-
-. /etc/bt-serial.conf
-
-sudo rfcomm release "$1"
-
-sudo killall rfcomm

@@ -1,0 +1,30 @@
+[
+    {
+        "arg_short": "-s",
+        "arg_long": "--ssid",
+        "type": "",
+        "short_desc": "For WiFi credentials only: Configure the SSID.",
+        "default": "RaspberryPi"
+    },
+    {
+        "arg_short": "-p",
+        "arg_long": "--password",
+        "type": "",
+        "short_desc": "For WiFi credentials only: Configure the Password.",
+        "default": "password"
+    },
+    {
+        "arg_short": "-u",
+        "arg_long": "--url",
+        "type": "",
+        "short_desc": "For URL only: Configure the URL.",
+        "default": "https://google.com"
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information.",
+        "default": ""
+    }
+]

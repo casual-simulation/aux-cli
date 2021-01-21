@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+wpa_conf="/etc/wpa_supplicant/wpa_supplicant.conf"
+
+echo "Checking for wpa_supplicant..."
+if [ -e "${wpa_conf}" ]; then
+    echo "Found wpa_supplicant. Verifying country and scan_ssid values..."
+    if sudo grep "country=" "${wpa_conf}"; then
+        sudo sed -i "s/^country=.*/country=US/g" "${wpa_conf}"
+    else
+        line_number=$(sudo grep -ne '^$' "${wpa_conf}" | grep -Eo '^[^:]+')
+        sudo sed -i "${line_number}i country=US" "${wpa_conf}"
+    fi
+
+    if sudo grep "scan_ssid=" "${wpa_conf}"; then
+        sudo sed -i "s/^scan_ssid=.*/scan_ssid=1/g" "${wpa_conf}"
+    else
+        line_number=$(sudo grep -n "network=" "${wpa_conf}" | grep -Eo '^[^:]+')
+        line_number=$((line_number + 1))
+        sudo sed -i "${line_number}i \\ \\ \\ \\ scan_ssid=1" "${wpa_conf}"
+    fi
+fi

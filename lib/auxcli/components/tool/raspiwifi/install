@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+# Add in our custom scripts to bypass interactivity
+echo "DEBUG: Modifying RaspiWiFi..."
+sudo cp "initial_setup.py" RaspiWiFi
+sudo cp "config.json" RaspiWiFi
+sudo cp "reset_lib.py" RaspiWiFi/libs/reset_device
+
+# Enable services before we hit a reboot
+sudo systemctl enable auxcli-dnsmasq-checker
+sudo systemctl start auxcli-dnsmasq-checker
+sudo systemctl enable auxcli-hotspot-checker
+sudo systemctl start auxcli-hotspot-checker
+sudo systemctl enable auxcli-wlan-checker
+sudo systemctl start auxcli-wlan-checker
+sudo systemctl enable auxcli-wpa-checker
+sudo systemctl start auxcli-wpa-checker
+
+# Set installed to true before we hit a reboot
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+
+jq '(.[] | select (.name == "raspiwifi") | .installed) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $new_config
+
+# Run the RaspiWiFi setup
+echo "DEBUG: Running RaspiWiFi..."
+cd RaspiWiFi
+sudo python3 initial_setup.py # Triggers a reboot

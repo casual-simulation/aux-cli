@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+
+# Install Zero Tier
+echo "DEBUG: Installing ZeroTier..."
+curl -s https://install.zerotier.com/ | sudo bash
+
+
+sudo sed -i '/^exit 0/d' /etc/rc.local
+
+sudo tee -a "/etc/rc.local" > /dev/null <<EOT
+# ZeroTier Start
+if [ -e /boot/zt ]; then
+    zt_network=\$(cat /boot/zt)
+    mkdir -p "/var/lib/zerotier-one/networks.d"
+    touch "/var/lib/zerotier-one/networks.d/\${zt_network}.conf"
+    rm /boot/zt
+
+
+#    if [ -e /usr/bin/slack ]; then
+#        info=\$(zerotier-cli info)
+#        sudo -u root slack "Computer \${info} sent a request to join the network \${zt_network}."
+#    fi
+fi
+# ZeroTier End
+
+exit 0
+EOT
+
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+jq '(.[] | select (.name == "zerotier") | .installed) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $config

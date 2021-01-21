@@ -1,0 +1,221 @@
+#!/bin/bash
+set -e
+
+config="/etc/auxcli/config.json"
+tmp="/etc/auxcli/config.json.tmp"
+
+args_short=($(jq -r '.[].arg_short' config.json))
+args_long=($(jq -r '.[].arg_long' config.json))
+args=("${args_short[@]}" "${args_long[@]}")
+
+# readarray splits each newline into one element in the array
+readarray -t args_desc < <(jq '.[].short_desc' config.json)
+
+usage() {
+    printf "\nUsage:    auxcli update [OPTIONS]\n\n"
+    printf "Update auxcli, casualOS, or the RaspberryPi.\n\n"
+    printf "OPTIONS:\n"
+    for ((i = 0; i < ${#args[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
+    exit 1
+}
+
+err_check() {
+    # First error check
+    # Show the usage menu if there aren't any arguments
+    if [ $# -eq 0 ]; then
+        printf "\nYou need to pass an argument.\n"
+        usage
+    fi
+
+    # Second error check
+    # Throw an error messege if the first argument isn't valid
+    if [[ ! ${args[*]} =~ $1 ]]; then
+        printf "\n\"$1\" is an invalid argument.\n"
+        printf "Run auxcli update -h for help.\n\n"
+        exit 1
+    fi
+}
+
+err_check "$@"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -a | --aux)
+        update_aux=true
+        shift # past argument
+        ;;
+    -A | --aux-auto)
+        automatic_update_aux=true
+        shift # past argument
+        ;;
+    -c | --cli)
+        update_cli=true
+        shift # past argument
+        ;;
+    -C | --cli-auto)
+        automatic_update_cli=true
+        shift # past argument
+        ;;
+    -p | --pi)
+        update_pi=true
+        shift # past argument
+        ;;
+    -P | --pi-auto)
+        automatic_update_pi=true
+        shift # past argument
+        ;;
+    -y)
+        agree=true
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    esac
+done
+
+vercomp () {
+    if [[ $1 == $2 ]]; then
+        return 1
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++)); do
+        if [[ -z ${ver2[i]} ]]; then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            return 0
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 1
+        fi
+    done
+    return 0
+}
+
+version_check() {
+    echo "Checking for newer versions of AUXCLI..."
+    # If hotspot mode is true, then do the work around
+    auxcli dhcpcd -s
+    curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/auxcli/config.json --output /home/pi/config.json
+    new_version=$(jq -r '.version' /home/pi/config.json) 
+    old_version=$(jq -r '.version' $config)
+    sudo rm -rf /home/pi/config.json
+
+    if vercomp $new_version $old_version; then
+        if $agree; then
+            return 0
+        else
+            read -p "There is a newer version of AUXCLI available. Press 'y' to update now, or press anything else to exit." -n 1 -r
+            echo # Gives us a newline
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                return 0
+            else
+                return 1
+            fi
+        fi
+    else
+        echo "You have the latest version of AUXCLI."
+        auxcli dhcpcd -u
+        return 1
+    fi
+}
+
+update_aux() {
+    # If hotspot mode is true, then do the work around
+    auxcli dhcpcd -s
+    sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output /home/pi/docker-compose.yml
+    docker-compose -f /home/pi/docker-compose.yml pull && docker-compose -f /home/pi/docker-compose.yml up -d
+    auxcli dhcpcd -u
+}
+
+automatic_update_aux() {
+    if ! $(jq -r '.autoupdate_aux' $config); then
+        echo "Enabling Automatic updates for AUX."
+        (
+            crontab -l
+            echo "@daily auxcli update -a"
+        ) | crontab -
+        jq '(.autoupdate_aux) = true' $config | sudo tee $tmp
+        sudo mv -f $tmp $new_config
+    else
+        echo "Disabling Automatic updates for AUX."
+        crontab -l | grep -v "auxcli update -a" | crontab -
+        jq '(.autoupdate_aux) = false' $config | sudo tee $tmp
+        sudo mv -f $tmp $new_config
+    fi
+}
+
+update_cli() {
+    if version_check; then
+        # If hotspot mode is true, then do the work around
+        auxcli dhcpcd -s
+        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
+        sudo rm -rf install.sh
+        auxcli dhcpcd -u
+    fi
+}
+
+automatic_update_cli() {
+    if ! $(jq -r '.autoupdate_cli' $config); then
+        echo "Enabling Automatic updates for AUXCLI."
+        (
+            crontab -l
+            echo "@hourly auxcli update -c -y"
+        ) | crontab -
+        jq '(.autoupdate_cli) = true' $config | sudo tee $tmp
+        sudo mv -f $tmp $new_config
+    else
+        echo "Disabling Automatic updates for AUXCLI."
+        crontab -l | grep -v "auxcli update -c -y" | crontab -
+        jq '(.autoupdate_cli) = false' $config | sudo tee $tmp
+        sudo mv -f $tmp $new_config
+    fi
+}
+
+update_pi() {
+    # If hotspot mode is true, then do the work around
+    auxcli dhcpcd -s
+    sudo apt-get update && sudo apt-get upgrade -y
+    auxcli dhcpcd -u
+
+}
+
+automatic_update_pi() {
+    if ! $(jq -r '.autoupdate_pi' $config); then
+        echo "Enabling Automatic updates for your RaspberryPi (apt-get)."
+        (
+            crontab -l
+            echo "@daily auxcli update -p"
+        ) | crontab -
+        jq '(.autoupdate_pi) = true' $config | sudo tee $tmp
+        sudo mv -f $tmp $new_config
+    else
+        echo "Disabling Automatic updates for your RaspberryPi (apt-get)."
+        crontab -l | grep -v "auxcli update -p" | crontab -
+        jq '(.autoupdate_pi) = false' $config | sudo tee $tmp
+        sudo mv -f $tmp $new_config
+    fi
+
+}
+
+run_steps() {
+    if $update_aux; then update_aux; fi
+    if $automatic_update_aux; then automatic_update_aux; fi
+    if $update_cli; then update_cli; fi
+    if $automatic_update_cli; then automatic_update_cli; fi
+    if $update_pi; then update_pi; fi
+    if $automatic_update_pi; then automatic_update_pi; fi
+}
+
+run_steps

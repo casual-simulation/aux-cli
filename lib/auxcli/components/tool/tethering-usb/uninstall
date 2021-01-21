@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+sudo apt-get remove -y usbmuxd
+    
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+jq '(.[] | select (.name == "tethering-usb") | .installed) = false' $config | sudo tee $tmp
+sudo mv -f $tmp $config

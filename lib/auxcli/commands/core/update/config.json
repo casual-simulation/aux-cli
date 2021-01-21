@@ -1,0 +1,50 @@
+[
+    {
+        "arg_short": "-a",
+        "arg_long": "--aux",
+        "type": "",
+        "short_desc": "Updates AUX to the latest version."
+    },
+    {
+        "arg_short": "-A",
+        "arg_long": "--aux-auto",
+        "type": "",
+        "short_desc": "Toggle automatic updates on or off for AUX."
+    },
+    {
+        "arg_short": "-c",
+        "arg_long": "--cli",
+        "type": "",
+        "short_desc": "Updates CLI to the latest version."
+    },
+    {
+        "arg_short": "-C",
+        "arg_long": "--cli-auto",
+        "type": "",
+        "short_desc": "Toggle automatic updates on or off for CLI."
+    },
+    {
+        "arg_short": "-p",
+        "arg_long": "--pi",
+        "type": "",
+        "short_desc": "Updates the software for your RaspberryPi (apt-get)."
+    },
+    {
+        "arg_short": "-P",
+        "arg_long": "--pi-auto",
+        "type": "",
+        "short_desc": "Toggle automatic updates on or off for your RaspberryPi (apt-get)."
+    },
+    {
+        "arg_short": "-y",
+        "arg_long": "",
+        "type": "",
+        "short_desc": "Bypass prompt to update."
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information."
+    }
+]

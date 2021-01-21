@@ -1,0 +1,94 @@
+led_green_01_toggle:
+  alias: Green LED01 Toggle
+  sequence:
+  - entity_id: switch.led_green_01
+    service: homeassistant.toggle
+  - data_template:
+      name: led_green_01
+      state: '''{{ states(''switch.led_green_01'') }}'''
+    service: rest_command.aux_webhook_led
+led_green_02_toggle:
+  alias: Green LED02 Toggle
+  sequence:
+  - entity_id: switch.led_green_02
+    service: homeassistant.toggle
+  - data_template:
+      name: led_green_02
+      state: '''{{ states(''switch.led_green_02'') }}'''
+    service: rest_command.aux_webhook_led
+led_green_03_toggle:
+  alias: Green LED03 Toggle
+  sequence:
+  - entity_id: switch.led_green_03
+    service: homeassistant.toggle
+  - data_template:
+      name: led_green_03
+      state: '''{{ states(''switch.led_green_03'') }}'''
+    service: rest_command.aux_webhook_led
+led_yellow_01_toggle:
+  alias: Yellow LED01 Toggle
+  sequence:
+  - entity_id: switch.led_yellow_01
+    service: homeassistant.toggle
+  - data_template:
+      name: led_yellow_01
+      state: '''{{ states(''switch.led_yellow_01'') }}'''
+    service: rest_command.aux_webhook_led
+led_yellow_02_toggle:
+  alias: Yellow LED02 Toggle
+  sequence:
+  - entity_id: switch.led_yellow_02
+    service: homeassistant.toggle
+  - data_template:
+      name: led_yellow_02
+      state: '''{{ states(''switch.led_yellow_02'') }}'''
+    service: rest_command.aux_webhook_led
+led_yellow_03_toggle:
+  alias: Yellow LED03 Toggle
+  sequence:
+  - entity_id: switch.led_yellow_03
+    service: homeassistant.toggle
+  - data_template:
+      name: led_yellow_03
+      state: '''{{ states(''switch.led_yellow_03'') }}'''
+    service: rest_command.aux_webhook_led
+led_red_01_toggle:
+  alias: Red LED01 Toggle
+  sequence:
+  - entity_id: switch.led_red_01
+    service: homeassistant.toggle
+  - data_template:
+      name: led_red_01
+      state: '''{{ states(''switch.led_red_01'') }}'''
+    service: rest_command.aux_webhook_led
+led_red_02_toggle:
+  alias: Red LED02 Toggle
+  sequence:
+  - entity_id: switch.led_red_02
+    service: homeassistant.toggle
+  - data_template:
+      name: led_red_02
+      state: '''{{ states(''switch.led_red_02'') }}'''
+    service: rest_command.aux_webhook_led
+led_red_03_toggle:
+  alias: Red LED03 Toggle
+  sequence:
+  - entity_id: switch.led_red_03
+    service: homeassistant.toggle
+  - data_template:
+      name: led_red_03
+      state: '''{{ states(''switch.led_red_03'') }}'''
+    service: rest_command.aux_webhook_led
+led_aux_wave1:
+  alias: AUX Wave1
+  sequence:
+  - service: script.led_green_03_toggle
+  - service: script.led_green_02_toggle
+  - service: script.led_green_01_toggle
+  - service: script.led_yellow_03_toggle
+  - service: script.led_yellow_02_toggle
+  - service: script.led_yellow_01_toggle
+  - service: script.led_red_03_toggle
+  - service: script.led_red_02_toggle
+  - service: script.led_red_01_toggle
+  

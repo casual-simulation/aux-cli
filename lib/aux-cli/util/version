@@ -1,5 +1,0 @@
-#!/bin/bash
-set -e
-
-. /etc/aux-cli.conf
-echo "${version}"

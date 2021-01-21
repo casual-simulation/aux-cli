@@ -1,0 +1,88 @@
+#!/bin/bash
+set -e
+
+config="/etc/auxcli/config.json"
+tmp="/etc/auxcli/config.json.tmp"
+previous_mode=($(jq -r '.btmode' $config))
+
+# args_short=($(jq -r '.[].arg_short' config.json))
+args_long=($(jq -r '.[].arg_long' config.json))
+# args=("${args_short[@]}" "${args_long[@]}")
+
+
+# readarray splits each newline into one element in the array
+readarray -t args_desc < <(jq '.[].short_desc' config.json)
+
+usage() {
+    printf "\nUsage:    auxcli btmode [OPTIONS]\n\n"
+    printf "A tool for configuring the bluetooth mode.\n\n"
+    printf "OPTIONS:\n"
+    for ((i = 0; i < ${#args_long[@]}; i++)); do
+        printf "\t%-6s\t%s\n" "${args_long[$i]}" "${args_desc[$i]}"
+    done
+    exit 1
+}
+
+err_check() {
+    # First error check
+    # Show the usage menu if there aren't any arguments
+    if [ $# -eq 0 ]; then
+        printf "\nYou need to pass an argument to change the bluetooth mode.\n"
+        usage
+    fi
+
+    # Second error check
+    # Throw an error messege if the first argument isn't valid
+    if [[ ! ${args_long[*]} =~ $1 ]]; then
+        printf "\n\"$1\" is an invalid argument.\n"
+        printf "Run auxcli btmode -h for help.\n\n"
+        exit 1
+    fi
+}
+
+err_check "$@"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    none)
+        jq '(.btmode) = none' $config | sudo tee $tmp
+        sudo mv -f $tmp $config
+        if [ "$previous_mode" == "tether" ]; then
+            sudo systemctl stop auxcli-bt-tether
+            sudo systemctl disable auxcli-bt-tether
+            echo "You need to reboot for the changes to take effect."
+        elif [ "$previous_mode" == "serial" ]; then
+            sudo systemctl stop auxcli-bt-serial-scan
+            sudo systemctl disable auxcli-bt-serial-scan
+        fi
+        shift # past argument
+        ;;
+    tether)
+        jq '(.btmode) = tether' $config | sudo tee $tmp
+        sudo mv -f $tmp $config
+        if [ "$previous_mode" == "serial" ]; then
+            sudo systemctl stop auxcli-bt-serial-scan
+            sudo systemctl disable auxcli-bt-serial-scan
+        fi
+        sudo systemctl enable auxcli-bt-tether
+        sudo systemctl start auxcli-bt-tether
+        shift # past argument
+        ;;
+    serial)
+        jq '(.btmode) = serial' $config | sudo tee $tmp
+        sudo mv -f $tmp $config
+        if [ "$previous_mode" == "tether" ]; then
+            sudo systemctl stop auxcli-bt-tether
+            sudo systemctl disable auxcli-bt-tether
+            echo "You need to reboot for the changes to take effect."
+        fi
+        sudo systemctl enable auxcli-bt-serial-scan
+        sudo systemctl start auxcli-bt-serial-scan
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    esac
+done

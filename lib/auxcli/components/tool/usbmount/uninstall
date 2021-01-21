@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+sudo apt-get remove -y usbmount
+
+# Modify the /lib/systemd/system/systemd-udevd.service
+echo "Modifying /lib/systemd/system/systemd-udevd.service"
+sudo sed -i "s/^PrivateMounts=no/PrivateMounts=yes/g" /lib/systemd/system/systemd-udevd.service
+
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+jq '(.[] | select (.name == "usbmount") | .installed) = false' $config | sudo tee $tmp
+sudo mv -f $tmp $config

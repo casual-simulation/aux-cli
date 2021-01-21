@@ -1,0 +1,163 @@
+[
+  {
+    "name": "gpio",
+    "type": "configuration",
+    "enabled": false,
+    "requires_reboot": true,
+    "install_path": "/lib/auxcli/components/configuration/gpio",
+    "config_path": "/lib/auxcli/components/configuration/gpio/config.json",
+    "description": "A tool that lets you enable/disable gpio.",
+    "dependencies": {}
+  },
+  {
+    "name": "serial-console",
+    "type": "configuration",
+    "enabled": true,
+    "requires_reboot": true,
+    "install_path": "/lib/auxcli/components/configuration/serial-console",
+    "config_path": "/lib/auxcli/components/configuration/serial-console/config.json",
+    "description": "A tool that lets you enable/disable serial-console.",
+    "dependencies": {}
+  },
+  {
+    "name": "uart",
+    "type": "configuration",
+    "enabled": false,
+    "requires_reboot": true,
+    "install_path": "/lib/auxcli/components/configuration/uart",
+    "config_path": "/lib/auxcli/components/configuration/uart/config.json",
+    "description": "A tool that lets you enable/disable uart.",
+    "dependencies": {}
+  },
+  {
+    "name": "hat-waveshare-pn532-nfc",
+    "type": "hardware",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/hardware/hat-waveshare-pn532-nfc",
+    "config_path": "/lib/auxcli/components/hardware/hat-waveshare-pn532-nfc/config.json",
+    "description": "Support for the WaveShare pn532 NFC hat.",
+    "dependencies": {}
+  },
+  {
+    "name": "led-dotstar-sk9822",
+    "type": "hardware",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/hardware/led-dotstar-sk9822",
+    "config_path": "/lib/auxcli/components/hardware/led-dotstar-sk9822/config.json",
+    "description": "Support for the DotStar sk9822 led strips.",
+    "dependencies": {}
+  },
+  {
+    "name": "led-neopixel-ws281x",
+    "type": "hardware",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/hardware/led-neopixel-ws281x",
+    "config_path": "/lib/auxcli/components/hardware/led-neopixel-ws281x/config.json",
+    "description": "Support for the NeoPixel ws281x led strips.",
+    "dependencies": {}
+  },
+  {
+    "name": "rfid-rc522",
+    "type": "hardware",
+    "installed": false,
+    "requires_reboot": true,
+    "install_path": "/lib/auxcli/components/hardware/rfid-rc522",
+    "config_path": "/lib/auxcli/components/hardware/rfid-rc522/config.json",
+    "description": "A collection of tools to work with RFID a reader/writer.",
+    "dependencies": {}
+  },
+  {
+    "name": "rotary-ky040",
+    "type": "hardware",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/hardware/rotary-ky040",
+    "config_path": "/lib/auxcli/components/hardware/rotary-ky040/config.json",
+    "description": "Support for the ky040 rotary encoder.",
+    "dependencies": {}
+  },
+  {
+    "name": "tof-vl6180",
+    "type": "hardware",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/hardware/tof-vl6180",
+    "config_path": "/lib/auxcli/components/hardware/tof-vl6180/config.json",
+    "description": "Support for the vl6180 time-of-flight sensor.",
+    "dependencies": {}
+  },
+  {
+    "name": "pishrink",
+    "type": "tool",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/tool/pishrink",
+    "config_path": "/lib/auxcli/components/tool/pishrink/config.json",
+    "description": "A tool for shrinking pi images.",
+    "dependencies": {}
+  },
+  {
+    "name": "raspiwifi",
+    "type": "tool",
+    "installed": false,
+    "requires_reboot": true,
+    "install_path": "/lib/auxcli/components/tool/raspiwifi",
+    "config_path": "/lib/auxcli/components/tool/raspiwifi/config.json",
+    "description": "A tool that lets you enable/disable hotspot mode.",
+    "dependencies": {}
+  },
+  {
+    "name": "slack",
+    "type": "tool",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/tool/slack",
+    "config_path": "/lib/auxcli/components/tool/slack/config.json",
+    "description": "Slack cli and support for a 'slack' file in the boot directory.",
+    "dependencies": {}
+  },
+  {
+    "name": "tethering-ble",
+    "type": "tool",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/tool/tethering-ble",
+    "config_path": "/lib/auxcli/components/tool/tethering-ble/config.json",
+    "description": "Bluetooth tethering support.",
+    "dependencies": {}
+  },
+  {
+    "name": "tethering-usb",
+    "type": "tool",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/tool/tethering-usb",
+    "config_path": "/lib/auxcli/components/tool/tethering-usb/config.json",
+    "description": "USB tethering support.",
+    "dependencies": {}
+  },
+  {
+    "name": "usbmount",
+    "type": "tool",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/tool/usbmount",
+    "config_path": "/lib/auxcli/components/tool/usbmount/config.json",
+    "description": "Automatically mount external storage to a specified directory.",
+    "dependencies": {}
+  },
+  {
+    "name": "zerotier",
+    "type": "tool",
+    "installed": false,
+    "requires_reboot": false,
+    "install_path": "/lib/auxcli/components/tool/zerotier",
+    "config_path": "/lib/auxcli/components/tool/zerotier/config.json",
+    "description": "Zerotier cli and support for a 'zt' file in the boot directory.",
+    "dependencies": {}
+  }
+]
+

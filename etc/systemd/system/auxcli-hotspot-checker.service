@@ -1,0 +1,14 @@
+[Unit]
+Description=Checks if the hostname/mac needs to be updated for hotspot.
+After=auxcli-wpa-checker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/env auxcli hotspot-checker
+
+[Install]
+WantedBy=multi-user.target

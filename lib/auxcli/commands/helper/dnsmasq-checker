@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+
+dnsmasq_conf="/etc/dnsmasq.conf"
+
+echo "Checking for dnsmasq..."
+if [ -e "${dnsmasq_conf}" ]; then
+    echo "Extending IP range and timeout for dnsmasq..."
+    # Give a larger default range of IP Addresses with a longer timeout
+    if sudo grep "^dhcp-range=" "${dnsmasq_conf}"; then
+        sudo sed -i "s/^dhcp-range=.*/dhcp-range=10.0.0.10,10.0.0.110,12h/g" "${dnsmasq_conf}"
+    else
+        echo "dhcp-range=10.0.0.10,10.0.0.110,12h" | sudo tee -a "${dnsmasq_conf}"
+    fi
+
+    echo "Verifying 'auxplayer.com' address is present..."
+    # Add the auxplayer name
+    if ! sudo grep "address=/auxplayer.com/10.0.0.1" "${dnsmasq_conf}"; then
+        echo "address=/auxplayer.com/10.0.0.1" | sudo tee -a "${dnsmasq_conf}"
+    fi
+fi

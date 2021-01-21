@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+
+# If it finds UART, make sure it's on
+sudo sed -i "s/^#enable_uart=1/enable_uart=1/g" /boot/config.txt
+sudo sed -i "s/^#enable_uart=0/enable_uart=1/g" /boot/config.txt
+sudo sed -i "s/^enable_uart=0/enable_uart=1/g" /boot/config.txt
+
+if ! sudo grep "enable_uart=1" "/boot/config.txt"; then
+    printf "\n# Enable UART\nenable_uart=1\n" | sudo tee -a /boot/config.txt
+fi
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+
+jq '(.[] | select (.name == "uart") | .enabled) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $config

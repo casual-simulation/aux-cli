@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+echo "Checking for wlan1..."
+# Check if there is an extra wlan present and use it
+if grep wlan1 /proc/net/dev; then
+    echo "Found wlan1. Changing default from wlan0..."
+    sudo sed -i "s/^interface=wlan0/interface=wlan1/g" "/etc/dnsmasq.conf"
+    sudo sed -i "s/^interface=wlan0/interface=wlan1/g" "/etc/hostapd/hostapd.conf"
+    sudo sed -i "s/^interface wlan0/interface wlan1/g" "/etc/dhcpcd.conf"
+fi

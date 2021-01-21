@@ -1,0 +1,67 @@
+#!/bin/bash
+set -e
+
+RDIR=$(dirname "${BASH_SOURCE}")
+DIR=$(cd $RDIR;pwd)
+
+# Install dependencies for usbmount
+echo "DEBUG: Setting up USBMount..."
+sudo apt-get install -y git debhelper build-essential ntfs-3g exfat-fuse exfat-utils usbmount
+
+sudo mkdir -p /data
+sudo mkdir -p /data/drives
+cd /data/drives
+sudo mkdir -p 0 1 2 3 4 5 6 7
+cd /home/pi
+
+# Clone the repository for usbmount
+git clone https://github.com/rbrito/usbmount
+
+# Change directory into the repo and build the project into a debian install file
+echo "Building usbmount debian file..."
+cd /home/pi/usbmount
+sudo dpkg-buildpackage -us -uc -b
+
+# Run the debian install file
+echo "Installing usbmount debian file..."
+error_msg="usbmount failed to install."
+while [[ $(sudo dpkg -i /home/pi/usbmount_0.0.24_all.deb >/dev/null 2>&1 || echo "${error_msg}") == "$error_msg" ]]; do
+    sudo apt --fix-broken install
+    echo "${error_msg}"
+    sleep 1
+done
+
+# Clean up all of the install files afterwards
+echo "Cleaning up usbmount repository and install files..."
+cd /home/pi
+sudo rm -rf usbmount
+sudo rm -rf usbmount_0.0.24_all.deb
+sudo rm -rf usbmount_0.0.24_armhf.buildinfo
+sudo rm -rf usbmount_0.0.24_armhf.changes
+
+# Modify the /etc/usbmount/usbmount.conf
+echo "Modifying /etc/usbmount/usbmount.conf"
+sudo sed -i "s@MOUNTPOINTS=\".*@MOUNTPOINTS=\"/data/drives/0 /data/drives/1 /data/drives/2 /data/drives/3 /data/drives/4 /data/drives/5 /data/drives/6 /data/drives/7\"@g" /etc/usbmount/usbmount.conf
+sudo sed -i "s@/media/usb[1-9].*\"@@g" /etc/usbmount/usbmount.conf
+sudo sed -i "s/FILESYSTEMS=\".*/FILESYSTEMS=\"vfat ext2 ext3 ext4 ntfs-3g ntfs exfat hfsplus fuseblk\"/g" /etc/usbmount/usbmount.conf
+
+# Modify the /lib/systemd/system/systemd-udevd.service
+echo "Modifying /lib/systemd/system/systemd-udevd.service"
+sudo sed -i "s/^PrivateMounts=yes/PrivateMounts=no/g" /lib/systemd/system/systemd-udevd.service
+
+# Run "sudo /sbin/blkid -p /dev/sd*1" to get DEVINFO
+line_number=$(sudo grep -n "# Try to use specifications in /etc/fstab first." "/usr/share/usbmount/usbmount" | grep -Eo '^[^:]+')
+num=$((line_number + 1))
+sudo sed -i "${num}s/if egrep -q/elif egrep -q/g" "/usr/share/usbmount/usbmount"
+
+sudo sed -i "${line_number}i \\ \\ \\ \\ \\ \\ \\ \\ log info \"Device \$DEVNAME is labeled 'rootfs'; not mounting it\"" "/usr/share/usbmount/usbmount"
+sudo sed -i "${line_number}i \\ \\ \\ \\ elif echo \$DEVINFO | grep \"LABEL=\\\\\"rootfs\\\\\"\"; then" "/usr/share/usbmount/usbmount"
+sudo sed -i "${line_number}i \\ \\ \\ \\ # Don't automount boot usb again for uuid" "/usr/share/usbmount/usbmount"
+sudo sed -i "${line_number}i \\ \\ \\ \\ \\ \\ \\ \\  log info \"Device \$DEVNAME is a boot partition; not mounting it\"" "/usr/share/usbmount/usbmount"
+sudo sed -i "${line_number}i \\ \\ \\ \\ if echo \$DEVINFO | grep \"LABEL_FATBOOT=\"boot\"\"; then" "/usr/share/usbmount/usbmount"
+sudo sed -i "${line_number}i \\ \\ \\ \\ # Don't automount boot usb again" "/usr/share/usbmount/usbmount"
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+jq '(.[] | select (.name == "usbmount") | .installed) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $config

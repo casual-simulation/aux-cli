@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+echo "Installing PiShrink."
+sudo chmod +x pishrink.sh
+sudo mv -f pishrink.sh /usr/local/bin
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+
+jq '(.[] | select (.name == "pishrink") | .installed) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $new_config

@@ -1,0 +1,58 @@
+led_aux_wave2:
+  alias: AUX Wave2
+  sequence:
+  - service: rest_command.aux_webhook_led
+    data_template: 
+      name: led_green_03
+      state: '{% if is_state("switch.led_green_03", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_green_03
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_green_02
+      state: '{% if is_state("switch.led_green_02", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_green_02
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_green_01
+      state: '{% if is_state("switch.led_green_01", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_green_01
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_yellow_03
+      state: '{% if is_state("switch.led_yellow_03", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_yellow_03
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_yellow_02
+      state: '{% if is_state("switch.led_yellow_02", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_yellow_02
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_yellow_01
+      state: '{% if is_state("switch.led_yellow_01", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_yellow_01
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_red_03
+      state: '{% if is_state("switch.led_red_03", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_red_03
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_red_02
+      state: '{% if is_state("switch.led_red_02", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_red_02
+  - service: rest_command.aux_webhook_led
+    data_template:
+      name: led_red_01
+      state: '{% if is_state("switch.led_red_01", "on")%}off{%else%}on{%endif%}'
+  - service: homeassistant.toggle
+    entity_id: switch.led_red_01
+    

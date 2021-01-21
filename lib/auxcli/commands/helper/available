@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+config="/etc/auxcli/commands.json"
+
+if [[ $(jq --arg command "$1" '.[] | select( .name == $command ) | .available' $config) == "true" ]]; then
+    # echo "$1 is available."
+    exit 0
+else
+    # echo "$1 is not available."
+    exit 1
+fi

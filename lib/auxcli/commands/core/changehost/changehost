@@ -1,0 +1,101 @@
+#!/bin/bash
+set -e
+
+args_short=($(jq -r '.[].arg_short' config.json))
+args_long=($(jq -r '.[].arg_long' config.json))
+args=("${args_short[@]}" "${args_long[@]}")
+
+# readarray splits each newline into one element in the array
+readarray -t args_desc < <(jq '.[].short_desc' config.json)
+
+usage() {
+    printf "\nUsage:    auxcli changehost [OPTIONS]\n\n"
+    printf "Changes the hostname in the necessary places.\n\n"
+    printf "OPTIONS:\n"
+    for ((i = 0; i < ${#args[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
+    exit 1
+}
+
+err_check() {
+    # First error check
+    # Show the usage menu if there aren't any arguments
+    if [ $# -eq 0 ]; then
+        printf "\nYou need to pass an argument to change the hostname.\n"
+        usage
+    fi
+
+    # Second error check
+    # Throw an error messege if the first argument isn't valid
+    if [[ ! ${args[*]} =~ $1 ]]; then
+        printf "\n\"$1\" is an invalid argument.\n"
+        printf "Run auxcli changehost -h for help.\n\n"
+        exit 1
+    fi
+}
+
+# Change hostname in /etc/hosts & /etc/hostname
+set_hostname() {
+
+    # Set current hostname
+    host=$(hostname)
+
+    # Check if new hostname is provided/valid
+    if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
+        printf "\n\"$2\" is an invalid argument for \"$1\".\n"
+        printf "Run auxcli changehost -h for help.\n\n"
+        exit 1
+    fi
+
+    # Check if new hostname is different
+    if [ "$host" == "$2" ]; then
+        printf "Your hostname is already $2.\n"
+        exit 1
+    fi
+
+    if hostnamectl >/dev/null 2>&1; then
+        if [ -e /etc/hosts ]; then
+            sudo sed -i "s/$host/$2/g" /etc/hosts
+        fi
+        sudo hostnamectl set-hostname "$2"
+        changed="true"
+        printf "\nHostname has been changed from $host to $2\n"
+        printf "Hostname changes requires a reboot to take effect.\n"
+    elif hostname >/dev/null 2>&1; then
+        if [ -e /etc/hosts ]; then
+            sudo sed -i "s/$host/$2/g" /etc/hosts
+        fi
+        if [ -e /etc/hostname ]; then
+            sudo sed -i "s/$host/$2/g" /etc/hostname
+        fi
+        sudo hostname "$2"
+        changed="true"
+        printf "\nHostname has been changed from $host to $2\n"
+        printf "Hostname changes requires a reboot to take effect.\n"
+    else
+        printf "Hostname was not changed. Your version of UNIX might not be currently supported.\n"
+        changed="false"
+        exit 1
+    fi
+}
+
+err_check "$@"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -n | --hostname)
+        set_hostname "$1" "$2"
+        shift # past argument
+        shift # past value
+        ;;
+    -r | --reboot)
+        sudo reboot now
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    esac
+done

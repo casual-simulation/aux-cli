@@ -1,0 +1,14 @@
+[Unit]
+Description=Bluetooth Serial Scan
+After=auxcli-hotspot-checker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/env auxcli bt-serial-scan
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,26 @@
+[
+    {
+        "arg_short": "-c",
+        "arg_long": "--check",
+        "type": "",
+        "short_desc": "Checks if you're in hotspot mode."
+    },
+    {
+        "arg_short": "-e",
+        "arg_long": "--enable",
+        "type": "",
+        "short_desc": "Enables hotspot mode."
+    },
+    {
+        "arg_short": "-d",
+        "arg_long": "--disable",
+        "type": "",
+        "short_desc": "Disables hotspot mode."
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information."
+    }
+]

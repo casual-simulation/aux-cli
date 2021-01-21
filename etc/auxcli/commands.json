@@ -1,0 +1,292 @@
+[
+    {
+        "name": "btmode",
+        "type": "core",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/btmode/btmode",
+        "config_path": "/lib/auxcli/commands/core/btmode/config.json",
+        "short_desc": "Changes the bluetooth mode your pi/auxcli is in."
+    },
+    {
+        "name": "changehost",
+        "type": "core",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": true,
+        "command_path": "/lib/auxcli/commands/core/changehost/changehost",
+        "config_path": "/lib/auxcli/commands/core/changehost/config.json",
+        "short_desc": "Changes the hostname in the necessary places."
+    },
+    {
+        "name": "conf",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/conf/conf",
+        "config_path": "",
+        "short_desc": "Opens the auxcli config.json for editing."
+    },
+    {
+        "name": "disable",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/disable/disable",
+        "config_path": "",
+        "short_desc": "Disable system related components of auxcli."
+    },
+    {
+        "name": "enable",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/enable/enable",
+        "config_path": "",
+        "short_desc": "Enable system related components of auxcli."
+    },
+    {
+        "name": "info",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/info/info",
+        "config_path": "",
+        "short_desc": "Displays helpful information about your pi."
+    },
+    {
+        "name": "install",
+        "type": "core",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/install/install",
+        "config_path": "/lib/auxcli/commands/core/install/config.json",
+        "short_desc": "Install additional components of auxcli."
+    },
+    {
+        "name": "reinstall",
+        "type": "core",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/reinstall/reinstall",
+        "config_path": "/lib/auxcli/commands/core/reinstall/config.json",
+        "short_desc": "Reinstall additional components of auxcli."
+    },
+    {
+        "name": "restart",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/restart/restart",
+        "config_path": "/lib/auxcli/commands/core/restart/config.json",
+        "short_desc": "Restart all docker containers (casualOS)."
+    },
+    {
+        "name": "start",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/start/start",
+        "config_path": "/lib/auxcli/commands/core/start/config.json",
+        "short_desc": "Start all docker containers (casualOS)."
+    },
+    {
+        "name": "stop",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/stop/stop",
+        "config_path": "/lib/auxcli/commands/core/stop/config.json",
+        "short_desc": "Stop all docker containers (casualOS)."
+    },
+    {
+        "name": "uninstall",
+        "type": "core",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/uninstall/uninstall",
+        "config_path": "/lib/auxcli/commands/core/uninstall/config.json",
+        "short_desc": "Uninstall additional components of auxcli."
+    },
+    {
+        "name": "update",
+        "type": "core",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/update/update",
+        "config_path": "/lib/auxcli/commands/core/update/config.json",
+        "short_desc": "Update auxcli, casualOS, or the RaspberryPi."
+    },
+    {
+        "name": "version",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/version/version",
+        "config_path": "/lib/auxcli/commands/core/version/config.json",
+        "short_desc": "Display the version of auxcli."
+    },
+    {
+        "name": "available",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/available",
+        "config_path": "",
+        "short_desc": "Checks if a command is available."
+    },
+    {
+        "name": "bt-serial-connect",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/bt-serial-connect",
+        "config_path": "",
+        "short_desc": "Connects to a discovered bluetooth serial device."
+    },
+    {
+        "name": "bt-serial-disconnect",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/bt-serial-disconnect",
+        "config_path": "",
+        "short_desc": "Disconnects any bluetooth serial devices currently connected."
+    },
+    {
+        "name": "bt-serial-scan",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/bt-serial-scan",
+        "config_path": "",
+        "short_desc": "Scans for bluetooth serial devices."
+    },
+    {
+        "name": "bt-tether",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/bt-tether",
+        "config_path": "",
+        "short_desc": "Broadcasts and automatically allows bluetooth devices to connect to the pi."
+    },
+    {
+        "name": "dnsmasq-checker",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/dnsmasq-checker",
+        "config_path": "",
+        "short_desc": "Extend IP Range and Timeout for dnsmasq."
+    },
+    {
+        "name": "enabled",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/enabled",
+        "config_path": "",
+        "short_desc": "Checks if a component is enabled."
+    },
+    {
+        "name": "hotspot-checker",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/hotspot-checker",
+        "config_path": "",
+        "short_desc": "Checks if the hostname/mac needs to be updated for hotspot."
+    },
+    {
+        "name": "installed",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/installed",
+        "config_path": "",
+        "short_desc": "Checks if a component is installed."
+    },
+    {
+        "name": "wlan-checker",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/wlan-checker",
+        "config_path": "",
+        "short_desc": "Checks if another WLAN is present."
+    },
+    {
+        "name": "wpa-checker",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/wpa-checker",
+        "config_path": "",
+        "short_desc": "Verifies WPA settings work with wlan0 and wlan1."
+    },
+    {
+        "name": "backup",
+        "type": "additional",
+        "available": false,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/additional/backup/backup",
+        "config_path": "/lib/auxcli/commands/additional/backup/config.json",
+        "short_desc": "Creates a backup img file of your pi."
+    },
+    {
+        "name": "dhcpcd",
+        "type": "additional",
+        "available": false,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/additional/dhcpcd/dhcpcd",
+        "config_path": "/lib/auxcli/commands/additional/dhcpcd/config.json",
+        "short_desc": "Wrapper for setting and unsetting dhcpcd settings."
+    },
+    {
+        "name": "hotspot",
+        "type": "additional",
+        "available": false,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/additional/hotspot/hotspot",
+        "config_path": "/lib/auxcli/commands/additional/hotspot/config.json",
+        "short_desc": "Changes the hotspot mode your pi/axucli is in."
+    },
+    {
+        "name": "nfc",
+        "type": "additional",
+        "available": false,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/additional/nfc/nfc",
+        "config_path": "/lib/auxcli/commands/additional/nfc/config.json",
+        "short_desc": "Configures NFC tags."
+    }
+]

@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+
+sudo apt-get install -y bluez-tools python-dbus python-gobject python-gobject-2
+
+old_dtimeout=$(grep DiscoverableTimeout /etc/bluetooth/main.conf)
+new_dtimeout="DiscoverableTimeout = 0"
+sudo sed -i "s/$old_dtimeout/$new_dtimeout/g" /etc/bluetooth/main.conf
+
+old_ptimeout=$(grep PairableTimeout /etc/bluetooth/main.conf)
+new_ptimeout="PairableTimeout = 0"
+sudo sed -i "s/$old_ptimeout/$new_ptimeout/g" /etc/bluetooth/main.conf
+
+# Write Installed
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+jq '(.[] | select (.name == "tethering-ble") | .installed) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $config
+
+# Write btmode Available
+config="/etc/auxcli/commands.json"
+tmp="/etc/auxcli/commands.json.tmp"
+jq '(.[] | select (.name == "btmode") | .available) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $config

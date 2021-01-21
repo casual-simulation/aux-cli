@@ -1,0 +1,103 @@
+#!/bin/bash
+set -e
+
+args_short=($(jq -r '.[].arg_short' config.json))
+args_long=($(jq -r '.[].arg_long' config.json))
+args=("${args_short[@]}" "${args_long[@]}")
+
+# Default Variables
+config_wifi="false"
+config_url="false"
+
+# readarray splits each newline into one element in the array
+readarray -t args_desc < <(jq '.[].short_desc' config.json)
+
+usage() {
+    printf "\nUsage:    auxcli nfc [OPTIONS]\n\n"
+    printf "Configures NFC tags.\n\n"
+    printf "OPTIONS:\n"
+    for ((i = 0; i < ${#args[@]}; i++)); do
+        printf "\t%-2s\t%-9s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
+    exit 1
+}
+
+err_check() {
+    # First error check
+    # Show the usage menu if there aren't any arguments
+    if [ $# -eq 0 ]; then
+        printf "\nYou need to pass an argument.\n"
+        usage
+    fi
+
+    # Second error check
+    # Throw an error messege if the first argument isn't valid
+    if [[ ! ${args[*]} =~ $1 ]]; then
+        printf "\n\"$1\" is an invalid argument.\n"
+        printf "Run auxcli nfc -h for help.\n\n"
+        exit 1
+    fi
+
+    # Third error check
+    # Throw an error messege if the first argument isn't valid
+    if [[ ${args[*]} =~ $2 ]]; then
+        printf "\n\"$2\" is not a valid argument for \"$1\".\n"
+        printf "Run auxcli nfc -h for help.\n\n"
+        exit 1
+    fi
+}
+
+err_check "$@"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -s | --ssid)
+        config_wifi="true"
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            ssid="$2"
+            shift # past argument
+            shift # past value
+        else
+            echo "No ssid specified. Using default: \"RaspberryPi\""
+            shift # past argument
+        fi
+        ;;
+    -p | --password)
+        config_wifi="true"
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            password="$2"
+            shift # past argument
+            shift # past value
+        else
+            echo "No password specified. Using default: \"password\""
+            shift # past argument
+        fi
+        ;;
+    -u | --url)
+        config_url="true"
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            url="$2"
+            shift # past argument
+            shift # past value
+        else
+            echo "No url specified. Using default: \"https://google.com\""
+            shift # past argument
+        fi
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    esac
+done
+
+if $config_wifi; then
+    echo "Configuring NFC with WiFi credentials..."
+    sudo python3 /lib/auxcli/modules/nfc-hat/nfc_write_wifi.py -s "$ssid" -p "$password"
+fi
+
+if $config_url; then
+    echo "Configuring NFC with URL..."
+    sudo python3 /lib/auxcli/modules/nfc-hat/nfc_write_url.py -u "$url"
+fi

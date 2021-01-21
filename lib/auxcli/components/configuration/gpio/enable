@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+
+sudo sed -i "s/^#dtoverlay=gpio-no-irq/dtoverlay=gpio-no-irq/g" /boot/config.txt
+if ! sudo grep "dtoverlay=gpio-no-irq" "/boot/config.txt"; then
+    echo "dtoverlay=gpio-no-irq" | sudo tee -a /boot/config.txt
+fi
+if ! sudo grep "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" "/etc/udev/rules.d/20-gpiomem.rules"; then
+    echo "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" | sudo tee -a /etc/udev/rules.d/20-gpiomem.rules
+fi
+
+
+config="/etc/auxcli/components.json"
+tmp="/etc/auxcli/components.json.tmp"
+
+jq '(.[] | select (.name == "gpio") | .enabled) = true' $config | sudo tee $tmp
+sudo mv -f $tmp $config

@@ -1,0 +1,14 @@
+[Unit]
+Description=Docker to Host Communication
+After=auxcli-hotspot-checker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/env python3 /srv/www/auxcli-web.py
+
+[Install]
+WantedBy=multi-user.target

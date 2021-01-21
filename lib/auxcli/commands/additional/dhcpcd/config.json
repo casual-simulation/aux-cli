@@ -1,0 +1,20 @@
+[
+    {
+        "arg_short": "-s",
+        "arg_long": "--set",
+        "type": "",
+        "short_desc": "Allows internet passthrough."
+    },
+    {
+        "arg_short": "-u",
+        "arg_long": "--unset",
+        "type": "",
+        "short_desc": "Stops the internet passthrough."
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information."
+    }
+]

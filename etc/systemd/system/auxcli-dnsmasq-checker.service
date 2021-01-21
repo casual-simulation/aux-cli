@@ -1,0 +1,14 @@
+[Unit]
+Description=Extend IP Range and Timeout for dnsmasq
+After=auxcli-wlan-checker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/env auxcli dnsmasq-checker
+
+[Install]
+WantedBy=multi-user.target

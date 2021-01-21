@@ -1,0 +1,20 @@
+[
+    {
+        "arg_short": "-n",
+        "arg_long": "--hostname",
+        "type": "STRING",
+        "short_desc": "Takes a string to set as the new hostname."
+    },
+    {
+        "arg_short": "-r",
+        "arg_long": "--reboot",
+        "type": "",
+        "short_desc": "Automatically reboot after hostname change."
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information."
+    }
+]

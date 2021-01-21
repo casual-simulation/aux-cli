@@ -1,0 +1,51 @@
+#!/bin/bash
+set -e
+
+
+bluetooth_start() {
+
+    echo "Starting up bluetoothctl..."
+    bluetoothctl <<EOF
+power on
+discoverable on
+pairable on
+EOF
+}
+
+bluetooth_broadcast() {
+    echo "Converting hostname to hex for broadcasting..."
+    STR=$(hostname)
+    HEXVAL=$(xxd -pu <<<"$STR")
+    HEXVAL=${HEXVAL::-2}
+    HEXLEN=${#HEXVAL}
+
+    while [ $HEXLEN -lt 22 ]; do
+        HEXVAL="${HEXVAL}0"
+        HEXLEN=${#HEXVAL}
+        echo $HEXVAL
+        echo $HEXLEN
+    done
+
+    INQ="0c09${HEXVAL}020a00091002006b1d460217050d03001801180e110c1115110b1100"
+    echo $INQ
+
+    echo "Starting Bluetooth broadcast..."
+    sudo hciconfig hci0 sspmode 1
+    sudo hciconfig hci0 inqdata $INQ
+    sudo /usr/bin/bt-agent -c NoInputNoOutput &
+}
+
+bluetooth_hotspot_check() {
+    echo "Starting infinite loop that checks for connected bluetooth devices..."
+    while $bluetooth_hotspot; do
+        sudo python /lib/auxcli/components/tool/tethering-ble/list-bt-devices.py &
+        sleep 5
+        read_conf
+    done
+}
+
+if [ $bt_mode == "tether" ]; then
+    bluetooth_start
+    bluetooth_broadcast
+    bluetooth_hotspot_check
+fi

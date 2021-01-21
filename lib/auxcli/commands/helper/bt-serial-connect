@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+devices_config="/etc/auxcli/devices.json"
+
+# Get array of device names
+# Maybe give them a "custom ID" from casualOS to pass to this command?
+# Check if any of those are "on"
+#
+
+sudo rfcomm connect "$1" $device01_mac 1 &
+
+while ! (sudo rfcomm -a | grep $device01_mac); do 
+    sleep 1
+    echo "Not Connected Yet."
+done

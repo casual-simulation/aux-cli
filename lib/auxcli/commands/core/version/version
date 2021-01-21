@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+config="/etc/auxcli/config.json"
+version=($(jq -r '.version' $config))
+
+echo "${version}"

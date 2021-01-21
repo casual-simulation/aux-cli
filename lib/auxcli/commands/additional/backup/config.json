@@ -1,0 +1,63 @@
+{
+    "default": {
+        "ssid": "RaspberryPi",
+        "password": "password",
+        "url:": "https://google.com"
+    },
+    "args": [
+        {
+            "arg_short": "-f",
+            "arg_long": "--filename",
+            "type": "STRING",
+            "short_desc": "Specify a filename to use. Default: ${hostn}-bkp.img"
+        },
+        {
+            "arg_short": "-m",
+            "arg_long": "--mountpoint",
+            "type": "STRING",
+            "short_desc": "Specify a mount point for your local storage device. Default: /mnt/usbstorage"
+        },
+        {
+            "arg_short": "-s",
+            "arg_long": "--storage",
+            "type": "STRING",
+            "short_desc": "Specify a local storage device to backup to. The script will try to find one if unspecified."
+        },
+        {
+            "arg_short": "-l",
+            "arg_long": "--log",
+            "type": "STRING",
+            "short_desc": "Specify a location to output the log to. Default: /var/log/auxcli.pi.backup.log"
+        },
+        {
+            "arg_short": "-S",
+            "arg_long": "--shrink",
+            "type": "STRING",
+            "short_desc": "Enable shrinking. Optional: Specify a string to append to the filename. Default: \"-shrunk\" Shrinking requires a device with at least 2x the storage space as your boot drive. NOTE: Sometimes drives are labeled incorrectly so double check. Actual storage might be slightly over or under the storage advertised. So 2x 4GB might not fit on an 8GB USB."
+        },
+        {
+            "arg_short": "-Z",
+            "arg_long": "--zip",
+            "type": "",
+            "short_desc": "Enable zipping the backup before moving it to its final destination. For simplicity's sake, it follows the storage requirements for shrinking."
+        },
+        {
+            "arg_short": "-o",
+            "arg_long": "--overwrite",
+            "type": "",
+            "short_desc": "Overwrite any files as needed."
+        },
+        {
+            "arg_short": "-y",
+            "arg_long": "",
+            "type": "",
+            "short_desc": "Bypass prompt to install dependencies."
+        },
+        {
+            "arg_short": "-h",
+            "arg_long": "--help",
+            "type": "",
+            "short_desc": "Displays this usage information."
+        }
+    ]
+}
