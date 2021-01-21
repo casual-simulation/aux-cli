@@ -50,18 +50,32 @@ err_check() {
 }
 
 install_component(){
-    if installed "raspiwifi"; then
-        auxcli dhcpcd -s
-        while [[ $# -gt 0 ]]; do
-            . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
-            shift
+    if [ "$1" == "everything" ]; then
+
+        # Enable all the things
+        auxcli enable gpio
+        auxcli enable uart
+        auxcli disable serial-console
+
+        # Install all the things
+        for ((i = 0; i < ${#components[@]}; i++)); do
+            auxcli install "${components[$i]}"
         done
-        auxcli dhcpcd -u
+        
     else
-        while [[ $# -gt 0 ]]; do
-            . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
-            shift
-        done
+        if installed "raspiwifi"; then
+            auxcli dhcpcd -s
+            while [[ $# -gt 0 ]]; do
+                . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
+                shift
+            done
+            auxcli dhcpcd -u
+        else
+            while [[ $# -gt 0 ]]; do
+                . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
+                shift
+            done
+        fi
     fi
 }
 
