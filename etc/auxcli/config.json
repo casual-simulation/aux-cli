@@ -3,5 +3,6 @@
     "autoupdate_aux": false,
     "autoupdate_cli": false,
     "autoupdate_pi": false,
-    "btmode": "none"
+    "btmode": "none",
+    "reboot_required": false
 }

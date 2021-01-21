@@ -230,6 +230,16 @@
         "short_desc": "Checks if a component is installed."
     },
     {
+        "name": "requires-reboot",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/requires-reboot",
+        "config_path": "",
+        "short_desc": "Checks if a component requires reboot"
+    },
+    {
         "name": "wlan-checker",
         "type": "helper",
         "available": true,
