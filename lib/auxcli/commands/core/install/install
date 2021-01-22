@@ -72,7 +72,7 @@ install_component(){
         if [[ ${hardware[*]} =~ $1 ]]; then
             . /lib/auxcli/components/hardware/$1/install
         fi
-        if [[ ${tool[*]} =~ $1 ]]; then
+        if [[ ${tools[*]} =~ $1 ]]; then
             . /lib/auxcli/components/tool/$1/install
         fi
         shift
