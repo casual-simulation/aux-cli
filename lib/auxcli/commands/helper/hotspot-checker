@@ -4,7 +4,7 @@ set -e
 PATH=$PATH:/lib/auxcli/commands/helper
 hostapd_conf="/etc/hostapd/hostapd.conf"
 raspiwifi_conf="/etc/raspiwifi/raspiwifi.conf"
-reboot_required="false"
+reboot_required=false
 
 mac_check() {
     echo "Checking the MAC..."
@@ -16,7 +16,7 @@ mac_set() {
     echo "Updating the MAC..."
     if [ "$oldfour" != "$newfour" ]; then
         sudo sed -i "s/$oldfour/$newfour/g" $hostapd_conf
-        reboot_required="true"
+        reboot_required=true
         echo "MAC has been updated."
     else
         echo "MAC Address matches."
@@ -33,13 +33,13 @@ hostname_set() {
     echo "Updating the hostname in relevant files..."
     if [ "$(hostname)" != "$oldhost" ]; then
         sudo sed -i "s/$oldhost/$(hostname)/g" $hostapd_conf
-        reboot_required="true"
+        reboot_required=true
     else
         echo "OldHost matches NewHost."
     fi
     if [ "$(hostname)" != "$oldhost2" ]; then
         sudo sed -i "s/$oldhost2/$(hostname)/g" $raspiwifi_conf
-        reboot_required="true"
+        reboot_required=true
     else
         echo "OldHost2 matches NewHost."
     fi
@@ -47,7 +47,7 @@ hostname_set() {
 
 reboot_check() {
     echo "Checking if reboot required..."
-    if [ "$reboot_required" == "true" ]; then
+    if $reboot_required; then
         echo "Reboot is required. Rebooting now..."
         sudo reboot now
     else
