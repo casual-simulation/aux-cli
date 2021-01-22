@@ -26,6 +26,14 @@ tmp="/etc/auxcli/components.json.tmp"
 jq '(.[] | select (.name == "raspiwifi") | .installed) = true' $config | sudo tee $tmp
 sudo mv -f $tmp $config
 
+# Make dhcpcd available
+jq '(.[] | select (.name == "dhcpcd") | .available) = true' /etc/auxcli/commands.json | sudo tee /etc/auxcli/commands.json.tmp
+sudo mv -f $tmp $config
+
+# Make hotspot available
+jq '(.[] | select (.name == "hotspot") | .available) = true' /etc/auxcli/commands.json | sudo tee /etc/auxcli/commands.json.tmp
+sudo mv -f $tmp $config
+
 # Run the RaspiWiFi setup
 echo "DEBUG: Running RaspiWiFi..."
 cd $install_path/RaspiWiFi
