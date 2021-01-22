@@ -23,16 +23,19 @@ sudo systemctl start auxcli-wpa-checker
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 
+config1="/etc/auxcli/components.json"
+tmp1="/etc/auxcli/components.json.tmp"
+
 jq '(.[] | select (.name == "raspiwifi") | .installed) = true' $config | sudo tee $tmp
 sudo mv -f $tmp $config
 
 # Make dhcpcd available
-jq '(.[] | select (.name == "dhcpcd") | .available) = true' /etc/auxcli/commands.json | sudo tee /etc/auxcli/commands.json.tmp
-sudo mv -f $tmp $config
+jq '(.[] | select (.name == "dhcpcd") | .available) = true' $config1 | sudo tee $tmp1
+sudo mv -f $tmp1 $config1
 
 # Make hotspot available
-jq '(.[] | select (.name == "hotspot") | .available) = true' /etc/auxcli/commands.json | sudo tee /etc/auxcli/commands.json.tmp
-sudo mv -f $tmp $config
+jq '(.[] | select (.name == "hotspot") | .available) = true' $config1 | sudo tee $tmp1
+sudo mv -f $tmp1 $config1
 
 # Run the RaspiWiFi setup
 echo "DEBUG: Running RaspiWiFi..."
