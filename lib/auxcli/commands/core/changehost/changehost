@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-config_path=($(jq -r '.[] | select( .name == "changehost" ) | .config_path' /etc/auxcli/commands.json))
+config_path=$(jq -r '.[] | select( .name == "changehost" ) | .config_path' /etc/auxcli/commands.json)
 
 args_short=($(jq -r '.[].arg_short' $config_path))
 args_long=($(jq -r '.[].arg_long' $config_path))

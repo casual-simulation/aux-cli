@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-config_path=($(jq -r '.[] | select( .name == "changehost" ) | .config_path' /etc/auxcli/commands.json))
+config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json)
 
 config="/etc/auxcli/config.json"
 tmp="/etc/auxcli/config.json.tmp"
-previous_mode=($(jq -r '.btmode' $config))
+previous_mode=$(jq -r '.btmode' $config)
 
 # args_short=($(jq -r '.[].arg_short' $config_path))
 args_long=($(jq -r '.[].arg_long' $config_path))
