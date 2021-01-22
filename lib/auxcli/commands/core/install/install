@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-config="/etc/auxcli/config.json"
-tmp="/etc/auxcli/config.json.tmp"
+config_main="/etc/auxcli/config.json"
+tmp_main="/etc/auxcli/config.json.tmp"
 
 # Temporarily add this dir to the path so we can use helper commands
 PATH=$PATH:/lib/auxcli/commands/helper
@@ -62,9 +62,9 @@ install_component(){
     if [ "$1" == "everything" ]; then
         # Enable all the things
         echo "DEBUG: Enabling everything"
-        auxcli enable gpio
-        auxcli enable uart
-        auxcli disable serial-console
+        if ! enabled gpio; then auxcli enable gpio; fi
+        if ! enabled uart; then auxcli enable uart; fi
+        if enabled serial-console; then auxcli disable serial-console; fi
 
         # Install all the things
         echo "DEBUG: Installing everything"
@@ -74,10 +74,10 @@ install_component(){
                 if requires-reboot ${components[$i]}; then
                     # Write Reboot Required
                     echo "DEBUG: ${components[$i]} requires a reboot. Setting the flag in config.json"
-                    jq '(.reboot_required) = true' $config | sudo tee $tmp
-                    sudo mv -f $tmp $config
+                    jq '(.reboot_required) = true' $config_main | sudo tee $tmp_main
+                    sudo mv -f $tmp_main $config_main
                 fi
-                auxcli install "${components[$i]}"
+                if ! installed "${components[$i]}"; then auxcli install "${components[$i]}"; fi
             fi
         done
     else
@@ -85,8 +85,8 @@ install_component(){
         while [[ $# -gt 0 ]]; do
             if requires-reboot $1; then
                 # Write Reboot Required
-                jq '(.reboot_required) = true' $config | sudo tee $tmp
-                sudo mv -f $tmp $config
+                jq '(.reboot_required) = true' $config_main | sudo tee $tmp_main
+                sudo mv -f $tmp_main $config_main
             fi
             . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
             shift
@@ -98,6 +98,6 @@ install_component(){
 err_check "$@"
 install_component "$@"
 
-if jq -r '.reboot_required' $config; then
+if jq -r '.reboot_required' $config_main; then
     echo "A reboot is required"
 fi
