@@ -10,7 +10,7 @@ components_type=($(jq -r '.[].type' /etc/auxcli/components.json))
 components_reboot=($(jq -r '.[].requires_reboot' /etc/auxcli/components.json))
 
 # readarray splits each newline into one element in the array
-readarray -t components_desc < <(jq '.[].short_desc' $components_config)
+readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config)
 
 usage() {
     printf "\nUsage:        auxcli install [COMPONENT]\n\n"

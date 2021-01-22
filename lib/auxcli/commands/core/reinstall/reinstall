@@ -8,7 +8,7 @@ components_config="/etc/auxcli/components.json"
 components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
 
 # readarray splits each newline into one element in the array
-readarray -t components_desc < <(jq '.[].short_desc' $components_config)
+readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config)
 
 usage() {
     printf "\nUsage:        auxcli reinstall [COMPONENT]\n\n"
