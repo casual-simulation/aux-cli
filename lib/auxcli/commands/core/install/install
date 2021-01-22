@@ -8,8 +8,11 @@ tmp_main="/etc/auxcli/config.json.tmp"
 PATH=$PATH:/lib/auxcli/commands/helper
 
 components_config="/etc/auxcli/components.json"
+# mapfile -t components < <(jq -r '.[] | select( .installed != null) | .name' $components_config)
 components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
-components_type=($(jq -r '.[].type' /etc/auxcli/components.json))
+# configuration=($(jq -r '.[] | select(.type == "configuration") | .name' /etc/auxcli/components.json))
+hardware=($(jq -r '.[] | select(.type == "hardware") | .name' /etc/auxcli/components.json))
+tools=($(jq -r '.[] | select(.type == "tool") | .name' /etc/auxcli/components.json))
 
 # readarray splits each newline into one element in the array
 readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config)
@@ -66,7 +69,12 @@ install_component(){
             jq '(.reboot_required) = true' $config_main | sudo tee $tmp_main
             sudo mv -f $tmp_main $config_main
         fi
-        . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
+        if [[ ${hardware[*]} =~ $1 ]]; then
+            . /lib/auxcli/components/hardware/$1/install
+        fi
+        if [[ ${tool[*]} =~ $1 ]]; then
+            . /lib/auxcli/components/tool/$1/install
+        fi
         shift
     done
     if available dhcpcd; then auxcli dhcpcd -u; fi
@@ -81,14 +89,6 @@ install_everything(){
 
     # Install all the things
     echo "DEBUG: Installing everything"
-    for ((i = 0; i < ${#components[@]}; i++)); do
-        if [ "${components_type[$i]}" == "tool" ]; then
-            echo "DEBUG: ${components[$i]} is a tool."
-            tools+=("${components[$i]}")
-        fi
-    done
-
-
     install_component "${tools[@]}"
 }
 
