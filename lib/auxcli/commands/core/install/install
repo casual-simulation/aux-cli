@@ -10,7 +10,6 @@ PATH=$PATH:/lib/auxcli/commands/helper
 components_config="/etc/auxcli/components.json"
 components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
 components_type=($(jq -r '.[].type' /etc/auxcli/components.json))
-components_reboot=($(jq -r '.[].requires_reboot' /etc/auxcli/components.json))
 
 # readarray splits each newline into one element in the array
 readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config)
@@ -61,24 +60,26 @@ err_check() {
 
 install_component(){
     if [ "$1" == "everything" ]; then
-
         # Enable all the things
+        echo "DEBUG: Enabling everything"
         auxcli enable gpio
         auxcli enable uart
         auxcli disable serial-console
 
         # Install all the things
+        echo "DEBUG: Installing everything"
         for ((i = 0; i < ${#components[@]}; i++)); do
             if [ "${components_type[$i]}" == "tool" ]; then
-                if ${components_reboot[$i]}; then
+                echo "DEBUG: ${components[$i]} is a tool."
+                if requires-reboot ${components[$i]}; then
                     # Write Reboot Required
+                    echo "DEBUG: ${components[$i]} requires a reboot. Setting the flag in config.json"
                     jq '(.reboot_required) = true' $config | sudo tee $tmp
                     sudo mv -f $tmp $config
                 fi
                 auxcli install "${components[$i]}"
             fi
         done
-
     else
         if available dhcpcd; then auxcli dhcpcd -s; fi
         while [[ $# -gt 0 ]]; do
