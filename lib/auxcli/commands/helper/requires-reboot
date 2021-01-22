@@ -1,9 +1,7 @@
 #!/bin/bash
 set -e
 
-config="/etc/auxcli/components.json"
-
-if jq --arg component "$1" -r '.[] | select( .name == $component ) | .requires_reboot' $config; then
+if jq --arg component "$1" -r '.[] | select( .name == $component ) | .requires_reboot' /etc/auxcli/components.json; then
     # echo "$1 requires reboot."
     exit 0
 else
