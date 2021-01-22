@@ -71,7 +71,7 @@ install_component(){
                     # Write Reboot Required
                     config="/etc/auxcli/config.json"
                     tmp="/etc/auxcli/config.json.tmp"
-                    jq '(.[].reboot_required) = true' $config | sudo tee $tmp
+                    jq '(.reboot_required) = true' $config | sudo tee $tmp
                     sudo mv -f $tmp $config
                 fi
                 auxcli install "${components[$i]}"
@@ -86,7 +86,7 @@ install_component(){
                     # Write Reboot Required
                     config="/etc/auxcli/config.json"
                     tmp="/etc/auxcli/config.json.tmp"
-                    jq '(.[].reboot_required) = true' $config | sudo tee $tmp
+                    jq '(.reboot_required) = true' $config | sudo tee $tmp
                     sudo mv -f $tmp $config
                 fi
                 . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
@@ -99,7 +99,7 @@ install_component(){
                     # Write Reboot Required
                     config="/etc/auxcli/config.json"
                     tmp="/etc/auxcli/config.json.tmp"
-                    jq '(.[].reboot_required) = true' $config | sudo tee $tmp
+                    jq '(.reboot_required) = true' $config | sudo tee $tmp
                     sudo mv -f $tmp $config
                 fi
                 . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
