@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-install_path=($(jq -r '.[] | select( .name == "pishrink" ) | .install_path' /etc/auxcli/components.json))
+install_path=$(jq -r '.[] | select( .name == "pishrink" ) | .install_path' /etc/auxcli/components.json)
 
 echo "Installing PiShrink."
 sudo chmod +x $install_path/pishrink.sh
@@ -11,4 +11,4 @@ config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 
 jq '(.[] | select (.name == "pishrink") | .installed) = true' $config | sudo tee $tmp
-sudo mv -f $tmp $new_config
+sudo mv -f $tmp $config

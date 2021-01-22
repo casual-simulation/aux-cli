@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-install_path=($(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc/auxcli/components.json))
+install_path=$(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc/auxcli/components.json)
 
 # Add in our custom scripts to bypass interactivity
 echo "DEBUG: Modifying RaspiWiFi..."
@@ -24,7 +24,7 @@ config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 
 jq '(.[] | select (.name == "raspiwifi") | .installed) = true' $config | sudo tee $tmp
-sudo mv -f $tmp $new_config
+sudo mv -f $tmp $config
 
 # Run the RaspiWiFi setup
 echo "DEBUG: Running RaspiWiFi..."

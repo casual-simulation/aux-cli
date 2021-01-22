@@ -7,4 +7,4 @@ sudo sed -i "/# Slack Start/,/# Slack End/d" /etc/rc.local
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 jq '(.[] | select (.name == "slack") | .installed) = false' $config | sudo tee $tmp
-sudo mv -f $tmp $new_config
+sudo mv -f $tmp $config

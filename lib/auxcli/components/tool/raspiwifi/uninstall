@@ -7,4 +7,4 @@ config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 
 jq '(.[] | select (.name == "raspiwifi") | .installed) = false' $config | sudo tee $tmp
-sudo mv -f $tmp $new_config
+sudo mv -f $tmp $config
