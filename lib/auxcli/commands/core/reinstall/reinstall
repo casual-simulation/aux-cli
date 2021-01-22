@@ -50,21 +50,13 @@ err_check() {
 }
 
 reinstall_component(){
-    if installed "raspiwifi"; then
-        auxcli dhcpcd -s
-        while [[ $# -gt 0 ]]; do
-            . /lib/auxcli/components/tool/$1/uninstall || . /lib/auxcli/components/hardware/$1/uninstall
-            . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
-            shift
-        done
-        auxcli dhcpcd -u
-    else
-        while [[ $# -gt 0 ]]; do
-            . /lib/auxcli/components/tool/$1/uninstall || . /lib/auxcli/components/hardware/$1/uninstall
-            . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
-            shift
-        done
-    fi
+    if available dhcpcd; then auxcli dhcpcd -s; fi
+    while [[ $# -gt 0 ]]; do
+        . /lib/auxcli/components/tool/$1/uninstall || . /lib/auxcli/components/hardware/$1/uninstall
+        . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
+        shift
+    done
+    if available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 err_check "$@"

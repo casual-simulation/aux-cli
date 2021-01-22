@@ -139,7 +139,7 @@ dep_check() {
     for dep in "${deps[@]}"; do
         if ! dpkg -l | grep "${dep}" >/dev/null 2>&1; then
             echo "${dep} is missing!"
-            auxcli dhcpcd -s
+            if available dhcpcd; then auxcli dhcpcd -s; fi
             if [ "${agree}" == "true" ]; then
                 echo "Installing ${dep} now."
                 sudo apt-get install -y "${dep}"
@@ -159,7 +159,7 @@ dep_check() {
     if [ "${zip}" == "true" ]; then
         if ! zip -h >/dev/null 2>&1; then
             echo "Zip is missing!"
-            auxcli dhcpcd -s
+            if available dhcpcd; then auxcli dhcpcd -s; fi
             if [ "${agree}" == "true" ]; then
                 echo "Installing Zip now."
                 sudo apt-get install -y zip
@@ -179,7 +179,7 @@ dep_check() {
     if [ "${shrink}" == "true" ]; then
         if ! [ -e /usr/local/bin/pishrink.sh ]; then
             echo "PiShrink is missing!"
-            auxcli dhcpcd -s
+            if available dhcpcd; then auxcli dhcpcd -s; fi
             if [ "${agree}" == "true" ]; then
                 echo "Installing PiShrink now."
                 wget https://code.lewman.com/andrew/PiShrink/raw/master/pishrink.sh
@@ -201,7 +201,7 @@ dep_check() {
             fi
         fi
     fi
-    auxcli dhcpcd -u
+    if available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 storage_list() {

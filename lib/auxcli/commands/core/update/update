@@ -108,7 +108,7 @@ vercomp () {
 version_check() {
     echo "Checking for newer versions of AUXCLI..."
     # If hotspot mode is true, then do the work around
-    auxcli dhcpcd -s
+    if available dhcpcd; then auxcli dhcpcd -s; fi
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/auxcli/config.json --output /home/pi/config.json
     new_version=$(jq -r '.version' /home/pi/config.json) 
     old_version=$(jq -r '.version' $config)
@@ -128,17 +128,17 @@ version_check() {
         fi
     else
         echo "You have the latest version of AUXCLI."
-        auxcli dhcpcd -u
+        if available dhcpcd; then auxcli dhcpcd -u; fi
         return 1
     fi
 }
 
 update_aux() {
     # If hotspot mode is true, then do the work around
-    auxcli dhcpcd -s
+    if available dhcpcd; then auxcli dhcpcd -s; fi
     sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output /home/pi/docker-compose.yml
     docker-compose -f /home/pi/docker-compose.yml pull && docker-compose -f /home/pi/docker-compose.yml up -d
-    auxcli dhcpcd -u
+    if available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 automatic_update_aux() {
@@ -161,10 +161,10 @@ automatic_update_aux() {
 update_cli() {
     if version_check; then
         # If hotspot mode is true, then do the work around
-        auxcli dhcpcd -s
+        if available dhcpcd; then auxcli dhcpcd -s; fi
         curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
         sudo rm -rf install.sh
-        auxcli dhcpcd -u
+        if available dhcpcd; then auxcli dhcpcd -u; fi
     fi
 }
 
@@ -187,9 +187,9 @@ automatic_update_cli() {
 
 update_pi() {
     # If hotspot mode is true, then do the work around
-    auxcli dhcpcd -s
+    if available dhcpcd; then auxcli dhcpcd -s; fi
     sudo apt-get update && sudo apt-get upgrade -y
-    auxcli dhcpcd -u
+    if available dhcpcd; then auxcli dhcpcd -u; fi
 
 }
 
