@@ -59,7 +59,7 @@ update_conf() {
             sudo mv -f $tmp $new_config
 
             # Write new version back onto the new file
-            jq --arg ver "$new_ver" '(.version) = $ver' $new_config | sudo tee $tmp
+            jq --arg ver "$new_ver" '(.version) = "$ver"' $new_config | sudo tee $tmp
             sudo mv -f $tmp $new_config
 
         # elif [ $new_config == "/etc/auxcli/devices.json" ]; then
