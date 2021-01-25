@@ -1,19 +1,19 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json 1> /dev/null)
+config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json)
 
 config="/etc/auxcli/config.json"
 tmp="/etc/auxcli/config.json.tmp"
-previous_mode=$(jq -r '.btmode' $config 1> /dev/null)
+previous_mode=$(jq -r '.btmode' $config)
 
-# args_short=($(jq -r '.[].arg_short' $config_path 1> /dev/null))
-args_long=($(jq -r '.[].arg_long' $config_path 1> /dev/null))
+# args_short=($(jq -r '.[].arg_short' $config_path))
+args_long=($(jq -r '.[].arg_long' $config_path))
 # args=("${args_short[@]}" "${args_long[@]}")
 
 
 # readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path 1> /dev/null)
+readarray -t args_desc < <(jq '.[].short_desc' $config_path)
 
 usage() {
     printf "\nUsage:    auxcli btmode [OPTIONS]\n\n"

@@ -8,14 +8,14 @@ tmp_main="/etc/auxcli/config.json.tmp"
 PATH=$PATH:/lib/auxcli/commands/helper
 
 components_config="/etc/auxcli/components.json"
-# mapfile -t components < <(jq -r '.[] | select( .installed != null) | .name' $components_config 1> /dev/null)
-components=($(jq -r '.[] | select( .installed != null) | .name' $components_config 1> /dev/null))
-# configuration=($(jq -r '.[] | select(.type == "configuration") | .name' /etc/auxcli/components.json 1> /dev/null))
-hardware=($(jq -r '.[] | select(.type == "hardware") | .name' /etc/auxcli/components.json 1> /dev/null))
-tools=($(jq -r '.[] | select(.type == "tool") | .name' /etc/auxcli/components.json 1> /dev/null))
+# mapfile -t components < <(jq -r '.[] | select( .installed != null) | .name' $components_config)
+components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
+# configuration=($(jq -r '.[] | select(.type == "configuration") | .name' /etc/auxcli/components.json))
+hardware=($(jq -r '.[] | select(.type == "hardware") | .name' /etc/auxcli/components.json))
+tools=($(jq -r '.[] | select(.type == "tool") | .name' /etc/auxcli/components.json))
 
 # readarray splits each newline into one element in the array
-readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config 1> /dev/null)
+readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config)
 
 usage() {
     printf "\nUsage:        auxcli install [COMPONENT]\n\n"

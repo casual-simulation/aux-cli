@@ -2,6 +2,6 @@
 set -e
 
 config="/etc/auxcli/config.json"
-version=($(jq -r '.version' $config 1> /dev/null))
+version=($(jq -r '.version' $config))
 
 echo "${version}"

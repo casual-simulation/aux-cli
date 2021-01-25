@@ -29,6 +29,6 @@ jq '(.[] | select (.name == "tethering-ble") | .installed) = false' $config | su
 sudo mv -f $tmp $config
 
 
-if [ $(jq -r '.btmode' /etc/auxcli/config.json 1> /dev/null) == "tether" ]; then
+if [ $(jq -r '.btmode' /etc/auxcli/config.json) == "tether" ]; then
     auxcli btmode "none"
 fi

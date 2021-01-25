@@ -2,7 +2,7 @@
 set -e
 
 if [ ! -f /etc/auxcli/config.json ]; then
-    verbose=$(jq -r '.verbose' /etc/auxcli/config.json 1> /dev/null) 
+    verbose=$(jq -r '.verbose' /etc/auxcli/config.json) 
 else
     verbose=false
 fi
@@ -68,7 +68,7 @@ update_conf() {
             if $verbose; then printf "DEBUG: Updating commands.json\n"; fi
 
             # Get array of available things
-            available=($(jq -r '.[] | select(.available == true) | .name' $bkp_config 1> /dev/null)) 
+            available=($(jq -r '.[] | select(.available == true) | .name' $bkp_config)) 
             if $verbose; then printf "DEBUG: Available commands from bkp_config: %s\n" "${available[*]}"; fi
 
             # Write those to the new config
@@ -83,11 +83,11 @@ update_conf() {
             if $verbose; then printf "DEBUG: Updating components.json\n"; fi
 
             # Get array of installed things
-            installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config 1> /dev/null)) 
+            installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config)) 
             if $verbose; then printf "DEBUG: Installed components from bkp_config: %s\n" "${installed[*]}"; fi
-            enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config 1> /dev/null))  
+            enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config))  
             if $verbose; then printf "DEBUG: Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
-            disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config 1> /dev/null)) 
+            disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config)) 
             if $verbose; then printf "DEBUG: Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
 
             # Write those to the new config
@@ -112,7 +112,7 @@ update_conf() {
             if $verbose; then printf "DEBUG: Updating config.json\n"; fi
 
             # Get new version number
-            new_ver=$(jq -r '.version' $new_config 1> /dev/null)
+            new_ver=$(jq -r '.version' $new_config)
             if $verbose; then printf "DEBUG: New Version is %s.\n" "${new_ver}"; fi
 
             # Merge

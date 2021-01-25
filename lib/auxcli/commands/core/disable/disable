@@ -5,10 +5,10 @@ set -e
 PATH=$PATH:/lib/auxcli/commands/helper
 
 components_config="/etc/auxcli/components.json"
-components=($(jq -r '.[] | select( .enabled != null) | .name' $components_config 1> /dev/null))
+components=($(jq -r '.[] | select( .enabled != null) | .name' $components_config))
 
 # readarray splits each newline into one element in the array
-readarray -t components_desc < <(jq -r '.[] | select( .enabled != null) | .short_desc' $components_config 1> /dev/null)
+readarray -t components_desc < <(jq -r '.[] | select( .enabled != null) | .short_desc' $components_config)
 
 usage() {
     printf "\nUsage:        auxcli disable [COMPONENT]\n\n"
