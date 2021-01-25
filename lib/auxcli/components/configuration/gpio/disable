@@ -14,5 +14,5 @@ sudo sed -i "s/SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 
-jq '(.[] | select (.name == "gpio") | .enabled) = false' $config | sudo tee $tmp
+jq '(.[] | select (.name == "gpio") | .enabled) = false' $config | sudo tee $tmp 1> /dev/null
 sudo mv -f $tmp $config

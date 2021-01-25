@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-install_path=$(jq -r '.[] | select( .name == "slack" ) | .install_path' /etc/auxcli/components.json)
+install_path=$(jq -r '.[] | select( .name == "slack" ) | .install_path' /etc/auxcli/components.json 1> /dev/null)
 
 sudo cp $install_path/slack_msg/slack /usr/bin/slack
 sudo chmod +x /usr/bin/slack
@@ -46,5 +46,5 @@ EOT
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 
-jq '(.[] | select (.name == "slack") | .installed) = true' $config | sudo tee $tmp
+jq '(.[] | select (.name == "slack") | .installed) = true' $config | sudo tee $tmp 1> /dev/null
 sudo mv -f $tmp $config

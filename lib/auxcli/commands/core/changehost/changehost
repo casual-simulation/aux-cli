@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "changehost" ) | .config_path' /etc/auxcli/commands.json)
+config_path=$(jq -r '.[] | select( .name == "changehost" ) | .config_path' /etc/auxcli/commands.json 1> /dev/null)
 
-args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+args_short=($(jq -r '.[].arg_short' $config_path 1> /dev/null))
+args_long=($(jq -r '.[].arg_long' $config_path 1> /dev/null))
 args=("${args_short[@]}" "${args_long[@]}")
 
 # readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
+readarray -t args_desc < <(jq '.[].short_desc' $config_path 1> /dev/null)
 
 usage() {
     printf "\nUsage:    auxcli changehost [OPTIONS]\n\n"

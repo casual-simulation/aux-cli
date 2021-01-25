@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "backup" ) | .config_path' /etc/auxcli/commands.json)
+config_path=$(jq -r '.[] | select( .name == "backup" ) | .config_path' /etc/auxcli/commands.json 1> /dev/null)
 
 # Default Variables
 hostn=$(hostname)                              # Hostname of RaspberryPi

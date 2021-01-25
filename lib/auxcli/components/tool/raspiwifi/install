@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-install_path=$(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc/auxcli/components.json)
+install_path=$(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc/auxcli/components.json 1> /dev/null)
 
 # Add in our custom scripts to bypass interactivity
 echo "DEBUG: Modifying RaspiWiFi..."
@@ -26,15 +26,15 @@ tmp="/etc/auxcli/components.json.tmp"
 config1="/etc/auxcli/components.json"
 tmp1="/etc/auxcli/components.json.tmp"
 
-jq '(.[] | select (.name == "raspiwifi") | .installed) = true' $config | sudo tee $tmp
+jq '(.[] | select (.name == "raspiwifi") | .installed) = true' $config | sudo tee $tmp 1> /dev/null
 sudo mv -f $tmp $config
 
 # Make dhcpcd available
-jq '(.[] | select (.name == "dhcpcd") | .available) = true' $config1 | sudo tee $tmp1
+jq '(.[] | select (.name == "dhcpcd") | .available) = true' $config1 | sudo tee $tmp1 1> /dev/null
 sudo mv -f $tmp1 $config1
 
 # Make hotspot available
-jq '(.[] | select (.name == "hotspot") | .available) = true' $config1 | sudo tee $tmp1
+jq '(.[] | select (.name == "hotspot") | .available) = true' $config1 | sudo tee $tmp1 1> /dev/null
 sudo mv -f $tmp1 $config1
 
 # Run the RaspiWiFi setup

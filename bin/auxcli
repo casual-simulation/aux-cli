@@ -5,10 +5,10 @@ set -e
 PATH=$PATH:/lib/auxcli/commands/helper
 
 commands_config="/etc/auxcli/commands.json"
-commands=($(jq -r '.[] | select( .available != null) | .name' $commands_config))
+commands=($(jq -r '.[] | select( .available != null) | .name' $commands_config 1> /dev/null))
 
 # readarray splits each newline into one element in the array
-readarray -t commands_desc < <(jq -r '.[] | select( .available != null) | .short_desc' $commands_config)
+readarray -t commands_desc < <(jq -r '.[] | select( .available != null) | .short_desc' $commands_config 1> /dev/null)
 
 usage() {
     printf "\nUsage:        auxcli [COMMAND]\n\n"
@@ -58,7 +58,7 @@ err_check() {
 
 run_cmd() {
     # Set the first argument to be the command and then shift past it
-    command_path=$(jq --arg cmd "$1" -r '.[] | select( .name == $cmd ) | .command_path' $commands_config)
+    command_path=$(jq --arg cmd "$1" -r '.[] | select( .name == $cmd ) | .command_path' $commands_config 1> /dev/null)
     shift
 
     # Add all other arguments to an array

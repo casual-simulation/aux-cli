@@ -63,5 +63,5 @@ sudo sed -i "${line_number}i \\ \\ \\ \\ # Don't automount boot usb again" "/usr
 
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
-jq '(.[] | select (.name == "usbmount") | .installed) = true' $config | sudo tee $tmp
+jq '(.[] | select (.name == "usbmount") | .installed) = true' $config | sudo tee $tmp 1> /dev/null
 sudo mv -f $tmp $config

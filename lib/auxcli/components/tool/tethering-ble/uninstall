@@ -25,10 +25,10 @@ sudo systemctl stop systemd-networkd
 
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
-jq '(.[] | select (.name == "tethering-ble") | .installed) = false' $config | sudo tee $tmp
+jq '(.[] | select (.name == "tethering-ble") | .installed) = false' $config | sudo tee $tmp 1> /dev/null
 sudo mv -f $tmp $config
 
 
-if [ $(jq -r '.btmode' /etc/auxcli/config.json) == "tether" ]; then
+if [ $(jq -r '.btmode' /etc/auxcli/config.json 1> /dev/null) == "tether" ]; then
     auxcli btmode "none"
 fi

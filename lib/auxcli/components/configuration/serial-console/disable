@@ -9,5 +9,5 @@ sudo sed -i "s/console=ttyAMA0,115200 //g" /boot/cmdline.txt
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
 
-jq '(.[] | select (.name == "serial-console") | .enabled) = false' $config | sudo tee $tmp
+jq '(.[] | select (.name == "serial-console") | .enabled) = false' $config | sudo tee $tmp 1> /dev/null
 sudo mv -f $tmp $config

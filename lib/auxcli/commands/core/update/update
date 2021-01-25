@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "update" ) | .config_path' /etc/auxcli/commands.json)
+config_path=$(jq -r '.[] | select( .name == "update" ) | .config_path' /etc/auxcli/commands.json 1> /dev/null)
 
 config="/etc/auxcli/config.json"
 tmp="/etc/auxcli/config.json.tmp"
 
-args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+args_short=($(jq -r '.[].arg_short' $config_path 1> /dev/null))
+args_long=($(jq -r '.[].arg_long' $config_path 1> /dev/null))
 args=("${args_short[@]}" "${args_long[@]}")
 
 update_aux=false
@@ -18,7 +18,7 @@ update_pi=false
 automatic_update_pi=false
 
 # readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
+readarray -t args_desc < <(jq '.[].short_desc' $config_path 1> /dev/null)
 
 usage() {
     printf "\nUsage:    auxcli update [OPTIONS]\n\n"
@@ -117,8 +117,8 @@ version_check() {
     # If hotspot mode is true, then do the work around
     if available dhcpcd; then auxcli dhcpcd -s; fi
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/etc/auxcli/config.json --output /home/pi/config.json
-    new_version=$(jq -r '.version' /home/pi/config.json) 
-    old_version=$(jq -r '.version' $config)
+    new_version=$(jq -r '.version' /home/pi/config.json 1> /dev/null) 
+    old_version=$(jq -r '.version' $config 1> /dev/null)
     echo "DEBUG: NewVersion: $new_version"
     echo "DEBUG: OldVersion: $old_version"
     sudo rm -rf /home/pi/config.json
@@ -151,18 +151,18 @@ update_aux() {
 }
 
 automatic_update_aux() {
-    if ! $(jq -r '.autoupdate_aux' $config); then
+    if ! jq -r '.autoupdate_aux' $config 1> /dev/null; then
         echo "Enabling Automatic updates for AUX."
         (
             crontab -l
             echo "@daily auxcli update -a"
         ) | crontab -
-        jq '(.autoupdate_aux) = true' $config | sudo tee $tmp
+        jq '(.autoupdate_aux) = true' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     else
         echo "Disabling Automatic updates for AUX."
         crontab -l | grep -v "auxcli update -a" | crontab -
-        jq '(.autoupdate_aux) = false' $config | sudo tee $tmp
+        jq '(.autoupdate_aux) = false' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     fi
 }
@@ -178,18 +178,18 @@ update_cli() {
 }
 
 automatic_update_cli() {
-    if ! $(jq -r '.autoupdate_cli' $config); then
+    if ! jq -r '.autoupdate_cli' $config 1> /dev/null; then
         echo "Enabling Automatic updates for AUXCLI."
         (
             crontab -l
             echo "@hourly auxcli update -c -y"
         ) | crontab -
-        jq '(.autoupdate_cli) = true' $config | sudo tee $tmp
+        jq '(.autoupdate_cli) = true' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     else
         echo "Disabling Automatic updates for AUXCLI."
         crontab -l | grep -v "auxcli update -c -y" | crontab -
-        jq '(.autoupdate_cli) = false' $config | sudo tee $tmp
+        jq '(.autoupdate_cli) = false' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     fi
 }
@@ -203,18 +203,18 @@ update_pi() {
 }
 
 automatic_update_pi() {
-    if ! $(jq -r '.autoupdate_pi' $config); then
+    if ! jq -r '.autoupdate_pi' $config 1> /dev/null; then
         echo "Enabling Automatic updates for your RaspberryPi (apt-get)."
         (
             crontab -l
             echo "@daily auxcli update -p"
         ) | crontab -
-        jq '(.autoupdate_pi) = true' $config | sudo tee $tmp
+        jq '(.autoupdate_pi) = true' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     else
         echo "Disabling Automatic updates for your RaspberryPi (apt-get)."
         crontab -l | grep -v "auxcli update -p" | crontab -
-        jq '(.autoupdate_pi) = false' $config | sudo tee $tmp
+        jq '(.autoupdate_pi) = false' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     fi
 

@@ -8,5 +8,5 @@ sudo systemctl start usbmuxd
 
 config="/etc/auxcli/components.json"
 tmp="/etc/auxcli/components.json.tmp"
-jq '(.[] | select (.name == "tethering-usb") | .installed) = true' $config | sudo tee $tmp
+jq '(.[] | select (.name == "tethering-usb") | .installed) = true' $config | sudo tee $tmp 1> /dev/null
 sudo mv -f $tmp $config

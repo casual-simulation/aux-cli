@@ -1,19 +1,19 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json)
+config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json 1> /dev/null)
 
 config="/etc/auxcli/config.json"
 tmp="/etc/auxcli/config.json.tmp"
-previous_mode=$(jq -r '.btmode' $config)
+previous_mode=$(jq -r '.btmode' $config 1> /dev/null)
 
-# args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+# args_short=($(jq -r '.[].arg_short' $config_path 1> /dev/null))
+args_long=($(jq -r '.[].arg_long' $config_path 1> /dev/null))
 # args=("${args_short[@]}" "${args_long[@]}")
 
 
 # readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
+readarray -t args_desc < <(jq '.[].short_desc' $config_path 1> /dev/null)
 
 usage() {
     printf "\nUsage:    auxcli btmode [OPTIONS]\n\n"
@@ -47,7 +47,7 @@ err_check "$@"
 while [[ $# -gt 0 ]]; do
     case "$1" in
     none)
-        jq '(.btmode) = "none"' $config | sudo tee $tmp
+        jq '(.btmode) = "none"' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
         if [ "$previous_mode" == "tether" ]; then
             sudo systemctl stop auxcli-bt-tether
@@ -60,7 +60,7 @@ while [[ $# -gt 0 ]]; do
         shift # past argument
         ;;
     tether)
-        jq '(.btmode) = "tether"' $config | sudo tee $tmp
+        jq '(.btmode) = "tether"' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
         if [ "$previous_mode" == "serial" ]; then
             sudo systemctl stop auxcli-bt-serial-scan
@@ -71,7 +71,7 @@ while [[ $# -gt 0 ]]; do
         shift # past argument
         ;;
     serial)
-        jq '(.btmode) = "serial"' $config | sudo tee $tmp
+        jq '(.btmode) = "serial"' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
         if [ "$previous_mode" == "tether" ]; then
             sudo systemctl stop auxcli-bt-tether
