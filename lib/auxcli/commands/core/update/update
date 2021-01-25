@@ -10,6 +10,13 @@ args_short=($(jq -r '.[].arg_short' $config_path))
 args_long=($(jq -r '.[].arg_long' $config_path))
 args=("${args_short[@]}" "${args_long[@]}")
 
+update_aux=false
+automatic_update_aux=false
+update_cli=false
+automatic_update_cli=false
+update_pi=false
+automatic_update_pi=false
+
 # readarray splits each newline into one element in the array
 readarray -t args_desc < <(jq '.[].short_desc' $config_path)
 
@@ -112,6 +119,8 @@ version_check() {
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/auxcli/config.json --output /home/pi/config.json
     new_version=$(jq -r '.version' /home/pi/config.json) 
     old_version=$(jq -r '.version' $config)
+    echo "NewV: $new_version"
+    echo "OldV: $old_version"
     sudo rm -rf /home/pi/config.json
 
     if vercomp $new_version $old_version; then
@@ -149,12 +158,12 @@ automatic_update_aux() {
             echo "@daily auxcli update -a"
         ) | crontab -
         jq '(.autoupdate_aux) = true' $config | sudo tee $tmp
-        sudo mv -f $tmp $new_config
+        sudo mv -f $tmp $config
     else
         echo "Disabling Automatic updates for AUX."
         crontab -l | grep -v "auxcli update -a" | crontab -
         jq '(.autoupdate_aux) = false' $config | sudo tee $tmp
-        sudo mv -f $tmp $new_config
+        sudo mv -f $tmp $config
     fi
 }
 
@@ -176,12 +185,12 @@ automatic_update_cli() {
             echo "@hourly auxcli update -c -y"
         ) | crontab -
         jq '(.autoupdate_cli) = true' $config | sudo tee $tmp
-        sudo mv -f $tmp $new_config
+        sudo mv -f $tmp $config
     else
         echo "Disabling Automatic updates for AUXCLI."
         crontab -l | grep -v "auxcli update -c -y" | crontab -
         jq '(.autoupdate_cli) = false' $config | sudo tee $tmp
-        sudo mv -f $tmp $new_config
+        sudo mv -f $tmp $config
     fi
 }
 
@@ -201,12 +210,12 @@ automatic_update_pi() {
             echo "@daily auxcli update -p"
         ) | crontab -
         jq '(.autoupdate_pi) = true' $config | sudo tee $tmp
-        sudo mv -f $tmp $new_config
+        sudo mv -f $tmp $config
     else
         echo "Disabling Automatic updates for your RaspberryPi (apt-get)."
         crontab -l | grep -v "auxcli update -p" | crontab -
         jq '(.autoupdate_pi) = false' $config | sudo tee $tmp
-        sudo mv -f $tmp $new_config
+        sudo mv -f $tmp $config
     fi
 
 }
