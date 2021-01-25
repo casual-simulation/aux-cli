@@ -5,9 +5,9 @@ install_path=$(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc
 
 # Add in our custom scripts to bypass interactivity
 echo "DEBUG: Modifying RaspiWiFi..."
-sudo cp "$install_path/initial_setup.py" $install_path/RaspiWiFi
-sudo cp "$install_path/config.json" $install_path/RaspiWiFi
-sudo cp "$install_path/reset_lib.py" $install_path/RaspiWiFi/libs/reset_device
+sudo cp -f "$install_path/initial_setup.py" $install_path/RaspiWiFi_modified
+sudo cp -f "$install_path/config.json" $install_path/RaspiWiFi_modified
+sudo cp -f "$install_path/reset_lib.py" $install_path/RaspiWiFi_modified/libs/reset_device
 
 # Enable services before we hit a reboot
 sudo systemctl enable auxcli-dnsmasq-checker
@@ -39,5 +39,5 @@ sudo mv -f $tmp1 $config1
 
 # Run the RaspiWiFi setup
 echo "DEBUG: Running RaspiWiFi..."
-cd $install_path/RaspiWiFi
+cd $install_path/RaspiWiFi_modified
 sudo python3 initial_setup.py # Triggers a reboot
