@@ -25,7 +25,7 @@ usage() {
     printf "Update auxcli, casualOS, or the RaspberryPi.\n\n"
     printf "OPTIONS:\n"
     for ((i = 0; i < ${#args[@]}; i++)); do
-        printf "\t%-2s\t%-10s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+        printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
@@ -116,11 +116,11 @@ version_check() {
     echo "Checking for newer versions of AUXCLI..."
     # If hotspot mode is true, then do the work around
     if available dhcpcd; then auxcli dhcpcd -s; fi
-    curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/auxcli/config.json --output /home/pi/config.json
+    curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/etc/auxcli/config.json --output /home/pi/config.json
     new_version=$(jq -r '.version' /home/pi/config.json) 
     old_version=$(jq -r '.version' $config)
-    echo "NewV: $new_version"
-    echo "OldV: $old_version"
+    echo "DEBUG: NewVersion: $new_version"
+    echo "DEBUG: OldVersion: $old_version"
     sudo rm -rf /home/pi/config.json
 
     if vercomp $new_version $old_version; then
