@@ -52,7 +52,7 @@ update_conf() {
 
         elif [ $new_config == "/etc/auxcli/config.json" ]; then
             # Get new version number
-            new_ver=$(jq '.version' $new_config)
+            new_ver=$(jq -r '.version' $new_config)
 
             # Merge
             jq -s '.[0] * .[1]' $new_config $bkp_config | sudo tee $tmp
