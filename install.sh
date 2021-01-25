@@ -1,73 +1,25 @@
 #!/bin/bash
 set -e
 
+if [ ! -f /etc/auxcli/config.json ]; then
+    verbose=$(jq -r '.verbose' /etc/auxcli/config.json 1> /dev/null) 
+else
+    verbose=false
+fi
+
 install_deps() {
     sudo apt-get install -y git jq
+}
+
+backup() {
+    sudo mv -f /bin/auxcli /bin/auxcli-bkp
+    sudo mv -f /lib/auxcli /lib/auxcli-bkp
+    sudo mv -f /etc/auxcli /etc/auxcli-bkp
 }
 
 clone_repo() {
     git clone --single-branch --branch 2.0.0 https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
     # git clone https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
-}
-
-update_conf() {
-    # Have a larger one-time use instead of making a process to check for installed/available
-
-    # Find config files from these backups
-    for bkp_config in $(find /lib/auxcli-bkp /etc/auxcli-bkp -name '*.json'); do 
-
-        # Get the new_config from modifying the bkp_config
-        new_config="${bkp_config/auxcli-bkp/auxcli}"
-        tmp="$new_config.tmp"
-
-        if [ $new_config == "/etc/auxcli/commands.json" ]; then
-            # Get array of available things
-            available=($(jq '.[] | select(.available == true) | .name' $bkp_config)) 
-
-            # Write those to the new config
-            for command in "${available[@]}"; do
-                jq --arg com "$command" '(.[] | select( .name == $com ) | .available) = true' $new_config | sudo tee $tmp
-                sudo mv -f $tmp $new_config
-            done
-
-        elif [ $new_config == "/etc/auxcli/components.json" ]; then
-            # Get array of installed things
-            installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config)) 
-            enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config))  
-            disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config)) 
-
-            # Write those to the new config
-            for component in "${installed[@]}"; do
-                jq --arg com "$component" '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp
-                sudo mv -f $tmp $new_config
-            done
-            for component in "${enabled[@]}"; do
-                jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp
-                sudo mv -f $tmp $new_config
-            done
-            for component in "${disabled[@]}"; do
-                jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp
-                sudo mv -f $tmp $new_config
-            done
-
-        elif [ $new_config == "/etc/auxcli/config.json" ]; then
-            # Get new version number
-            new_ver=$(jq -r '.version' $new_config)
-
-            # Merge
-            jq -s '.[0] * .[1]' $new_config $bkp_config | sudo tee $tmp
-            sudo mv -f $tmp $new_config
-
-            # Write new version back onto the new file
-            jq --arg ver "$new_ver" '(.version) = $ver' $new_config | sudo tee $tmp
-            sudo mv -f $tmp $new_config
-
-        # elif [ $new_config == "/etc/auxcli/devices.json" ]; then
-        #     jq -s '.[0] * .[1]' $new_config $bkp_config
-        else 
-            echo "Config: $bkp_config is not being saved at all."
-        fi
-    done
 }
 
 deploy_files() {
@@ -93,6 +45,95 @@ enable_services(){
     sudo systemctl start auxcli-web  
 }
 
+    jq '(.version) = "1.2.2"' 1.json | sudo tee 3.json 1> /dev/null
+
+
+update_conf() {
+    # Have a larger one-time use instead of making a process to check for installed/available
+
+    # Find config files from these backups
+    for bkp_config in $(find /lib/auxcli-bkp /etc/auxcli-bkp -name '*.json'); do 
+
+        if $verbose; then printf "\nDEBUG: Backup config file:\t%s.\n" "${bkp_config}"; fi
+
+        # Get the new_config from modifying the bkp_config
+        new_config="${bkp_config/auxcli-bkp/auxcli}"
+        if $verbose; then printf "DEBUG: New config file:\t\t%s.\n" "${new_config}"; fi
+
+        tmp="$new_config.tmp"
+        if $verbose; then printf "DEBUG: Temp config file:\t%s.\n" "${tmp}"; fi
+
+        if [ $new_config == "/etc/auxcli/commands.json" ]; then
+
+            if $verbose; then printf "DEBUG: Updating commands.json\n"; fi
+
+            # Get array of available things
+            available=($(jq -r '.[] | select(.available == true) | .name' $bkp_config 1> /dev/null)) 
+            if $verbose; then printf "DEBUG: Available commands from bkp_config: %s\n" "${available[*]}"; fi
+
+            # Write those to the new config
+            for command in "${available[@]}"; do
+                if $verbose; then printf "DEBUG: Setting command %s to available in the new_config.\n" "${command}"; fi
+                jq --arg com "$command" '(.[] | select( .name == $com ) | .available) = true' $new_config | sudo tee $tmp 1> /dev/null
+                sudo mv -f $tmp $new_config
+            done
+
+        elif [ $new_config == "/etc/auxcli/components.json" ]; then
+
+            if $verbose; then printf "DEBUG: Updating components.json\n"; fi
+
+            # Get array of installed things
+            installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config 1> /dev/null)) 
+            if $verbose; then printf "DEBUG: Installed components from bkp_config: %s\n" "${installed[*]}"; fi
+            enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config 1> /dev/null))  
+            if $verbose; then printf "DEBUG: Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
+            disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config 1> /dev/null)) 
+            if $verbose; then printf "DEBUG: Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
+
+            # Write those to the new config
+            for component in "${installed[@]}"; do
+                if $verbose; then printf "DEBUG: Setting component %s to installed in the new_config.\n" "${component}"; fi
+                jq --arg com "$component" '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp 1> /dev/null
+                sudo mv -f $tmp $new_config
+            done
+            for component in "${enabled[@]}"; do
+                if $verbose; then printf "DEBUG: Setting component %s to enabled in the new_config.\n" "${component}"; fi
+                jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp 1> /dev/null
+                sudo mv -f $tmp $new_config
+            done
+            for component in "${disabled[@]}"; do
+                if $verbose; then printf "DEBUG: Setting component %s to disabled in the new_config.\n" "${component}"; fi
+                jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp 1> /dev/null
+                sudo mv -f $tmp $new_config
+            done
+
+        elif [ $new_config == "/etc/auxcli/config.json" ]; then
+
+            if $verbose; then printf "DEBUG: Updating config.json\n"; fi
+
+            # Get new version number
+            new_ver=$(jq -r '.version' $new_config 1> /dev/null)
+            if $verbose; then printf "DEBUG: New Version is %s.\n" "${new_ver}"; fi
+
+            # Merge
+            jq -s '.[0] * .[1]' $new_config $bkp_config | sudo tee $tmp 1> /dev/null
+            sudo mv -f $tmp $new_config
+
+            # Write new version back onto the new file
+            jq --arg ver "$new_ver" '(.version) = $ver' $new_config | sudo tee $tmp 1> /dev/null
+            sudo mv -f $tmp $new_config
+
+        # elif [ $new_config == "/etc/auxcli/devices.json" ]; then
+
+        #     if $verbose; then printf "DEBUG: Updating devices.json\n"
+
+        #     jq -s '.[0] * .[1]' $new_config $bkp_config 1> /dev/null
+        else 
+            echo "Config: $bkp_config is not being saved at all."
+        fi
+    done
+}
+
 cleanup() {
     if [ -e /home/pi/auxcli ]; then
         sudo rm -rf /home/pi/auxcli
@@ -109,12 +150,6 @@ cleanup() {
     if [ -e /etc/auxcli-bkp ]; then
         sudo rm -rf /etc/auxcli-bkp
     fi
-}
-
-backup() {
-    sudo mv -f /bin/auxcli /bin/auxcli-bkp
-    sudo mv -f /lib/auxcli /lib/auxcli-bkp
-    sudo mv -f /etc/auxcli /etc/auxcli-bkp
 }
 
 install() {
