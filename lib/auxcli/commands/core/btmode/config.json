@@ -18,6 +18,12 @@
         "short_desc": "Enables bluetooth serial connection."
     },
     {
+        "arg_short": "-r",
+        "arg_long": "--reboot",
+        "type": "",
+        "short_desc": "Automatically reboot after btmode change."
+    },
+    {
         "arg_short": "-h",
         "arg_long": "--help",
         "type": "",
