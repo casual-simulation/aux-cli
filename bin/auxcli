@@ -69,14 +69,12 @@ run_cmd() {
     # Set the first argument to be the command and then shift past it
     command_path=$(jq --arg cmd "$1" -r '.[] | select( .name == $cmd ) | .command_path' $commands_config)
     if $verbose; then printf "DEBUG (auxcli): The command path is %s.\n" "$command_path"; fi
-    if $verbose; then printf "DEBUG (auxcli): shift\n"; fi
     shift
 
     # Add all other arguments to an array
     while [[ $# -gt 0 ]]; do
         if $verbose; then printf "DEBUG (auxcli): Adding %s to the command argument array.\n" "$1"; fi
         command_args+=("$1")
-        if $verbose; then printf "DEBUG (auxcli): shift\n"; fi
         shift
     done
 
@@ -92,3 +90,17 @@ run_cmd() {
 
 err_check "$@"
 run_cmd "$@"
+
+if jq -r '.reboot_required' /etc/auxcli/config.json 1> /dev/null; then
+    printf "You need to reboot for the changes to take effect."
+    if jq -r '.reboot_on_exit' /etc/auxcli/config.json 1> /dev/null; then
+        printf "Rebooting now."
+        sudo reboot now
+    else
+        read -rep $'Press "y" to reboot now or press anything else to wait.\n' -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            printf "Rebooting now."
+            sudo reboot now
+        fi
+    fi
+fi
