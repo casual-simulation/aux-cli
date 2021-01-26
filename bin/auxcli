@@ -27,7 +27,7 @@ usage() {
             printf "\t[ ] %-24s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
         fi
     done
-    printf "\t%-4s\t\t\t%s\n" "help" "Displays this usage information."
+    printf "\t%-4s\t\t\t\t%s\n" "help" "Displays this usage information."
     printf "\nRun 'auxcli COMMAND --help' for more information on a command.\n\n"
     exit 1
 }
@@ -69,10 +69,10 @@ run_cmd() {
 
     # If there are no arguments for the command, just run the command
     if [ ${#command_args[@]} -eq 0 ]; then
-        printf "Running command\n"
+        printf "Running command: %s\n" "${command_path}"
         . "${command_path}"
     else
-        printf "Command with args\n"
+        printf "Running Command with args: %s %s" "${command_path} ${command_args[*]}\n"
         . "${command_path}" "${command_args[@]}"
     fi
 }
