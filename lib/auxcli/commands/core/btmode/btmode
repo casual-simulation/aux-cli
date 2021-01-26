@@ -51,8 +51,9 @@ while [[ $# -gt 0 ]]; do
         sudo mv -f $tmp $config
         if [ "$previous_mode" == "tether" ]; then
             sudo systemctl stop auxcli-bt-tether
-            sudo systemctl disable auxcli-bt-tether
-            echo "You need to reboot for the changes to take effect."
+            sudo systemctl disable auxcli-t-btether
+            jq '(.reboot_required) = true' $config | sudo tee $tmp 1> /dev/null
+            sudo mv -f $tmp $config
         elif [ "$previous_mode" == "serial" ]; then
             sudo systemctl stop auxcli-bt-serial-scan
             sudo systemctl disable auxcli-bt-serial-scan
@@ -76,7 +77,8 @@ while [[ $# -gt 0 ]]; do
         if [ "$previous_mode" == "tether" ]; then
             sudo systemctl stop auxcli-bt-tether
             sudo systemctl disable auxcli-bt-tether
-            echo "You need to reboot for the changes to take effect."
+            jq '(.reboot_required) = true' $config | sudo tee $tmp 1> /dev/null
+            sudo mv -f $tmp $config
         fi
         sudo systemctl enable auxcli-bt-serial-scan
         sudo systemctl start auxcli-bt-serial-scan
@@ -88,3 +90,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
+
+if jq -r '.reboot_required' $config 1> /dev/null; then
+    echo "You need to reboot for the changes to take effect."
+fi
