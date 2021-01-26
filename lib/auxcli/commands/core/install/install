@@ -65,7 +65,6 @@ install_component(){
     if available dhcpcd; then auxcli dhcpcd -s; fi
     while [[ $# -gt 0 ]]; do
         if requires-reboot $1; then
-            # Write Reboot Required
             jq '(.reboot_required) = true' $config_main | sudo tee $tmp_main 1> /dev/null
             sudo mv -f $tmp_main $config_main
         fi
@@ -101,5 +100,5 @@ else
 fi
 
 if jq -r '.reboot_required' $config_main 1> /dev/null; then
-    echo "A reboot is required"
+    echo "A reboot is required."
 fi
