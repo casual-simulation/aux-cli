@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+if [ -f /etc/auxcli/config.json ]; then
+    verbose=$(jq -r '.verbose' /etc/auxcli/config.json) 
+else
+    verbose=false
+fi
+
 # Temporarily add this dir to the path so we can use helper commands
 PATH=$PATH:/lib/auxcli/commands/helper
 
@@ -29,12 +35,14 @@ err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
     # or if the argument is "-h" or "--help"
+    if $verbose; then printf "DEBUG (disable): First error check.\n"; fi
     if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a component
+    if $verbose; then printf "DEBUG (disable): Second error check.\n"; fi
     if [[ ! ${components[*]} =~ $1 ]]; then
         printf "\n\"$1\" is not a valid component.\n"
         printf "Run 'auxcli disable -h' for help.\n\n"
@@ -43,6 +51,7 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the component is already disabled
+    if $verbose; then printf "DEBUG (disable): Third error check.\n"; fi
     if ! enabled $1; then
         printf "\nThe \"$1\" component is already disabled.\n\n"
         exit 1
@@ -51,6 +60,7 @@ err_check() {
 
 disable_component(){
     while [[ $# -gt 0 ]]; do
+        if $verbose; then printf "DEBUG (disable): Disabling component: %s\n" "$1"; fi
         . /lib/auxcli/components/configuration/$1/disable
         shift
     done

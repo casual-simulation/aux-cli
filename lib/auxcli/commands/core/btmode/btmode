@@ -6,7 +6,6 @@ if [ -f /etc/auxcli/config.json ]; then
 else
     verbose=false
 fi
-# if $verbose; then printf "DEBUG (auxcli): All commands: %s\n" "${commands[@]}"; fi
 
 config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json)
 if $verbose; then printf "DEBUG (btmode): Config path: %s\n" "$config_path"; fi

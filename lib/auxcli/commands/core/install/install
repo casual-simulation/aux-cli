@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+if [ -f /etc/auxcli/config.json ]; then
+    verbose=$(jq -r '.verbose' /etc/auxcli/config.json) 
+else
+    verbose=false
+fi
+
 config_main="/etc/auxcli/config.json"
 tmp_main="/etc/auxcli/config.json.tmp"
 
