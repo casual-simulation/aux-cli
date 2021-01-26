@@ -1,11 +1,20 @@
 #!/bin/bash
 set -e
 
+if [ -f /etc/auxcli/config.json ]; then
+    verbose=$(jq -r '.verbose' /etc/auxcli/config.json) 
+else
+    verbose=false
+fi
+# if $verbose; then printf "DEBUG (auxcli): All commands: %s\n" "${commands[@]}"; fi
+
 config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json)
+if $verbose; then printf "DEBUG (btmode): Config path: %s\n" "$config_path"; fi
 
 config="/etc/auxcli/config.json"
 tmp="/etc/auxcli/config.json.tmp"
 previous_mode=$(jq -r '.btmode' $config)
+if $verbose; then printf "DEBUG (btmode): Previous mode: %s\n" "$previous_mode"; fi
 
 # args_short=($(jq -r '.[].arg_short' $config_path))
 args_long=($(jq -r '.[].arg_long' $config_path))
@@ -28,6 +37,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
+    if $verbose; then printf "DEBUG (btmode): First error check.\n"; fi
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument to change the bluetooth mode.\n"
         usage
@@ -35,6 +45,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
+    if $verbose; then printf "DEBUG (btmode): Second error check.\n"; fi
     if [[ ! ${args_long[*]} =~ $1 ]]; then
         printf "\n\"$1\" is an invalid argument.\n"
         printf "Run auxcli btmode -h for help.\n\n"
@@ -47,41 +58,67 @@ err_check "$@"
 while [[ $# -gt 0 ]]; do
     case "$1" in
     none)
+        if $verbose; then printf "DEBUG (btmode): Setting btmode to 'none'\n"; fi
         jq '(.btmode) = "none"' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
         if [ "$previous_mode" == "tether" ]; then
+            if $verbose; then printf "DEBUG (btmode): Previous mode was 'tether'\n"; fi
+            if $verbose; then printf "DEBUG (btmode): Stopping service: auxcli-bt-tether.\n"; fi
             sudo systemctl stop auxcli-bt-tether
+            if $verbose; then printf "DEBUG (btmode): Disabling service: auxcli-bt-tether.\n"; fi
             sudo systemctl disable auxcli-t-btether
+            if $verbose; then printf "DEBUG (btmode): Setting reboot_required to 'true'\n"; fi
             jq '(.reboot_required) = true' $config | sudo tee $tmp 1> /dev/null
             sudo mv -f $tmp $config
         elif [ "$previous_mode" == "serial" ]; then
+            if $verbose; then printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"; fi
             sudo systemctl stop auxcli-bt-serial-scan
+            if $verbose; then printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"; fi
             sudo systemctl disable auxcli-bt-serial-scan
         fi
         shift # past argument
         ;;
     tether)
+        if $verbose; then printf "DEBUG (btmode): Setting btmode to 'tether'\n"; fi
         jq '(.btmode) = "tether"' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
         if [ "$previous_mode" == "serial" ]; then
+            if $verbose; then printf "DEBUG (btmode): Previous mode was 'serial'\n"; fi
+            if $verbose; then printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"; fi
             sudo systemctl stop auxcli-bt-serial-scan
+            if $verbose; then printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"; fi
             sudo systemctl disable auxcli-bt-serial-scan
         fi
+        if $verbose; then printf "DEBUG (btmode): Enabling service: auxcli-bt-tether.\n"; fi
         sudo systemctl enable auxcli-bt-tether
+        if $verbose; then printf "DEBUG (btmode): Starting service: auxcli-bt-tether.\n"; fi
         sudo systemctl start auxcli-bt-tether
         shift # past argument
         ;;
     serial)
+        if $verbose; then printf "DEBUG (btmode): Setting btmode to 'serial'\n"; fi
         jq '(.btmode) = "serial"' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
         if [ "$previous_mode" == "tether" ]; then
+            if $verbose; then printf "DEBUG (btmode): Previous mode was 'tether'\n"; fi
+            if $verbose; then printf "DEBUG (btmode): Stopping service: auxcli-bt-tether.\n"; fi
             sudo systemctl stop auxcli-bt-tether
+            if $verbose; then printf "DEBUG (btmode): Disabling service: auxcli-bt-tether.\n"; fi
             sudo systemctl disable auxcli-bt-tether
+            if $verbose; then printf "DEBUG (btmode): Setting reboot_required to 'true'\n"; fi
             jq '(.reboot_required) = true' $config | sudo tee $tmp 1> /dev/null
             sudo mv -f $tmp $config
         fi
+        if $verbose; then printf "DEBUG (btmode): Enabling service: auxcli-bt-serial-scan.\n"; fi
         sudo systemctl enable auxcli-bt-serial-scan
+        if $verbose; then printf "DEBUG (btmode): Starting service: auxcli-bt-serial-scan.\n"; fi
         sudo systemctl start auxcli-bt-serial-scan
+        shift # past argument
+        ;;
+    -r | --reboot)
+        if $verbose; then printf "DEBUG (btmode): Setting reboot_on_exit to 'true'\n"; fi
+        jq '(.reboot_on_exit) = true' $config | sudo tee $tmp 1> /dev/null
+        sudo mv -f $tmp $config
         shift # past argument
         ;;
     -h | -help | --help)
@@ -90,7 +127,3 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
-
-if jq -r '.reboot_required' $config 1> /dev/null; then
-    echo "You need to reboot for the changes to take effect."
-fi
