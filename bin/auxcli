@@ -6,7 +6,7 @@ if [ -f /etc/auxcli/config.json ]; then
 else
     verbose=false
 fi
-# if $verbose; then printf "DEBUG: All commands: %s\n" "${commands[@]}"; fi
+# if $verbose; then printf "DEBUG (auxcli): All commands: %s\n" "${commands[@]}"; fi
 
 
 # Temporarily add this dir to the path so we can use helper commands
@@ -45,7 +45,7 @@ err_check() {
     # Show the usage menu if there aren't any arguments after `auxcli`
     # or if the command is "help"
     if [ $# -eq 0 ] || [ $1 == "help" ]; then
-        if $verbose; then printf "DEBUG: %s is empty or 'help'.\n" "$1"; fi
+        if $verbose; then printf "DEBUG (auxcli): %s is empty or 'help'.\n" "$1"; fi
         usage
     fi
 
@@ -68,24 +68,24 @@ err_check() {
 run_cmd() {
     # Set the first argument to be the command and then shift past it
     command_path=$(jq --arg cmd "$1" -r '.[] | select( .name == $cmd ) | .command_path' $commands_config)
-    if $verbose; then printf "DEBUG: The command path is %s.\n" "$command_path"; fi
-    if $verbose; then printf "DEBUG: shift\n"; fi
+    if $verbose; then printf "DEBUG (auxcli): The command path is %s.\n" "$command_path"; fi
+    if $verbose; then printf "DEBUG (auxcli): shift\n"; fi
     shift
 
     # Add all other arguments to an array
     while [[ $# -gt 0 ]]; do
-        if $verbose; then printf "DEBUG: Adding %s to the command argument array.\n" "$1"; fi
+        if $verbose; then printf "DEBUG (auxcli): Adding %s to the command argument array.\n" "$1"; fi
         command_args+=("$1")
-        if $verbose; then printf "DEBUG: shift\n"; fi
+        if $verbose; then printf "DEBUG (auxcli): shift\n"; fi
         shift
     done
 
     # If there are no arguments for the command, just run the command
     if [ ${#command_args[@]} -eq 0 ]; then
-        if $verbose; then printf "DEBUG: Running command: %s\n" "${command_path}"; fi
+        if $verbose; then printf "DEBUG (auxcli): Running command: %s\n" "${command_path}"; fi
         . "${command_path}"
     else
-        if $verbose; then printf "DEBUG: Running command with args: %s %s\n" "${command_path}" "${command_args[*]}"; fi
+        if $verbose; then printf "DEBUG (auxcli): Running command with args: %s %s\n" "${command_path}" "${command_args[*]}"; fi
         . "${command_path}" "${command_args[@]}"
     fi
 }
