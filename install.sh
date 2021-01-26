@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ ! -f /etc/auxcli/config.json ]; then
+if [ -f /etc/auxcli/config.json ]; then
     verbose=$(jq -r '.verbose' /etc/auxcli/config.json) 
 else
     verbose=false
