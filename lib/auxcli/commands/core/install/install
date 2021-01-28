@@ -7,8 +7,17 @@ else
     verbose=false
 fi
 
+config_path=$(jq -r '.[] | select( .name == "install" ) | .config_path' /etc/auxcli/commands.json)
+if $verbose; then printf "DEBUG (install): Config path: %s\n" "$config_path"; fi
+
 config_main="/etc/auxcli/config.json"
 tmp_main="/etc/auxcli/config.json.tmp"
+args_short=($(jq -r '.[].arg_short' $config_path))
+args_long=($(jq -r '.[].arg_long' $config_path))
+args=("${args_short[@]}" "${args_long[@]}")
+
+# readarray splits each newline into one element in the array
+readarray -t args_desc < <(jq '.[].short_desc' $config_path)
 
 # Temporarily add this dir to the path so we can use helper commands
 PATH=$PATH:/lib/auxcli/commands/helper
@@ -16,6 +25,7 @@ PATH=$PATH:/lib/auxcli/commands/helper
 components_config="/etc/auxcli/components.json"
 # mapfile -t components < <(jq -r '.[] | select( .installed != null) | .name' $components_config)
 components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
+
 # configuration=($(jq -r '.[] | select(.type == "configuration") | .name' /etc/auxcli/components.json))
 hardware=($(jq -r '.[] | select(.type == "hardware") | .name' /etc/auxcli/components.json))
 tools=($(jq -r '.[] | select(.type == "tool") | .name' /etc/auxcli/components.json))
@@ -35,24 +45,23 @@ usage() {
         fi
     done
     printf "\t    %-10s\t\t\t%s\n" "everything" "Install all tools."
-    printf "\t    %-2s\t%-6s\t\t\t%s\n" "-h" "--help" "Displays this usage information."
+    for ((i = 0; i < ${#args[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
     exit 1
 }
 
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    # or if the argument is "-h" or "--help"
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ]; then
+    if $verbose; then printf "DEBUG (install): First error check.\n"; fi
+    if [ $# -eq 0 ]; then
         usage
-    fi
-
-    if [ $1 == "everything" ]; then
-        return 0
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a component
+    if $verbose; then printf "DEBUG (install): Second error check.\n"; fi
     if [[ ! ${components[*]} =~ $1 ]]; then
         printf "\n\"$1\" is not a valid component.\n"
         printf "Run 'auxcli install -h' for help.\n\n"
@@ -61,6 +70,7 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the component is already installed
+    if $verbose; then printf "DEBUG (install): Third error check.\n"; fi
     if installed $1; then
         printf "\nThe \"$1\" component is already installed.\n\n"
         exit 1
@@ -68,43 +78,66 @@ err_check() {
 }
 
 install_component(){
+    if $verbose; then printf "DEBUG (install): DHCPCD set check.\n"; fi
     if available dhcpcd; then auxcli dhcpcd -s; fi
     while [[ $# -gt 0 ]]; do
         if requires-reboot $1; then
+            if $verbose; then printf "DEBUG (install): %s requires a reboot.\n" "$1"; fi
+            if $verbose; then printf "DEBUG (install): Setting reboot_required to 'true'\n"; fi
             jq '(.reboot_required) = true' $config_main | sudo tee $tmp_main 1> /dev/null
             sudo mv -f $tmp_main $config_main
         fi
         if [[ ${hardware[*]} =~ $1 ]]; then
+            if $verbose; then printf "DEBUG (install): %s is a 'hardware' component.\n" "$1"; fi
+            if $verbose; then printf "DEBUG (install): Installing: %s...\n" "$1"; fi
             . /lib/auxcli/components/hardware/$1/install
         fi
         if [[ ${tools[*]} =~ $1 ]]; then
+            if $verbose; then printf "DEBUG (install): %s is a 'tool' component.\n" "$1"; fi
+            if $verbose; then printf "DEBUG (install): Installing: %s...\n" "$1"; fi
             . /lib/auxcli/components/tool/$1/install
         fi
         shift
     done
+    if $verbose; then printf "DEBUG (install): DHCPCD unset check.\n"; fi
     if available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 install_everything(){
     # Enable all the things
-    echo "DEBUG: Enabling everything"
+    if $verbose; then printf "DEBUG (install): Enabling: gpio\n"; fi
     if ! enabled gpio; then auxcli enable gpio; fi
+    if $verbose; then printf "DEBUG (install): Enabling: uart\n"; fi
     if ! enabled uart; then auxcli enable uart; fi
+    if $verbose; then printf "DEBUG (install): Disabling: serial-console\n"; fi
     if enabled serial-console; then auxcli disable serial-console; fi
 
     # Install all the things
-    echo "DEBUG: Installing everything"
+    if $verbose; then printf "DEBUG (install): Installing everything...\n"; fi
     install_component "${tools[@]}"
 }
 
 err_check "$@"
 
-if [ "$1" == "everything" ]; then
-    install_everything
-else
-    install_component "$@"
-fi
-
-if jq -r '.reboot_required' $config_main 1> /dev/null; then
-    echo "A reboot is required."
-fi
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    everything)
+        install_everything
+        shift # past argument
+        ;;
+    -r | --reboot)
+        if $verbose; then printf "DEBUG (install): Setting reboot_on_exit to 'true'\n"; fi
+        jq '(.reboot_on_exit) = true' $config_main | sudo tee $tmp_main 1> /dev/null
+        sudo mv -f $tmp_main $config_main
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    *)
+        install_component "$1"
+        shift # past argument
+        ;;
+    esac
+done

@@ -42,13 +42,14 @@ err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments after `auxcli`
     # or if the command is "help"
+    if $verbose; then printf "DEBUG (auxcli): First error check.\n"; fi
     if [ $# -eq 0 ] || [ $1 == "help" ]; then
-        if $verbose; then printf "DEBUG (auxcli): %s is empty or 'help'.\n" "$1"; fi
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a command
+    if $verbose; then printf "DEBUG (auxcli): Second error check.\n"; fi
     if [[ ! ${commands[*]} =~ $1 ]]; then
         printf "\n\"$1\" is not a valid command.\n"
         printf "Run 'auxcli help' for help.\n\n"
@@ -57,6 +58,7 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the first argument isn't an available command
+    if $verbose; then printf "DEBUG (auxcli): Third error check.\n"; fi
     if ! available $1; then
         printf "\nThe \"$1\" command is not available. Install the correct component first.\n\n"
         exit 1
