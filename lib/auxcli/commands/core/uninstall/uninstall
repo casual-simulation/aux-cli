@@ -1,37 +1,39 @@
 #!/bin/bash
 set -e
 
-# Temporarily add this dir to the path so we can use helper commands
-PATH=$PATH:/lib/auxcli/commands/helper
+# Config path for uninstall
+config_uninstall=$(jq -r '.[] | select( .name == "uninstall" ) | .config_path' $config_commands)
 auxcli debug-printf "DEBUG (uninstall): Config path: %s\n" "$config_uninstall"
 
-components_config="/etc/auxcli/components.json"
-components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
-
-# readarray splits each newline into one element in the array
-readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config)
+# Arguments for uninstall
+readarray -t args_short < <(q -r '.[].arg_short' $config_uninstall)
+readarray -t args_long < <(q -r '.[].arg_long' $config_uninstall)
+readarray -t args_desc < <(jq '.[].short_desc' $config_uninstall)
+args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {
     printf "\nUsage:        auxcli uninstall [COMPONENT]\n\n"
     printf "Uninstall additional components of auxcli.\n\n"
     printf "COMPONENTS:\n"
     for ((i = 0; i < ${#components[@]}; i++)); do
-        if installed ${components[$i]}; then
+        if auxcli installed ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         fi
     done
-    printf "\t    %-2s\t%-14s\t%s\n" "-h" "--help" "Displays this usage information."
+    printf "\t    %-10s\t\t\t%s\n" "everything" "Uninstall all tools."
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
     exit 1
 }
 
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    # or if the argument is "-h" or "--help"
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ]; then
     auxcli debug-printf "DEBUG (uninstall): First error check.\n"
+    if [ $# -eq 0 ]; then
         usage
     fi
 
@@ -54,6 +56,7 @@ err_check() {
 
 uninstall_component(){
     auxcli debug-printf "DEBUG (uninstall): DHCPCD set check.\n"
+    if auxcli available dhcpcd; then auxcli dhcpcd -s; fi
     while [[ $# -gt 0 ]]; do
             . /lib/auxcli/components/tool/$1/uninstall || . /lib/auxcli/components/hardware/$1/uninstall
         shift

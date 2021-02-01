@@ -1,31 +1,28 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "update" ) | .config_path' /etc/auxcli/commands.json)
-
-config="/etc/auxcli/config.json"
-tmp="/etc/auxcli/config.json.tmp"
-
-args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+# Config path for update
+config_update=$(jq -r '.[] | select( .name == "update" ) | .config_path' $config_commands)
 auxcli debug-printf "DEBUG (update): Config path: %s\n" "$config_update"
+
+# Arguments for update
+readarray -t args_short < <(q -r '.[].arg_short' $config_update)
+readarray -t args_long < <(q -r '.[].arg_long' $config_update)
+readarray -t args_desc < <(jq '.[].short_desc' $config_update)
 args=("${args_short[@]}" "${args_long[@]}")
 
-update_aux=false
-automatic_update_aux=false
-update_cli=false
-automatic_update_cli=false
-update_pi=false
-automatic_update_pi=false
-
-# readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
+# update_aux=false
+# automatic_update_aux=false
+# update_cli=false
+# automatic_update_cli=false
+# update_pi=false
+# automatic_update_pi=false
 
 usage() {
     printf "\nUsage:    auxcli update [OPTIONS]\n\n"
     printf "Update auxcli, casualOS, or the RaspberryPi.\n\n"
     printf "OPTIONS:\n"
-    for ((i = 0; i < ${#args[@]}; i++)); do
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
         printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
@@ -131,7 +128,7 @@ version_check() {
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/etc/auxcli/config.json --output /home/pi/config.json
 
     new_version=$(jq -r '.version' /home/pi/config.json) 
-    old_version=$(jq -r '.version' $config)
+    old_version=$(jq -r '.version' $config_main)
     auxcli debug-printf "DEBUG (update): New Version: %s\n" "$new_version"
     auxcli debug-printf "DEBUG (update): Old Version: %s\n" "$old_version"
     sudo rm -rf /home/pi/config.json
@@ -143,8 +140,7 @@ version_check() {
             auxcli debug-printf "DEBUG (update): Auto-agree was set.\n"
             return 0
         else
-            read -p "There is a newer version of AUXCLI available. Press 'y' to update now, or press anything else to exit." -n 1 -r
-            echo # Gives us a newline
+            read -rep $'Press "y" to update now, or press anything else to exit.\n' -n 1 -r
             if [[ $REPLY =~ ^[Yy]$ ]]; then
                 auxcli debug-printf "DEBUG (update): Agreed.\n"
                 return 0
@@ -167,8 +163,8 @@ update_aux() {
 }
 
 automatic_update_aux() {
-    if ! jq -r '.autoupdate_aux' $config 1> /dev/null; then
     auxcli debug-printf "DEBUG (update): Running 'automatic_update_aux'.\n"
+    if ! jq -r '.autoupdate_aux' $config_main 1> /dev/null; then
         printf "Enabling Automatic updates for AUX.\n"
         (
             crontab -l
@@ -192,8 +188,8 @@ update_cli() {
 }
 
 automatic_update_cli() {
-    if ! jq -r '.autoupdate_cli' $config 1> /dev/null; then
     auxcli debug-printf "DEBUG (update): Running 'automatic_update_cli'.\n"
+    if ! jq -r '.autoupdate_cli' $config_main 1> /dev/null; then
         printf "Enabling Automatic updates for AUXCLI.\n"
         (
             crontab -l
@@ -213,8 +209,8 @@ update_pi() {
 }
 
 automatic_update_pi() {
-    if ! jq -r '.autoupdate_pi' $config 1> /dev/null; then
     auxcli debug-printf "DEBUG (update): Running 'automatic_update_pi'.\n"
+    if ! jq -r '.autoupdate_pi' $config_main 1> /dev/null; then
         printf "Enabling Automatic updates for your RaspberryPi (apt-get).\n"
         (
             crontab -l

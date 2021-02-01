@@ -190,6 +190,26 @@
         "short_desc": "Broadcasts and automatically allows bluetooth devices to connect to the pi."
     },
     {
+        "name": "debug-check",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/debug-check",
+        "config_path": "",
+        "short_desc": "Checks if auxcli is in debug mode."
+    },
+    {
+        "name": "debug-printf",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/debug-printf",
+        "config_path": "",
+        "short_desc": "Only outputs if auxcli is in debug mode."
+    },
+    {
         "name": "dnsmasq-checker",
         "type": "helper",
         "available": true,

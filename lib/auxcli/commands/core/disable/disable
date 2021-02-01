@@ -1,23 +1,14 @@
 #!/bin/bash
 set -e
 
-# Temporarily add this dir to the path so we can use helper commands
-PATH=$PATH:/lib/auxcli/commands/helper
-
-components_config="/etc/auxcli/components.json"
-components=($(jq -r '.[] | select( .enabled != null) | .name' $components_config))
-
-# readarray splits each newline into one element in the array
-readarray -t components_desc < <(jq -r '.[] | select( .enabled != null) | .short_desc' $components_config)
-
 usage() {
     printf "\nUsage:        auxcli disable [COMPONENT]\n\n"
     printf "Disable system related components of auxcli.\n\n"
     printf "COMPONENTS:\n"
     for ((i = 0; i < ${#components[@]}; i++)); do
-        if enabled ${components[$i]}; then
+        if auxcli enabled ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
-        elif ! enabled ${components[$i]}; then
+        elif ! auxcli enabled ${components[$i]}; then
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         fi
     done
@@ -45,8 +36,8 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the component is already disabled
-    if ! enabled $1; then
     auxcli debug-printf "DEBUG (disable): Third error check.\n"
+    if ! auxcli enabled "$1"; then
         printf "\nThe \"%s\" component is already disabled.\n\n" "$1"
         exit 1
     fi

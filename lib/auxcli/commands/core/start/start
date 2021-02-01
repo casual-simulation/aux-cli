@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Temporarily add this dir to the path so we can use helper commands
-PATH=$PATH:/lib/auxcli/commands/helper
-
 docker_check() {
     echo "Starting Docker."
 
@@ -32,8 +29,10 @@ usbmount_docker_check() {
 run_steps() {
     docker_check
     
-    if installed "usbmount"; then
+    if auxcli installed "usbmount"; then
         usbmount_docker_check
     fi
 
 }
+
+run_steps

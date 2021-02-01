@@ -1,45 +1,29 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "install" ) | .config_path' /etc/auxcli/commands.json)
-
-config_main="/etc/auxcli/config.json"
-tmp_main="/etc/auxcli/config.json.tmp"
-args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+# Config path for install
+config_install=$(jq -r '.[] | select( .name == "install" ) | .config_path' $config_commands)
 auxcli debug-printf "DEBUG (install): Config path: %s\n" "$config_install"
+
+# Arguments for install
+readarray -t args_short < <(q -r '.[].arg_short' $config_install)
+readarray -t args_long < <(q -r '.[].arg_long' $config_install)
+readarray -t args_desc < <(jq '.[].short_desc' $config_install)
 args=("${args_short[@]}" "${args_long[@]}")
-
-# readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
-
-# Temporarily add this dir to the path so we can use helper commands
-PATH=$PATH:/lib/auxcli/commands/helper
-
-components_config="/etc/auxcli/components.json"
-# mapfile -t components < <(jq -r '.[] | select( .installed != null) | .name' $components_config)
-components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
-
-# configuration=($(jq -r '.[] | select(.type == "configuration") | .name' /etc/auxcli/components.json))
-hardware=($(jq -r '.[] | select(.type == "hardware") | .name' /etc/auxcli/components.json))
-tools=($(jq -r '.[] | select(.type == "tool") | .name' /etc/auxcli/components.json))
-
-# readarray splits each newline into one element in the array
-readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $components_config)
 
 usage() {
     printf "\nUsage:        auxcli install [COMPONENT]\n\n"
     printf "Install additional components of auxcli.\n\n"
     printf "COMPONENTS:\n"
     for ((i = 0; i < ${#components[@]}; i++)); do
-        if installed ${components[$i]}; then
+        if auxcli installed ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         fi
     done
     printf "\t    %-10s\t\t\t%s\n" "everything" "Install all tools."
-    for ((i = 0; i < ${#args[@]}; i++)); do
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
         printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
@@ -64,16 +48,16 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the component is already installed
-    if installed $1; then
     auxcli debug-printf "DEBUG (install): Fourth error check.\n"
+    if auxcli installed "$1"; then
         printf "\nThe \"%s\" component is already installed.\n\n" "$1"
         exit 1
     fi
 }
 
 install_component(){
-    if available dhcpcd; then auxcli dhcpcd -s; fi
     auxcli debug-printf "DEBUG (install): DHCPCD set check.\n"
+    if auxcli available dhcpcd; then auxcli dhcpcd -s; fi
     while [[ $# -gt 0 ]]; do
         if auxcli requires-reboot $1; then
             auxcli debug-printf "DEBUG (install): %s requires a reboot.\n" "$1"
@@ -85,29 +69,29 @@ install_component(){
             auxcli debug-printf "DEBUG (install): Installing: %s...\n" "$1"
             . /lib/auxcli/components/hardware/$1/install
         fi
-        if [[ ${tools[*]} =~ $1 ]]; then
+        if [[ ${tool[*]} =~ $1 ]]; then
             auxcli debug-printf "DEBUG (install): %s is a 'tool' component.\n" "$1"
             auxcli debug-printf "DEBUG (install): Installing: %s...\n" "$1"
             . /lib/auxcli/components/tool/$1/install
         fi
         shift
     done
-    if available dhcpcd; then auxcli dhcpcd -u; fi
     auxcli debug-printf "DEBUG (install): DHCPCD unset check.\n"
+    if auxcli available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 install_everything(){
     # Enable all the things
-    if ! enabled gpio; then auxcli enable gpio; fi
-    if ! enabled uart; then auxcli enable uart; fi
-    if enabled serial-console; then auxcli disable serial-console; fi
     auxcli debug-printf "DEBUG (install): Enabling: gpio\n"
+    auxcli enable gpio
     auxcli debug-printf "DEBUG (install): Enabling: uart\n"
+    auxcli enable uart
     auxcli debug-printf "DEBUG (install): Disabling: serial-console\n"
+    auxcli disable serial-console
 
     # Install all the things
-    install_component "${tools[@]}"
     auxcli debug-printf "DEBUG (install): Installing everything...\n"
+    install_component "${tool[@]}"
 }
 
 err_check "$@"

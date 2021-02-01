@@ -1,26 +1,25 @@
 #!/bin/bash
 set -e
 
+# Config path for changehost
+config_changehost=$(jq -r '.[] | select( .name == "changehost" ) | .config_path' $config_commands)
 auxcli debug-printf "DEBUG (changehost): Config path: %s\n" "$config_changehost"
 
-config_path=$(jq -r '.[] | select( .name == "changehost" ) | .config_path' /etc/auxcli/commands.json)
-
-config="/etc/auxcli/config.json"
-tmp="/etc/auxcli/config.json.tmp"
-args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+# Arguments for changehost
+readarray -t args_short < <(q -r '.[].arg_short' $config_changehost)
+readarray -t args_long < <(q -r '.[].arg_long' $config_changehost)
+readarray -t args_desc < <(jq '.[].short_desc' $config_changehost)
 args=("${args_short[@]}" "${args_long[@]}")
 
-# readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
+host=$(hostname)
 auxcli debug-printf "DEBUG (changehost): Current hostname is: %s\n" "$host"
 
 usage() {
     printf "\nUsage:    auxcli changehost [OPTIONS]\n\n"
     printf "Changes the hostname in the necessary places.\n\n"
     printf "OPTIONS:\n"
-    for ((i = 0; i < ${#args[@]}; i++)); do
-        printf "\t%-2s\t%-10s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
@@ -47,8 +46,6 @@ err_check() {
 # Change hostname in /etc/hosts & /etc/hostname
 set_hostname() {
 
-    # Set current hostname
-    host=$(hostname)
     # Check if new hostname is provided/valid
     auxcli debug-printf "DEBUG (changehost): Hostname provided/valid check.\n"
     if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
@@ -73,7 +70,6 @@ set_hostname() {
         fi
         auxcli debug-printf "DEBUG (changehost): Setting hostname with command 'hostnamectl'.\n"
         sudo hostnamectl set-hostname "$2"
-        changed=true
         printf "\nHostname has been changed from %s to %s\n" "$host" "$2"
         auxcli debug-printf "DEBUG (changehost): Setting reboot_required to 'true'\n"
         auxcli write "config" "reboot_required" "true"
@@ -91,13 +87,11 @@ set_hostname() {
         fi
         auxcli debug-printf "DEBUG (changehost): Setting hostname with command 'hostname'.\n"
         sudo hostname "$2"
-        changed=true
         printf "\nHostname has been changed from %s to %s\n" "$host" "$2"
         auxcli debug-printf "DEBUG (changehost): Setting reboot_required to 'true'\n"
         auxcli write "config" "reboot_required" "true"
     else
         printf "Hostname was not changed. Your version of UNIX might not be currently supported.\n"
-        changed=false
         auxcli debug-printf "DEBUG (changehost): Setting 'changed' to 'false'.\n"
         exit 1
     fi

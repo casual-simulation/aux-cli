@@ -1,26 +1,24 @@
 #!/bin/bash
 set -e
 
+# Config path for btmode
+config_btmode=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' $config_commands)
+auxcli debug-printf "DEBUG (btmode): Config path: %s\n" "$config_btmode"
 
-config_path=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' /etc/auxcli/commands.json)
+# Arguments for btmode
+readarray -t args_short < <(q -r '.[].arg_short' $config_btmode)
+readarray -t args_long < <(q -r '.[].arg_long' $config_btmode)
+readarray -t args_desc < <(jq '.[].short_desc' $config_btmode)
+args=("${args_short[@]}" "${args_long[@]}")
 
-config="/etc/auxcli/config.json"
-tmp="/etc/auxcli/config.json.tmp"
-previous_mode=$(jq -r '.btmode' $config)
-
-# args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
-# args=("${args_short[@]}" "${args_long[@]}")
-
-
-# readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
+previous_mode=$(jq -r '.btmode' $config_main)
+auxcli debug-printf "DEBUG (btmode): Previous mode: %s\n" "$previous_mode"
 
 usage() {
     printf "\nUsage:    auxcli btmode [OPTIONS]\n\n"
     printf "A tool for configuring the bluetooth mode.\n\n"
     printf "OPTIONS:\n"
-    for ((i = 0; i < ${#args_long[@]}; i++)); do
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
         printf "\t%-6s\t%s\n" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1

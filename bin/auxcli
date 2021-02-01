@@ -3,21 +3,33 @@ set -e
 
 . /lib/auxcli/commands/helper/debug-check
 
-# Temporarily add this dir to the path so we can use helper commands
-PATH=$PATH:/lib/auxcli/commands/helper
+# Config paths
+config_main="/etc/auxcli/config.json"
+config_main_tmp="/etc/auxcli/config.json.tmp"
+config_commands="/etc/auxcli/commands.json"
+config_commands_tmp="/etc/auxcli/commands.json.tmp"
+config_components="/etc/auxcli/components.json"
+config_components_tmp="/etc/auxcli/components.json.tmp"
+config_devices="/etc/auxcli/devices.json"
+config_devices_tmp="/etc/auxcli/devices.json.tmp"
 
-commands_config="/etc/auxcli/commands.json"
-commands=($(jq -r '.[] | select( .available != null) | .name' $commands_config))
+# Command information
+readarray -t commands < <(jq -r '.[] | select( .available != null) | .name' $config_commands)
+readarray -t commands_desc < <(jq -r '.[] | select( .available != null) | .short_desc' $config_commands)
 
-# readarray splits each newline into one element in the array
-readarray -t commands_desc < <(jq -r '.[] | select( .available != null) | .short_desc' $commands_config)
+# Component information
+readarray -t components < <(jq -r '.[] | select( .installed != null) | .name' $config_components)
+readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $config_components)
+readarray -t configuration < <(jq -r '.[] | select(.type == "configuration") | .name' $config_components)
+readarray -t hardware < <(jq -r '.[] | select(.type == "hardware") | .name' $config_components)
+readarray -t tool < <(jq -r '.[] | select(.type == "tool") | .name' $config_components)
 
 usage() {
     printf "\nUsage:        auxcli [COMMAND]\n\n"
     printf "Command line tools for AUX dealing more with the hardware/server than auxplayer itself.\n\n"
     printf "COMMANDS:\n"
     for ((i = 0; i < ${#commands[@]}; i++)); do
-        if available ${commands[$i]}; then
+        if . /lib/auxcli/commands/helper/available ${commands[$i]}; then
             # \t        Tab
             # [ ]       Marked if available
             # %-24s     Left-Aligned column 24 spaces wide that contains the first 's' string
