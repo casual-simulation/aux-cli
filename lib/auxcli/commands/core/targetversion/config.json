@@ -1,0 +1,28 @@
+[
+    {
+        "arg_short": "-f",
+        "arg_long": "--file",
+        "type": "",
+        "short_desc": "Specify a docker-compose.yml file other than /home/pi",
+        "default": "/home/pi/docker-compose.yml"
+    },
+    {
+        "arg_short": "-v",
+        "arg_long": "--version",
+        "type": "",
+        "short_desc": "Specify the target casualOS version.",
+        "default": "latest"
+    },
+    {
+        "arg_short": "-r",
+        "arg_long": "--restart",
+        "type": "",
+        "short_desc": "Immediately restart casualOS after setting the target version."
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information."
+    }
+]

@@ -110,6 +110,16 @@
         "short_desc": "Stop all docker containers (casualOS)."
     },
     {
+        "name": "targetversion",
+        "type": "core",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/targetversion/targetversion",
+        "config_path": "/lib/auxcli/commands/core/targetversion/config.json",
+        "short_desc": "Set the version of casualOS."
+    },
+    {
         "name": "uninstall",
         "type": "core",
         "available": true,

@@ -1,0 +1,97 @@
+#!/bin/bash
+set -e
+
+# Config path for targetversion
+config_targetversion=$(jq -r '.[] | select( .name == "targetversion" ) | .config_path' $config_commands)
+auxcli debug-printf "DEBUG (targetversion): Config path: %s\n" "$config_targetversion"
+
+# Arguments for targetversion
+readarray -t args_short < <(q -r '.[].arg_short' $config_targetversion)
+readarray -t args_long < <(q -r '.[].arg_long' $config_targetversion)
+readarray -t args_desc < <(jq '.[].short_desc' $config_targetversion)
+readarray -t defaults < <(jq '.[].default' $config_targetversion)
+args=("${args_short[@]}" "${args_long[@]}")
+
+# Default Variables
+file="${defaults[0]}"
+version="${defaults[1]}"
+
+usage() {
+    printf "\nUsage:    auxcli targetversion [OPTIONS]\n\n"
+    printf "Changes the target version of casualOS.\n\n"
+    printf "OPTIONS:\n"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-7s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
+    exit 1
+}
+
+err_check() {
+    # First error check
+    # Show the usage menu if there aren't any arguments
+    auxcli debug-printf "DEBUG (targetversion): First error check.\n"
+    if [ $# -eq 0 ]; then
+        printf "\nYou need to pass an argument.\n"
+        usage
+    fi
+
+    # Second error check
+    # Throw an error messege if the first argument isn't valid
+    auxcli debug-printf "DEBUG (targetversion): Second error check.\n"
+    if [[ ! ${args[*]} =~ $1 ]]; then
+        printf "\n\"%s\" is an invalid argument.\n" "$1"
+        printf "Run auxcli targetversion -h for help.\n\n"
+        exit 1
+    fi
+}
+
+err_check "$@"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+    -f | --file)
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            file="$2"
+            auxcli debug-printf "DEBUG (targetversion): Setting 'file' to '%s'.\n" "$2"
+            shift # past argument
+            shift # past value
+        else
+            printf "No file specified. Using default: \"%s\"\n" "$file"
+            shift # past argument
+        fi
+        ;;
+    -v | --version)
+        if [[ ! ${args[*]} =~ $2 ]]; then
+            version="$2"
+            auxcli debug-printf "DEBUG (targetversion): Setting 'version' to '%s'.\n" "$2"
+            shift # past argument
+            shift # past value
+        else
+            printf "No version specified. Using default: \"%s\"\n" "$version"
+            shift # past argument
+        fi
+        ;;
+    -r | --restart)
+        restart_casualOS=true
+        auxcli debug-printf "DEBUG (targetversion): Setting restart_casualOS to 'true'\n"
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        break # past argument
+        ;;
+    esac
+done
+
+set_targetversion(){
+    if [ $version == "latest" ]; then
+        target_version="$version"
+    else
+        target_version="v$version"
+    fi
+    sudo sed -i -E "s@(^\s*.*aux-arm32:).*@\1$target_version'@g" $file
+}
+
+set_targetversion
+if $restart_casualOS; then auxcli restart; fi
