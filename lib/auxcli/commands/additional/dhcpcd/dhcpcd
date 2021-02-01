@@ -1,21 +1,22 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "dhcpcd" ) | .config_path' /etc/auxcli/commands.json)
+# Config path for dhcpcd
+config_dhcpcd=$(jq -r '.[] | select( .name == "dhcpcd" ) | .config_path' $config_commands)
+auxcli debug-printf "DEBUG (dhcpcd): Config path: %s\n" "$config_dhcpcd"
 
-args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+# Arguments for dhcpcd
+readarray -t args_short < <(q -r '.[].arg_short' $config_dhcpcd)
+readarray -t args_long < <(q -r '.[].arg_long' $config_dhcpcd)
+readarray -t args_desc < <(jq '.[].short_desc' $config_dhcpcd)
 args=("${args_short[@]}" "${args_long[@]}")
-
-# readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
 
 usage() {
     printf "\nUsage:    auxcli dhcpcd [OPTIONS]\n\n"
     printf "Wrapper for setting and unsetting dhcpcd settings.\n\n"
     printf "OPTIONS:\n"
-    for ((i = 0; i < ${#args[@]}; i++)); do
-        printf "\t%-2s\t%-7s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-7s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
@@ -23,6 +24,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
+    auxcli debug-printf "DEBUG (dhcpcd): Error Check: 1 of 2\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -30,8 +32,9 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
+    auxcli debug-printf "DEBUG (dhcpcd): Error Check: 2 of 2\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
-        printf "\n\"$1\" is an invalid argument.\n"
+        printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli dhcpcd -h for help.\n\n"
         exit 1
     fi
@@ -40,22 +43,22 @@ err_check() {
 dhcpcd_set() {
     if auxcli hotspot -c; then
         if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
-            echo "DHCPCD has already been set."
+            printf "DHCPCD has already been set.\n"
             return 0
         fi
         # if [ "$(cat /sys/class/net/eth0/operstate)" == "down" ]; then # TODO: Check for WiFi/Bluetooth Hotspot also.
         #     echo "You need a wired internet connection while in Hotspot/AP Mode to use the internet."
         #     return 1
         # fi
-        echo "Modifying dchpcd.conf"
-        echo "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" | sudo tee -a /etc/dhcpcd.conf
+        printf "Modifying dchpcd.conf...\n"
+        printf "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4\n" | sudo tee -a /etc/dhcpcd.conf
 
-        echo "Reloading dhcpcd"
+        printf "Reloading dhcpcd...\n"
         sudo systemctl daemon-reload
         sudo systemctl restart dhcpcd
         sleep 10
     else
-        echo "There's no need to dhcpcd set."
+        printf "There's no need to dhcpcd set.\n"
         return 0
     fi
 }
@@ -63,15 +66,15 @@ dhcpcd_set() {
 dhcpcd_unset() {
     if auxcli hotspot -c; then
         if grep -q "static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4" "/etc/dhcpcd.conf"; then
-            echo "Unmodifying dchpcd.conf"
+            printf "Unmodifying dchpcd.conf...\n"
             sudo sed -i '/^static domain_name_servers=127.0.0.1 8.8.8.8 8.8.4.4/d' /etc/dhcpcd.conf
 
-            echo "Reloading dhcpcd"
+            printf "Reloading dhcpcd...\n"
             sudo systemctl daemon-reload
             sudo systemctl restart dhcpcd
             sleep 10
         else
-            echo "DHCPCD wasn't set."
+            printf "DHCPCD wasn't set.\n"
         fi
     fi
 }
