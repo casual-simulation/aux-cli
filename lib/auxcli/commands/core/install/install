@@ -47,6 +47,15 @@ err_check() {
     fi
 
     # Third error check
+    # Throw an error messege if the first argument isn't valid
+    auxcli debug-printf "DEBUG (install): Third error check.\n"
+    if [[ ! ${args[*]} =~ $1 ]]; then
+        printf "\n\"%s\" is not a valid argument.\n" "$1"
+        printf "Run 'auxcli install -h' for help.\n\n"
+        exit 1
+    fi
+
+    # Fourth error check
     # Throw an error messege if the component is already installed
     auxcli debug-printf "DEBUG (install): Fourth error check.\n"
     if auxcli installed "$1"; then

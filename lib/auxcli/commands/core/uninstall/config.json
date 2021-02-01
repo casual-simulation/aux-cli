@@ -1,0 +1,14 @@
+[
+    {
+        "arg_short": "-r",
+        "arg_long": "--reboot",
+        "type": "",
+        "short_desc": "Automatically reboot after install(s) finish."
+    },
+    {
+        "arg_short": "-h",
+        "arg_long": "--help",
+        "type": "",
+        "short_desc": "Displays this usage information."
+    }
+]
