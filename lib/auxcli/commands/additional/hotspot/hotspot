@@ -1,21 +1,22 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "hotspot" ) | .config_path' /etc/auxcli/commands.json)
+# Config path for hotspot
+config_hotspot=$(jq -r '.[] | select( .name == "hotspot" ) | .config_path' $config_commands)
+auxcli debug-printf "DEBUG (hotspot): Config path: %s\n" "$config_hotspot"
 
-args_short=($(jq -r '.[].arg_short' $config_path))
-args_long=($(jq -r '.[].arg_long' $config_path))
+# Arguments for hotspot
+readarray -t args_short < <(q -r '.[].arg_short' $config_hotspot)
+readarray -t args_long < <(q -r '.[].arg_long' $config_hotspot)
+readarray -t args_desc < <(jq '.[].short_desc' $config_hotspot)
 args=("${args_short[@]}" "${args_long[@]}")
-
-# readarray splits each newline into one element in the array
-readarray -t args_desc < <(jq '.[].short_desc' $config_path)
 
 usage() {
     printf "\nUsage:    auxcli hotspot [OPTIONS]\n\n"
     printf "Changes the hotspot mode your pi/axucli is in.\n\n"
     printf "OPTIONS:\n"
-    for ((i = 0; i < ${#args[@]}; i++)); do
-        printf "\t%-2s\t%-7s\t%s\n" "${arg_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-7s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
@@ -23,6 +24,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
+    auxcli debug-printf "DEBUG (hotspot): First error check.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -30,47 +32,47 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
+    auxcli debug-printf "DEBUG (hotspot): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
-        printf "\n\"$1\" is an invalid argument.\n"
+        printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli hotspot -h for help.\n\n"
         exit 1
     fi
 }
 
 hotspot_check() {
+    auxcli debug-printf "DEBUG (hotspot): Checking for 'hostapd' process.\n"
     if pgrep -x "hostapd" >/dev/null 2>&1; then
-        echo "You are in hotspot mode!"
+        auxcli debug-printf "DEBUG (hotspot): You are in hotspot mode.\n"
         return 0
     else
-        echo "You aren't in hotspot mode!"
+        auxcli debug-printf "DEBUG (hotspot): You are not in hotspot mode.\n"
         return 1
     fi
 }
 
 hotspot_enable() {
+    auxcli debug-printf "DEBUG (hotspot): Enabling hotspot.\n"
     sudo python3 /usr/lib/raspiwifi/reset_device/manual_reset.py
-    echo "Hotspot Enabled!"
+    auxcli debug-printf "DEBUG (hotspot): Hotspot enabled.\n"
+    auxcli debug-printf "DEBUG (hotspot): Setting reboot_required to 'true'\n"
+    auxcli write "config" "reboot_required" "true"
 }
 
 hotspot_disable() {
+    auxcli debug-printf "DEBUG (hotspot): Disabling hotspot.\n"
     # From app.py def set_ap_client_mode()
-    sudo rm -f /etc/raspiwifi/host_mode || echo "/etc/raspiwifi/host_mode does not exist."
-    sudo rm /etc/cron.raspiwifi/aphost_bootstrapper || echo "/etc/cron.raspiwifi/aphost_bootstrapper does not exist."
+    sudo rm -f /etc/raspiwifi/host_mode || printf "/etc/raspiwifi/host_mode does not exist.\n"
+    sudo rm /etc/cron.raspiwifi/aphost_bootstrapper || printf "/etc/cron.raspiwifi/aphost_bootstrapper does not exist.\n"
     sudo cp /usr/lib/raspiwifi/reset_device/static_files/apclient_bootstrapper /etc/cron.raspiwifi/
     sudo chmod +x /etc/cron.raspiwifi/apclient_bootstrapper
     sudo mv /etc/dnsmasq.conf.original /etc/dnsmasq.conf || sudo cp /lib/auxcli/modules/raspi-wifi/dnsmasq.conf /etc/dnsmasq.conf
     sudo mv /etc/dhcpcd.conf.original /etc/dhcpcd.conf || sudo cp /lib/auxcli/modules/raspi-wifi/dhcpcd.conf /etc/dhcpcd.conf
-    sudo mv /etc/wpa_supplicant/wpa_supplicant.conf.original /etc/wpa_supplicant/wpa_supplicant.conf || echo "You're original wpa_supplicant.conf is missing."
+    sudo mv /etc/wpa_supplicant/wpa_supplicant.conf.original /etc/wpa_supplicant/wpa_supplicant.conf || printf "Your original wpa_supplicant.conf is missing.\n"
 
-    echo "Hotspot Disabled!"
-
-    read -rep $'Disabling Hotspot Mode requires a reboot to take effect. Press "y" to reboot now, or press anything else to exit.\n' -n 1 -r
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        auxcli debug-printf "DEBUG (reboot-apply): Rebooting now.\n"
-        sudo reboot now
-    else
-        exit 1
-    fi
+    auxcli debug-printf "DEBUG (hotspot): Hotspot disabled.\n"
+    auxcli debug-printf "DEBUG (hotspot): Setting reboot_required to 'true'\n"
+    auxcli write "config" "reboot_required" "true"
 }
 
 err_check "$@"
@@ -89,6 +91,11 @@ while [[ $# -gt 0 ]]; do
     -d | --disable) #Set Hostname
         hotspot_disable
         break # past argument
+        ;;
+    -r | --reboot)
+        auxcli debug-printf "DEBUG (hotspot): Setting reboot_on_exit to 'true'\n"
+        auxcli write "config" "reboot_on_exit" "true"
+        shift # past argument
         ;;
     -h | -help | --help)
         usage

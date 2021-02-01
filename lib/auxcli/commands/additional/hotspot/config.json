@@ -18,6 +18,12 @@
         "short_desc": "Disables hotspot mode."
     },
     {
+        "arg_short": "-r",
+        "arg_long": "--reboot",
+        "type": "",
+        "short_desc": "Automatically reboot after hotspot enable/disable."
+    },
+    {
         "arg_short": "-h",
         "arg_long": "--help",
         "type": "",
