@@ -1,7 +1,16 @@
 #!/bin/bash
 set -e
 
-config_path=$(jq -r '.[] | select( .name == "backup" ) | .config_path' /etc/auxcli/commands.json)
+# Config path for backup
+config_backup=$(jq -r '.[] | select( .name == "backup" ) | .config_path' $config_commands)
+auxcli debug-printf "DEBUG (backup): Config path: %s\n" "$config_backup"
+
+# Arguments for backup
+readarray -t args_short < <(q -r '.[].arg_short' $config_backup)
+readarray -t args_long < <(q -r '.[].arg_long' $config_backup)
+readarray -t args_desc < <(jq '.[].short_desc' $config_backup)
+readarray -t defaults < <(jq '.[].default' $config_backup)
+args=("${args_short[@]}" "${args_long[@]}")
 
 # Default Variables
 hostn=$(hostname)                              # Hostname of RaspberryPi
@@ -13,23 +22,12 @@ overwrite="false"                              # Default overwriting files to fa
 args=(-d --destination -f --filename -m --mountpoint -s --storage -l --log -S --shrink -Z --zip -o --overwrite -y -h -help --help)
 
 usage() {
-    echo ""
-    echo "Usage:    backup.sh [OPTIONS]"
-    echo ""
-    echo "A tool that creates a complete backup image of your RaspberryPi with options to Shrink/Zip/Move/Upload it wherever you choose."
-    echo ""
-    echo "OPTIONS:"
-    # echo "-d    --destination STRING    Specify a final destination for the backup."
-    echo "-f    --filename STRING       Specify a filename to use. Default: ${hostn}-bkp.img"
-    echo "-m    --mountpoint STRING     Specify a mount point for your local storage device. Default: /mnt/usbstorage"
-    echo "-s    --storage STRING        Specify a local storage device to backup to. The script will try to find one if unspecified."
-    echo "-l    --log STRING            Specify a location to output the log to. Default: /var/log/auxcli.pi.backup.log"
-    echo "-S    --shrink STRING         Enable shrinking. Optional: Specify a string to append to the filename. Default: \"-shrunk\" Shrinking requires a device with at least 2x the storage space as your boot drive. NOTE: Sometimes drives are labeled incorrectly so double check. Actual storage might be slightly over or under the storage advertised. So 2x 4GB might not fit on an 8GB USB."
-    echo "-Z    --zip                   Enable zipping the backup before moving it to its final destination. For simplicity's sake, it follows the storage requirements for shrinking."
-    echo "-o    --overwrite             Overwrite any files as needed."
-    echo "-y                            Bypass prompt to install dependencies."
-    echo "-h    --help                  Displays this help information."
-    echo ""
+    printf "\nUsage:    auxcli nfc [OPTIONS]\n\n"
+    printf "Creates a backup img file of your pi.\n\n"
+    printf "OPTIONS:\n"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-9s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
     exit 1
 }
 
