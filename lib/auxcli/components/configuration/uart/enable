@@ -11,8 +11,4 @@ if ! sudo grep "enable_uart=1" "/boot/config.txt"; then
     printf "\n# Enable UART\nenable_uart=1\n" | sudo tee -a /boot/config.txt
 fi
 
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-
-jq '(.[] | select (.name == "uart") | .enabled) = true' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "uart" "enabled" "true"

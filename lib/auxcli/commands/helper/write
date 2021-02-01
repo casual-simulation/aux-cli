@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    commands)
+        jq --arg command "$2" --arg key "$3" --arg value "$4" '(.[] | select (.name == $command) | .[$key]) = $value' $config_commands | sudo tee $config_commands_tmp 1> /dev/null
+        sudo mv -f $config_commands_tmp $config_commands
+        shift # past commands
+        shift # past command
+        shift # past key
+        shift # past value
+        ;;
+    components)
+        jq --arg component "$2" --arg key "$3" --arg value "$4" '(.[] | select (.name == $component) | .[$key]) = $value' $config_components | sudo tee $config_components_tmp 1> /dev/null
+        sudo mv -f $config_components_tmp $config_components
+        shift # past components
+        shift # past command
+        shift # past key
+        shift # past value
+        ;;
+    config)
+        jq --arg key "$2" --arg value "$3" '(.[$key]) = $value' $config_main | sudo tee $config_main_tmp 1> /dev/null
+        sudo mv -f $config_main_tmp $config_main
+        shift # past config
+        shift # past key
+        shift # past value
+        ;;
+    # devices)
+    #     jq --arg command "$2" --arg key "$3" --arg value $4 '(.[] | select (.name == $command) | .[$key]) = $value' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
+    #     sudo mv -f $config_devices_tmp $config_devices
+    #     shift # past devices
+    #     shift # past name
+    #     shift # past value
+    #     ;;
+    *)
+        shift # past unknown command
+        ;;
+    esac
+done
+

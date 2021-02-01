@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-
-jq '(.[] | select (.name == "raspiwifi") | .installed) = false' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+# Set installed/available to false before we hit a reboot
+auxcli write "components" "raspiwifi" "installed" "false"
+auxcli write "commands" "dhcpcd" "available" "false"
+auxcli write "commands" "hotspot" "available" "false"
 
 sudo python3 /usr/lib/raspiwifi/uninstall.py

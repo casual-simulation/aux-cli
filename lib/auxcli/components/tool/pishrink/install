@@ -7,8 +7,4 @@ echo "Installing PiShrink."
 sudo chmod +x $install_path/pishrink.sh
 sudo mv -f $install_path/pishrink.sh /usr/local/bin
 
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-
-jq '(.[] | select (.name == "pishrink") | .installed) = true' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "pishrink" "installed" "true"

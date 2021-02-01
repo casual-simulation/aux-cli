@@ -4,8 +4,4 @@ set -e
 sudo apt-get remove zerotier-one
 sudo sed -i "/# ZeroTier Start/,/# ZeroTier End/d" /etc/rc.local
 
-
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-jq '(.[] | select (.name == "zerotier") | .installed) = false' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "zerotier" "installed" "false"

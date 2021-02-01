@@ -61,7 +61,4 @@ sudo sed -i "${line_number}i \\ \\ \\ \\ \\ \\ \\ \\  log info \"Device \$DEVNAM
 sudo sed -i "${line_number}i \\ \\ \\ \\ if echo \$DEVINFO | grep \"LABEL_FATBOOT=\"boot\"\"; then" "/usr/share/usbmount/usbmount"
 sudo sed -i "${line_number}i \\ \\ \\ \\ # Don't automount boot usb again" "/usr/share/usbmount/usbmount"
 
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-jq '(.[] | select (.name == "usbmount") | .installed) = true' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "usbmount" "installed" "true"

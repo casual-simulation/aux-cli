@@ -87,16 +87,5 @@ run_cmd() {
 err_check "$@"
 run_cmd "$@"
 
-if jq -r '.reboot_required' /etc/auxcli/config.json 1> /dev/null; then
-    printf "You need to reboot for the changes to take effect."
-    if jq -r '.reboot_on_exit' /etc/auxcli/config.json 1> /dev/null; then
-        printf "Rebooting now."
-        sudo reboot now
-    else
-        read -rep $'Press "y" to reboot now or press anything else to wait.\n' -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            printf "Rebooting now."
-            sudo reboot now
-        fi
-    fi
-fi
+auxcli debug-printf "DEBUG (auxcli): Checking reboot settings.\n"
+. /lib/auxcli/commands/helper/reboot-apply

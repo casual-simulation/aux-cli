@@ -9,8 +9,4 @@ if ! sudo grep "console=ttyAMA0" "/boot/cmdline.txt"; then
     printf "console=ttyAMA0,115200" | sudo tee -a /boot/cmdline.txt
 fi
 
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-
-jq '(.[] | select (.name == "serial-console") | .enabled) = true' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "serial-console" "enabled" "true"

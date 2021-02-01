@@ -10,9 +10,4 @@ if ! sudo grep "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpi
     echo "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" | sudo tee -a /etc/udev/rules.d/20-gpiomem.rules
 fi
 
-
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-
-jq '(.[] | select (.name == "gpio") | .enabled) = true' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "gpio" "enabled" "true"

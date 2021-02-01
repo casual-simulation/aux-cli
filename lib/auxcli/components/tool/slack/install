@@ -43,8 +43,4 @@ fi
 exit 0
 EOT
 
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-
-jq '(.[] | select (.name == "slack") | .installed) = true' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "slack" "installed" "true"

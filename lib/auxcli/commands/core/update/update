@@ -174,13 +174,11 @@ automatic_update_aux() {
             crontab -l
             echo "@daily auxcli update -a"
         ) | crontab -
-        jq '(.autoupdate_aux) = true' $config | sudo tee $tmp 1> /dev/null
-        sudo mv -f $tmp $config
+        auxcli write "config" "autoupdate_aux" "true"
     else
         printf "Disabling Automatic updates for AUX.\n"
         crontab -l | grep -v "auxcli update -a" | crontab -
-        jq '(.autoupdate_aux) = false' $config | sudo tee $tmp 1> /dev/null
-        sudo mv -f $tmp $config
+        auxcli write "config" "autoupdate_aux" "false"
     fi
 }
 
@@ -201,13 +199,11 @@ automatic_update_cli() {
             crontab -l
             echo "@hourly auxcli update -c -y"
         ) | crontab -
-        jq '(.autoupdate_cli) = true' $config | sudo tee $tmp 1> /dev/null
-        sudo mv -f $tmp $config
+        auxcli write "config" "autoupdate_cli" "true"
     else
         printf "Disabling Automatic updates for AUXCLI.\n"
         crontab -l | grep -v "auxcli update -c -y" | crontab -
-        jq '(.autoupdate_cli) = false' $config | sudo tee $tmp 1> /dev/null
-        sudo mv -f $tmp $config
+        auxcli write "config" "autoupdate_cli" "false"
     fi
 }
 
@@ -224,13 +220,11 @@ automatic_update_pi() {
             crontab -l
             echo "@daily auxcli update -p"
         ) | crontab -
-        jq '(.autoupdate_pi) = true' $config | sudo tee $tmp 1> /dev/null
-        sudo mv -f $tmp $config
+        auxcli write "config" "autoupdate_pi" "true"
     else
         printf "Disabling Automatic updates for your RaspberryPi (apt-get).\n"
         crontab -l | grep -v "auxcli update -p" | crontab -
-        jq '(.autoupdate_pi) = false' $config | sudo tee $tmp 1> /dev/null
-        sudo mv -f $tmp $config
+        auxcli write "config" "autoupdate_pi" "false"
     fi
 
 }

@@ -230,6 +230,16 @@
         "short_desc": "Checks if a component is installed."
     },
     {
+        "name": "reboot-apply",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/reboot-apply",
+        "config_path": "",
+        "short_desc": "Checks if a reboot is required and then prompts for a reboot."
+    },
+    {
         "name": "requires-reboot",
         "type": "helper",
         "available": true,
@@ -258,6 +268,16 @@
         "command_path": "/lib/auxcli/commands/helper/wpa-checker",
         "config_path": "",
         "short_desc": "Verifies WPA settings work with wlan0 and wlan1."
+    },
+    {
+        "name": "write",
+        "type": "helper",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/write",
+        "config_path": "",
+        "short_desc": "Uses jq to write to a json file."
     },
     {
         "name": "backup",

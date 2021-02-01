@@ -10,9 +10,4 @@ fi
 sudo touch /etc/udev/rules.d/20-gpiomem.rules
 sudo sed -i "s/SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"//g" /etc/udev/rules.d/20-gpiomem.rules
 
-
-config="/etc/auxcli/components.json"
-tmp="/etc/auxcli/components.json.tmp"
-
-jq '(.[] | select (.name == "gpio") | .enabled) = false' $config | sudo tee $tmp 1> /dev/null
-sudo mv -f $tmp $config
+auxcli write "components" "gpio" "enabled" "false"

@@ -4,7 +4,7 @@ set -e
 PATH=$PATH:/lib/auxcli/commands/helper
 hostapd_conf="/etc/hostapd/hostapd.conf"
 raspiwifi_conf="/etc/raspiwifi/raspiwifi.conf"
-reboot_required=false
+host=$(hostname)
 
 mac_check() {
     auxcli debug-printf "DEBUG (hotspot-checker): Checking the MAC...\n"
@@ -22,11 +22,12 @@ mac_set() {
 
         auxcli debug-printf "DEBUG (hotspot-checker): Updating the MAC...\n"
         sudo sed -i "s/$oldfour/$newfour/g" $hostapd_conf
-        reboot_required=true
 
         auxcli debug-printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
+        auxcli write "config" "reboot_required" "true"
 
         auxcli debug-printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
+        auxcli write "config" "reboot_on_exit" "true"
 
         auxcli debug-printf "DEBUG (hotspot-checker): MAC has been updated.\n"
     else
@@ -45,38 +46,33 @@ hostname_check() {
 }
 
 hostname_set() {
-    if [ "$(hostname)" != "$oldhost" ]; then
-        sudo sed -i "s/$oldhost/$(hostname)/g" $hostapd_conf
-        reboot_required=true
-    else
-    fi
-    if [ "$(hostname)" != "$oldhost2" ]; then
-        sudo sed -i "s/$oldhost2/$(hostname)/g" $raspiwifi_conf
-        reboot_required=true
+    if [ "$host" != "$oldhost" ]; then
         auxcli debug-printf "DEBUG (hotspot-checker): hostapd hostname has changed.\n"
 
         auxcli debug-printf "DEBUG (hotspot-checker): Updating the hostapd hostname.\n"
+        sudo sed -i "s/$oldhost/$host/g" $hostapd_conf
 
         auxcli debug-printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
+        auxcli write "config" "reboot_required" "true"
 
         auxcli debug-printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
+        auxcli write "config" "reboot_on_exit" "true"
 
     else
         auxcli debug-printf "DEBUG (hotspot-checker): hostapd hostname has not changed.\n"
     fi
+    if [ "$host" != "$oldhost2" ]; then
         auxcli debug-printf "DEBUG (hotspot-checker): raspiwifi hostname has changed.\n"
 
         auxcli debug-printf "DEBUG (hotspot-checker): Updating the raspiwifi hostname.\n"
+        sudo sed -i "s/$oldhost2/$host/g" $raspiwifi_conf
 
         auxcli debug-printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
+        auxcli write "config" "reboot_required" "true"
 
         auxcli debug-printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
+        auxcli write "config" "reboot_on_exit" "true"
 
-reboot_check() {
-    echo "Checking if reboot required..."
-    if $reboot_required; then
-        echo "Reboot is required. Rebooting now..."
-        sudo reboot now
     else
         auxcli debug-printf "DEBUG (hotspot-checker): raspiwifi hostname has not changed.\n"
     fi
@@ -87,5 +83,4 @@ if installed "raspiwifi"; then
     mac_set
     hostname_check
     hostname_set
-    reboot_check
 fi
