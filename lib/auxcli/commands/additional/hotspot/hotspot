@@ -67,6 +67,7 @@ hotspot_disable() {
     read -p "Disabling Hotspot Mode requires a reboot to take effect. Press 'y' to reboot now, or press anything else to exit." -n 1 -r
     echo # Gives us a newline
     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        auxcli debug-printf "DEBUG (reboot-apply): Rebooting now.\n"
         sudo reboot now
     else
         exit 1

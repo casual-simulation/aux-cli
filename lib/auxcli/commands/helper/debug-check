@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+if [ -f /etc/auxcli/config.json ]; then
+    debug=$(jq -r '.debug' /etc/auxcli/config.json) 
+else
+    debug=false
+fi

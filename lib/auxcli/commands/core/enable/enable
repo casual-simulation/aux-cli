@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e
 
-if [ -f /etc/auxcli/config.json ]; then
-    verbose=$(jq -r '.verbose' /etc/auxcli/config.json) 
-else
-    verbose=false
-fi
-
 # Temporarily add this dir to the path so we can use helper commands
 PATH=$PATH:/lib/auxcli/commands/helper
 
@@ -35,32 +29,32 @@ err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
     # or if the argument is "-h" or "--help"
-    if $verbose; then printf "DEBUG (enable): First error check.\n"; fi
-    if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ]; then
+    auxcli debug-printf "DEBUG (enable): First error check.\n"
+    if [ $# -eq 0 ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a component
-    if $verbose; then printf "DEBUG (enable): Second error check.\n"; fi
+    auxcli debug-printf "DEBUG (enable): Second error check.\n"
     if [[ ! ${components[*]} =~ $1 ]]; then
-        printf "\n\"$1\" is not a valid component.\n"
+        printf "\n\"%s\" is not a valid component.\n" "$1"
         printf "Run 'auxcli enable -h' for help.\n\n"
         exit 1
     fi
 
     # Third error check
     # Throw an error messege if the component is already enabled
-    if $verbose; then printf "DEBUG (enable): Third error check.\n"; fi
     if enabled $1; then
-        printf "\nThe \"$1\" component is already enabled.\n\n"
+    auxcli debug-printf "DEBUG (enable): Third error check.\n"
+        printf "\nThe \"%s\" component is already enabled.\n\n" "$1"
         exit 1
     fi
 }
 
 enable_component(){
     while [[ $# -gt 0 ]]; do
-        if $verbose; then printf "DEBUG (enable): Disabling component: %s\n" "$1"; fi
+        auxcli debug-printf "DEBUG (enable): Disabling component: %s\n" "$1"
         . /lib/auxcli/components/configuration/$1/enable
         shift
     done

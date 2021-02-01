@@ -2,9 +2,9 @@
 set -e
 
 if [ -f /etc/auxcli/config.json ]; then
-    verbose=$(jq -r '.verbose' /etc/auxcli/config.json) 
+    debug=$(jq -r '.debug' /etc/auxcli/config.json) 
 else
-    verbose=false
+    debug=false
 fi
 
 install_deps() {
@@ -45,75 +45,72 @@ enable_services(){
     sudo systemctl start auxcli-web  
 }
 
-    jq '(.version) = "1.2.2"' 1.json | sudo tee 3.json 1> /dev/null
-
-
 update_conf() {
     # Have a larger one-time use instead of making a process to check for installed/available
 
     # Find config files from these backups
     for bkp_config in $(find /lib/auxcli-bkp /etc/auxcli-bkp -name '*.json'); do 
 
-        if $verbose; then printf "\nDEBUG (install.sh): Backup config file:\t%s.\n" "${bkp_config}"; fi
+        if $debug; then "\nDEBUG (install.sh): Backup config file:\t%s.\n" "${bkp_config}"; fi
 
         # Get the new_config from modifying the bkp_config
         new_config="${bkp_config/auxcli-bkp/auxcli}"
-        if $verbose; then printf "DEBUG (install.sh): New config file:\t\t%s.\n" "${new_config}"; fi
+        if $debug; then "DEBUG (install.sh): New config file:\t\t%s.\n" "${new_config}"; fi
 
         tmp="$new_config.tmp"
-        if $verbose; then printf "DEBUG (install.sh): Temp config file:\t%s.\n" "${tmp}"; fi
+        if $debug; then "DEBUG (install.sh): Temp config file:\t%s.\n" "${tmp}"; fi
 
         if [ $new_config == "/etc/auxcli/commands.json" ]; then
 
-            if $verbose; then printf "DEBUG (install.sh): Updating commands.json\n"; fi
+            if $debug; then "DEBUG (install.sh): Updating commands.json\n"; fi
 
             # Get array of available things
             available=($(jq -r '.[] | select(.available == true) | .name' $bkp_config)) 
-            if $verbose; then printf "DEBUG (install.sh): Available commands from bkp_config: %s\n" "${available[*]}"; fi
+            if $debug; then "DEBUG (install.sh): Available commands from bkp_config: %s\n" "${available[*]}"; fi
 
             # Write those to the new config
             for command in "${available[@]}"; do
-                if $verbose; then printf "DEBUG (install.sh): Setting command %s to available in the new_config.\n" "${command}"; fi
+                if $debug; then "DEBUG (install.sh): Setting command %s to available in the new_config.\n" "${command}"; fi
                 jq --arg com "$command" '(.[] | select( .name == $com ) | .available) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
 
         elif [ $new_config == "/etc/auxcli/components.json" ]; then
 
-            if $verbose; then printf "DEBUG (install.sh): Updating components.json\n"; fi
+            if $debug; then "DEBUG (install.sh): Updating components.json\n"; fi
 
             # Get array of installed things
             installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config)) 
-            if $verbose; then printf "DEBUG (install.sh): Installed components from bkp_config: %s\n" "${installed[*]}"; fi
+            if $debug; then "DEBUG (install.sh): Installed components from bkp_config: %s\n" "${installed[*]}"; fi
             enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config))  
-            if $verbose; then printf "DEBUG (install.sh): Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
+            if $debug; then "DEBUG (install.sh): Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
             disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config)) 
-            if $verbose; then printf "DEBUG (install.sh): Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
+            if $debug; then "DEBUG (install.sh): Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
 
             # Write those to the new config
             for component in "${installed[@]}"; do
-                if $verbose; then printf "DEBUG (install.sh): Setting component %s to installed in the new_config.\n" "${component}"; fi
+                if $debug; then "DEBUG (install.sh): Setting component %s to installed in the new_config.\n" "${component}"; fi
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
             for component in "${enabled[@]}"; do
-                if $verbose; then printf "DEBUG (install.sh): Setting component %s to enabled in the new_config.\n" "${component}"; fi
+                if $debug; then "DEBUG (install.sh): Setting component %s to enabled in the new_config.\n" "${component}"; fi
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
             for component in "${disabled[@]}"; do
-                if $verbose; then printf "DEBUG (install.sh): Setting component %s to disabled in the new_config.\n" "${component}"; fi
+                if $debug; then "DEBUG (install.sh): Setting component %s to disabled in the new_config.\n" "${component}"; fi
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
 
         elif [ $new_config == "/etc/auxcli/config.json" ]; then
 
-            if $verbose; then printf "DEBUG (install.sh): Updating config.json\n"; fi
+            if $debug; then "DEBUG (install.sh): Updating config.json\n"; fi
 
             # Get new version number
             new_ver=$(jq -r '.version' $new_config)
-            if $verbose; then printf "DEBUG (install.sh): New Version is %s.\n" "${new_ver}"; fi
+            if $debug; then "DEBUG (install.sh): New Version is %s.\n" "${new_ver}"; fi
 
             # Merge
             jq -s '.[0] * .[1]' $new_config $bkp_config | sudo tee $tmp 1> /dev/null
@@ -125,7 +122,7 @@ update_conf() {
 
         # elif [ $new_config == "/etc/auxcli/devices.json" ]; then
 
-        #     if $verbose; then printf "DEBUG (install.sh): Updating devices.json\n"
+        #     if $debug; then printf "DEBUG (install.sh): Updating devices.json\n"
 
         #     jq -s '.[0] * .[1]' $new_config $bkp_config 1> /dev/null
         else 

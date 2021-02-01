@@ -8,6 +8,7 @@ tmp="/etc/auxcli/config.json.tmp"
 
 args_short=($(jq -r '.[].arg_short' $config_path))
 args_long=($(jq -r '.[].arg_long' $config_path))
+auxcli debug-printf "DEBUG (update): Config path: %s\n" "$config_update"
 args=("${args_short[@]}" "${args_long[@]}")
 
 update_aux=false
@@ -33,6 +34,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
+    auxcli debug-printf "DEBUG (update): First error check.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -40,8 +42,9 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
+    auxcli debug-printf "DEBUG (update): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
-        printf "\n\"$1\" is an invalid argument.\n"
+        printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli update -h for help.\n\n"
         exit 1
     fi
@@ -53,30 +56,37 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
 
     -a | --aux)
+        auxcli debug-printf "DEBUG (update): Setting 'update_aux' to 'true'.\n"
         update_aux=true
         shift # past argument
         ;;
     -A | --aux-auto)
+        auxcli debug-printf "DEBUG (update): Setting 'automatic_update_aux' to 'true'.\n"
         automatic_update_aux=true
         shift # past argument
         ;;
     -c | --cli)
+        auxcli debug-printf "DEBUG (update): Setting 'update_cli' to 'true'.\n"
         update_cli=true
         shift # past argument
         ;;
     -C | --cli-auto)
+        auxcli debug-printf "DEBUG (update): Setting 'automatic_update_cli' to 'true'.\n"
         automatic_update_cli=true
         shift # past argument
         ;;
     -p | --pi)
+        auxcli debug-printf "DEBUG (update): Setting 'update_pi' to 'true'.\n"
         update_pi=true
         shift # past argument
         ;;
     -P | --pi-auto)
+        auxcli debug-printf "DEBUG (update): Setting 'automatic_update_pi' to 'true'.\n"
         automatic_update_pi=true
         shift # past argument
         ;;
     -y)
+        auxcli debug-printf "DEBUG (update): Setting 'agree' to 'true'.\n"
         agree=true
         shift # past argument
         ;;
@@ -89,6 +99,7 @@ done
 
 vercomp () {
     if [[ $1 == $2 ]]; then
+        auxcli debug-printf "DEBUG (update): Version numbers are the same.\n"
         return 1
     fi
     local IFS=.
@@ -103,9 +114,11 @@ vercomp () {
             ver2[i]=0
         fi
         if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            auxcli debug-printf "DEBUG (update): New Version number is higher.\n"
             return 0
         fi
         if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            auxcli debug-printf "DEBUG (update): New Version number is lower.\n"
             return 1
         fi
     done
@@ -113,46 +126,50 @@ vercomp () {
 }
 
 version_check() {
-    echo "Checking for newer versions of AUXCLI..."
-    # If hotspot mode is true, then do the work around
-    if available dhcpcd; then auxcli dhcpcd -s; fi
+    printf "Checking for newer versions of AUXCLI...\n"
+    auxcli debug-printf "DEBUG (update): CURL the latest config.json\n"
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/etc/auxcli/config.json --output /home/pi/config.json
+
     new_version=$(jq -r '.version' /home/pi/config.json) 
     old_version=$(jq -r '.version' $config)
-    echo "DEBUG: NewVersion: $new_version"
-    echo "DEBUG: OldVersion: $old_version"
+    auxcli debug-printf "DEBUG (update): New Version: %s\n" "$new_version"
+    auxcli debug-printf "DEBUG (update): Old Version: %s\n" "$old_version"
     sudo rm -rf /home/pi/config.json
 
+    auxcli debug-printf "DEBUG (update): Compare version numbers.\n"
     if vercomp $new_version $old_version; then
+        printf "There is a newer version of AUXCLI available.\n"
         if $agree; then
+            auxcli debug-printf "DEBUG (update): Auto-agree was set.\n"
             return 0
         else
             read -p "There is a newer version of AUXCLI available. Press 'y' to update now, or press anything else to exit." -n 1 -r
             echo # Gives us a newline
             if [[ $REPLY =~ ^[Yy]$ ]]; then
+                auxcli debug-printf "DEBUG (update): Agreed.\n"
                 return 0
             else
+                auxcli debug-printf "DEBUG (update): Disagreed.\n"
                 return 1
             fi
         fi
     else
-        echo "You have the latest version of AUXCLI."
-        if available dhcpcd; then auxcli dhcpcd -u; fi
+        printf "You have the latest version of AUXCLI.\n"
         return 1
     fi
 }
 
 update_aux() {
-    # If hotspot mode is true, then do the work around
-    if available dhcpcd; then auxcli dhcpcd -s; fi
+    auxcli debug-printf "DEBUG (update): Running 'update_aux'.\n"
+    auxcli debug-printf "DEBUG (update): CURL the latest docker-compose.arm32.yml.\n"
     sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output /home/pi/docker-compose.yml
     docker-compose -f /home/pi/docker-compose.yml pull && docker-compose -f /home/pi/docker-compose.yml up -d
-    if available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 automatic_update_aux() {
     if ! jq -r '.autoupdate_aux' $config 1> /dev/null; then
-        echo "Enabling Automatic updates for AUX."
+    auxcli debug-printf "DEBUG (update): Running 'automatic_update_aux'.\n"
+        printf "Enabling Automatic updates for AUX.\n"
         (
             crontab -l
             echo "@daily auxcli update -a"
@@ -160,7 +177,7 @@ automatic_update_aux() {
         jq '(.autoupdate_aux) = true' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     else
-        echo "Disabling Automatic updates for AUX."
+        printf "Disabling Automatic updates for AUX.\n"
         crontab -l | grep -v "auxcli update -a" | crontab -
         jq '(.autoupdate_aux) = false' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
@@ -168,18 +185,18 @@ automatic_update_aux() {
 }
 
 update_cli() {
+    auxcli debug-printf "DEBUG (update): Running 'update_cli'.\n"
     if version_check; then
-        # If hotspot mode is true, then do the work around
-        if available dhcpcd; then auxcli dhcpcd -s; fi
-        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
+        auxcli debug-printf "DEBUG (update): CURL the latest config.json\n"
+        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/install.sh --output install.sh && sudo bash install.sh
         sudo rm -rf install.sh
-        if available dhcpcd; then auxcli dhcpcd -u; fi
     fi
 }
 
 automatic_update_cli() {
     if ! jq -r '.autoupdate_cli' $config 1> /dev/null; then
-        echo "Enabling Automatic updates for AUXCLI."
+    auxcli debug-printf "DEBUG (update): Running 'automatic_update_cli'.\n"
+        printf "Enabling Automatic updates for AUXCLI.\n"
         (
             crontab -l
             echo "@hourly auxcli update -c -y"
@@ -187,7 +204,7 @@ automatic_update_cli() {
         jq '(.autoupdate_cli) = true' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     else
-        echo "Disabling Automatic updates for AUXCLI."
+        printf "Disabling Automatic updates for AUXCLI.\n"
         crontab -l | grep -v "auxcli update -c -y" | crontab -
         jq '(.autoupdate_cli) = false' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
@@ -195,16 +212,14 @@ automatic_update_cli() {
 }
 
 update_pi() {
-    # If hotspot mode is true, then do the work around
-    if available dhcpcd; then auxcli dhcpcd -s; fi
+    auxcli debug-printf "DEBUG (update): Running 'update_pi'.\n"
     sudo apt-get update && sudo apt-get upgrade -y
-    if available dhcpcd; then auxcli dhcpcd -u; fi
-
 }
 
 automatic_update_pi() {
     if ! jq -r '.autoupdate_pi' $config 1> /dev/null; then
-        echo "Enabling Automatic updates for your RaspberryPi (apt-get)."
+    auxcli debug-printf "DEBUG (update): Running 'automatic_update_pi'.\n"
+        printf "Enabling Automatic updates for your RaspberryPi (apt-get).\n"
         (
             crontab -l
             echo "@daily auxcli update -p"
@@ -212,7 +227,7 @@ automatic_update_pi() {
         jq '(.autoupdate_pi) = true' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
     else
-        echo "Disabling Automatic updates for your RaspberryPi (apt-get)."
+        printf "Disabling Automatic updates for your RaspberryPi (apt-get).\n"
         crontab -l | grep -v "auxcli update -p" | crontab -
         jq '(.autoupdate_pi) = false' $config | sudo tee $tmp 1> /dev/null
         sudo mv -f $tmp $config
@@ -221,12 +236,18 @@ automatic_update_pi() {
 }
 
 run_steps() {
+    auxcli debug-printf "DEBUG (update): DHCPCD set check.\n"
+    if auxcli available dhcpcd; then auxcli dhcpcd -s; fi
+
     if $update_aux; then update_aux; fi
     if $automatic_update_aux; then automatic_update_aux; fi
     if $update_cli; then update_cli; fi
     if $automatic_update_cli; then automatic_update_cli; fi
     if $update_pi; then update_pi; fi
     if $automatic_update_pi; then automatic_update_pi; fi
+
+    auxcli debug-printf "DEBUG (update): DHCPCD unset check.\n"
+    if auxcli available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 run_steps

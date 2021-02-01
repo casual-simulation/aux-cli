@@ -3,6 +3,7 @@ set -e
 
 # Temporarily add this dir to the path so we can use helper commands
 PATH=$PATH:/lib/auxcli/commands/helper
+auxcli debug-printf "DEBUG (reinstall): Config path: %s\n" "$config_reinstall"
 
 components_config="/etc/auxcli/components.json"
 components=($(jq -r '.[] | select( .installed != null) | .name' $components_config))
@@ -30,13 +31,15 @@ err_check() {
     # Show the usage menu if there aren't any arguments
     # or if the argument is "-h" or "--help"
     if [ $# -eq 0 ] || [ $1 == "-h" ] || [ $1 == "--help" ]; then
+    auxcli debug-printf "DEBUG (reinstall): First error check.\n"
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a component
+    auxcli debug-printf "DEBUG (reinstall): Second error check.\n"
     if [[ ! ${components[*]} =~ $1 ]]; then
-        printf "\n\"$1\" is not a valid component.\n"
+        printf "\n\"%s\" is not a valid component.\n" "$1"
         printf "Run 'auxcli reinstall -h' for help.\n\n"
         exit 1
     fi
@@ -51,12 +54,14 @@ err_check() {
 
 reinstall_component(){
     if available dhcpcd; then auxcli dhcpcd -s; fi
+    auxcli debug-printf "DEBUG (reinstall): DHCPCD set check.\n"
     while [[ $# -gt 0 ]]; do
         . /lib/auxcli/components/tool/$1/uninstall || . /lib/auxcli/components/hardware/$1/uninstall
         . /lib/auxcli/components/tool/$1/install || . /lib/auxcli/components/hardware/$1/install
         shift
     done
     if available dhcpcd; then auxcli dhcpcd -u; fi
+    auxcli debug-printf "DEBUG (reinstall): DHCPCD unset check.\n"
 }
 
 err_check "$@"

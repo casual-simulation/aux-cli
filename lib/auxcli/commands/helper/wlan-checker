@@ -1,11 +1,17 @@
 #!/bin/bash
 set -e
 
-echo "Checking for wlan1..."
 # Check if there is an extra wlan present and use it
+auxcli debug-printf "DEBUG (wlan-checker): Checking for wlan1...\n"
 if grep wlan1 /proc/net/dev; then
-    echo "Found wlan1. Changing default from wlan0..."
+    auxcli debug-printf "DEBUG (wlan-checker): Found wlan1. Changing default from wlan0...\n"
+
+    auxcli debug-printf "DEBUG (wlan-checker): Modifying /etc/dnsmasq.conf\n"
     sudo sed -i "s/^interface=wlan0/interface=wlan1/g" "/etc/dnsmasq.conf"
+
+    auxcli debug-printf "DEBUG (wlan-checker): Modifying /etc/hostapd/hostapd.conf\n"
     sudo sed -i "s/^interface=wlan0/interface=wlan1/g" "/etc/hostapd/hostapd.conf"
+
+    auxcli debug-printf "DEBUG (wlan-checker): Modifying /etc/dhcpcd.conf\n"
     sudo sed -i "s/^interface wlan0/interface wlan1/g" "/etc/dhcpcd.conf"
 fi
