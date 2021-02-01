@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+#### Commands can access any variables set in this file
+#### as long as they are run as an 'auxcli [command]'.
+
+#### Commands run with an absolute path will not have
+#### access to the variables. (This next debug-check as an example.)
+
+# Calling directly to avoid an infinite loop
 . /lib/auxcli/commands/helper/debug-check
 
 # Config paths
