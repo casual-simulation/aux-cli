@@ -57,14 +57,14 @@ err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments after `auxcli`
     # or if the command is "help"
-    auxcli debug-printf "DEBUG (auxcli): First error check.\n"
+    . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): First error check.\n"
     if [ $# -eq 0 ] || [ "$1" == "help" ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a command
-    auxcli debug-printf "DEBUG (auxcli): Second error check.\n"
+    . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Second error check.\n"
     if [[ ! ${commands[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid command.\n" "$1"
         printf "Run 'auxcli help' for help.\n\n"
@@ -73,7 +73,7 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the first argument isn't an available command
-    auxcli debug-printf "DEBUG (auxcli): Third error check.\n"
+    . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Third error check.\n"
     if ! . /lib/auxcli/commands/helper/available "$1"; then
         printf "\nThe \"%s\" command is not available. Install the correct component first.\n\n" "$1"
         exit 1
@@ -83,22 +83,22 @@ err_check() {
 run_cmd() {
     # Set the first argument to be the command and then shift past it
     command_path=$(jq --arg cmd "$1" -r '.[] | select( .name == $cmd ) | .command_path' $config_commands)
-    auxcli debug-printf "DEBUG (auxcli): The command path is %s.\n" "$command_path"
+    . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): The command path is %s.\n" "$command_path"
     shift
 
     # Add all other arguments to an array
     while [[ $# -gt 0 ]]; do
-        auxcli debug-printf "DEBUG (auxcli): Adding %s to the command argument array.\n" "$1"
+        . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Adding %s to the command argument array.\n" "$1"
         command_args+=("$1")
         shift
     done
 
     # If there are no arguments for the command, just run the command
     if [ ${#command_args[@]} -eq 0 ]; then
-        auxcli debug-printf "DEBUG (auxcli): Running command: %s\n" "${command_path}"
+        . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Running command: %s\n" "${command_path}"
         . "${command_path}"
     else
-        auxcli debug-printf "DEBUG (auxcli): Running command with args: %s %s\n" "${command_path}" "${command_args[*]}"
+        . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Running command with args: %s %s\n" "${command_path}" "${command_args[*]}"
         . "${command_path}" "${command_args[@]}"
     fi
 }
@@ -106,5 +106,5 @@ run_cmd() {
 err_check "$@"
 run_cmd "$@"
 
-auxcli debug-printf "DEBUG (auxcli): Checking reboot settings.\n"
+. /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Checking reboot settings.\n"
 . /lib/auxcli/commands/helper/reboot-apply
