@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 
+auxcli debug-printf "DEBUG (raspiwifi-uninstall): Uninstalling Raspiwifi.\n"
+
 # Set installed/available to false before we hit a reboot
+auxcli debug-printf "DEBUG (raspiwifi-uninstall): Writing to config files.\n"
 auxcli write "components" "raspiwifi" "installed" "false"
 auxcli write "commands" "dhcpcd" "available" "false"
 auxcli write "commands" "hotspot" "available" "false"
 
+auxcli debug-printf "DEBUG (raspiwifi-uninstall): Running uninstall script.\n"
 sudo python3 /usr/lib/raspiwifi/uninstall.py
