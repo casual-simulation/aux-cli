@@ -117,5 +117,6 @@ write_url(){
     printf "Configuring NFC with URL...\n"
     sudo python3 /lib/auxcli/modules/nfc-hat/nfc_write_url.py -u "$url"
 }
+
 if $config_wifi; then write_wifi; fi
 if $config_url; then write_url; fi

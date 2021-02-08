@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+# auxcli write [file] [OPTIONAL: command/component] [key] [value]
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
     commands)

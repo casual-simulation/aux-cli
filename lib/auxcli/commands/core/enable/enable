@@ -45,7 +45,7 @@ err_check() {
 
 enable_component(){
     while [[ $# -gt 0 ]]; do
-        auxcli debug-printf "DEBUG (enable): Disabling component: %s\n" "$1"
+        auxcli debug-printf "DEBUG (enable): Enabling component: %s\n" "$1"
         . /lib/auxcli/components/configuration/$1/enable
         shift
     done

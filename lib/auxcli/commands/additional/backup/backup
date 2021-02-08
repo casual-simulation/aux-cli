@@ -16,10 +16,9 @@ args=("${args_short[@]}" "${args_long[@]}")
 hostn=$(hostname)                              # Hostname of RaspberryPi
 filename="${hostn}-bkp.img"                    # Image name
 mountpoint="/mnt/usbstorage"                   # External Storage - Path
-log="/var/log/auxcli.pi.backup.log"           # Path to log file
+log="/var/log/auxcli.pi.backup.log"            # Path to log file
 filename_shrunk="${filename/.img/-shrunk.img}" # Image name shrunk
 overwrite="false"                              # Default overwriting files to false
-args=(-d --destination -f --filename -m --mountpoint -s --storage -l --log -S --shrink -Z --zip -o --overwrite -y -h -help --help)
 
 usage() {
     printf "\nUsage:    auxcli nfc [OPTIONS]\n\n"
@@ -154,6 +153,7 @@ dep_check() {
         fi
     done
 
+    # See if gzip works instead
     if [ "${zip}" == "true" ]; then
         if ! zip -h >/dev/null 2>&1; then
             echo "Zip is missing!"
