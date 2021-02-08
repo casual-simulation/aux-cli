@@ -4,48 +4,69 @@ set -e
 if [ -f /etc/auxcli/config.json ]; then
     debug=$(jq -r '.debug' /etc/auxcli/config.json) 
 else
-    debug=false
+    debug=true
 fi
 
 install_deps() {
+    if $debug; then "DEBUG (install.sh): Installing dependencies."; fi
     sudo apt-get install -y git jq
 }
 
 backup() {
+    if $debug; then "DEBUG (install.sh): Backing up install."; fi
     sudo mv -f /bin/auxcli /bin/auxcli-bkp
     sudo mv -f /lib/auxcli /lib/auxcli-bkp
     sudo mv -f /etc/auxcli /etc/auxcli-bkp
 }
 
 clone_repo() {
+    if $debug; then "DEBUG (install.sh): Cloning repo."; fi
     git clone --single-branch --branch 2.0.0 https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
     # git clone https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
 }
 
 deploy_files() {
+    if $debug; then "DEBUG (install.sh): Deploying files."; fi
     if [ ! -e /data/drives ]; then
+        if $debug; then "DEBUG (install.sh): /data/drives does not exist."; fi
+        if $debug; then "DEBUG (install.sh): Creating /data/drives"; fi
         sudo mkdir -p /data/drives
     fi
 
     if [ ! -e /srv ]; then
+        if $debug; then "DEBUG (install.sh): /srv does not exist."; fi
+        if $debug; then "DEBUG (install.sh): Creating /srv"; fi
         sudo mkdir /srv
     fi
     
+    if $debug; then "DEBUG (install.sh): Copying files into /data"; fi
     sudo cp -rf /home/pi/auxcli/data/* /data
+
+    if $debug; then "DEBUG (install.sh): Copying files into /srv"; fi
     sudo cp -rf /home/pi/auxcli/srv/* /srv
 
+    if $debug; then "DEBUG (install.sh): Copying files into /bin"; fi
     sudo cp -rf /home/pi/auxcli/bin/* /bin
+
+    if $debug; then "DEBUG (install.sh): Copying files into /lib"; fi
     sudo cp -rf /home/pi/auxcli/lib/* /lib
+
+    if $debug; then "DEBUG (install.sh): Copying files into /etc"; fi
     sudo cp -rf /home/pi/auxcli/etc/* /etc
 
 }
 
 enable_services(){
+    if $debug; then "DEBUG (install.sh): Enabling auxcli-web service."; fi
     sudo systemctl enable auxcli-web
+    
+    if $debug; then "DEBUG (install.sh): Starting auxcli-web service."; fi
     sudo systemctl start auxcli-web  
 }
 
 update_conf() {
+    if $debug; then "DEBUG (install.sh): Updating config files."; fi
+
     # Have a larger one-time use instead of making a process to check for installed/available
 
     # Find config files from these backups
@@ -133,18 +154,28 @@ update_conf() {
 
 cleanup() {
     if [ -e /home/pi/auxcli ]; then
+        if $debug; then "DEBUG (install.sh): /home/pi/auxcli exists."; fi
+        if $debug; then "DEBUG (install.sh): Removing /home/pi/auxcli"; fi
         sudo rm -rf /home/pi/auxcli
     fi
     if [ -e /home/pi/auxcli-bkp ]; then
+        if $debug; then "DEBUG (install.sh): /home/pi/auxcli-bkp exists."; fi
+        if $debug; then "DEBUG (install.sh): Removing /home/pi/auxcli-bkp"; fi
         sudo rm -rf /home/pi/auxcli-bkp
     fi
     if [ -e /bin/auxcli-bkp ]; then
+        if $debug; then "DEBUG (install.sh): /bin/auxcli-bkp exists."; fi
+        if $debug; then "DEBUG (install.sh): Removing /bin/auxcli-bkp"; fi
         sudo rm -rf /bin/auxcli-bkp
     fi
     if [ -e /lib/auxcli-bkp ]; then
+        if $debug; then "DEBUG (install.sh): /lib/auxcli-bkp exists."; fi
+        if $debug; then "DEBUG (install.sh): Removing /lib/auxcli-bkp"; fi
         sudo rm -rf /lib/auxcli-bkp
     fi
     if [ -e /etc/auxcli-bkp ]; then
+        if $debug; then "DEBUG (install.sh): /etc/auxcli-bkp exists."; fi
+        if $debug; then "DEBUG (install.sh): Removing /etc/auxcli-bkp"; fi
         sudo rm -rf /etc/auxcli-bkp
     fi
 }
