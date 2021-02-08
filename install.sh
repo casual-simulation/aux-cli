@@ -8,130 +8,130 @@ else
 fi
 
 install_deps() {
-    if $debug; then "DEBUG (install.sh): Installing dependencies."; fi
+    if $debug; then printf "DEBUG (install.sh): Installing dependencies.\n"; fi
     sudo apt-get install -y git jq
 }
 
 backup() {
-    if $debug; then "DEBUG (install.sh): Backing up install."; fi
+    if $debug; then printf "DEBUG (install.sh): Backing up install.\n"; fi
     sudo mv -f /bin/auxcli /bin/auxcli-bkp
     sudo mv -f /lib/auxcli /lib/auxcli-bkp
     sudo mv -f /etc/auxcli /etc/auxcli-bkp
 }
 
 clone_repo() {
-    if $debug; then "DEBUG (install.sh): Cloning repo."; fi
+    if $debug; then printf "DEBUG (install.sh): Cloning repo.\n"; fi
     git clone --single-branch --branch 2.0.0 https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
     # git clone https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
 }
 
 deploy_files() {
-    if $debug; then "DEBUG (install.sh): Deploying files."; fi
+    if $debug; then printf "DEBUG (install.sh): Deploying files.\n"; fi
     if [ ! -e /data/drives ]; then
-        if $debug; then "DEBUG (install.sh): /data/drives does not exist."; fi
-        if $debug; then "DEBUG (install.sh): Creating /data/drives"; fi
+        if $debug; then printf "DEBUG (install.sh): /data/drives does not exist.\n"; fi
+        if $debug; then printf "DEBUG (install.sh): Creating /data/drives\n"; fi
         sudo mkdir -p /data/drives
     fi
 
     if [ ! -e /srv ]; then
-        if $debug; then "DEBUG (install.sh): /srv does not exist."; fi
-        if $debug; then "DEBUG (install.sh): Creating /srv"; fi
+        if $debug; then printf "DEBUG (install.sh): /srv does not exist.\n"; fi
+        if $debug; then printf "DEBUG (install.sh): Creating /srv\n"; fi
         sudo mkdir /srv
     fi
     
-    if $debug; then "DEBUG (install.sh): Copying files into /data"; fi
+    if $debug; then printf "DEBUG (install.sh): Copying files into /data\n"; fi
     sudo cp -rf /home/pi/auxcli/data/* /data
 
-    if $debug; then "DEBUG (install.sh): Copying files into /srv"; fi
+    if $debug; then printf "DEBUG (install.sh): Copying files into /srv\n"; fi
     sudo cp -rf /home/pi/auxcli/srv/* /srv
 
-    if $debug; then "DEBUG (install.sh): Copying files into /bin"; fi
+    if $debug; then printf "DEBUG (install.sh): Copying files into /bin\n"; fi
     sudo cp -rf /home/pi/auxcli/bin/* /bin
 
-    if $debug; then "DEBUG (install.sh): Copying files into /lib"; fi
+    if $debug; then printf "DEBUG (install.sh): Copying files into /lib\n"; fi
     sudo cp -rf /home/pi/auxcli/lib/* /lib
 
-    if $debug; then "DEBUG (install.sh): Copying files into /etc"; fi
+    if $debug; then printf "DEBUG (install.sh): Copying files into /etc\n"; fi
     sudo cp -rf /home/pi/auxcli/etc/* /etc
 
 }
 
 enable_services(){
-    if $debug; then "DEBUG (install.sh): Enabling auxcli-web service."; fi
+    if $debug; then printf "DEBUG (install.sh): Enabling auxcli-web service.\n"; fi
     sudo systemctl enable auxcli-web
     
-    if $debug; then "DEBUG (install.sh): Starting auxcli-web service."; fi
+    if $debug; then printf "DEBUG (install.sh): Starting auxcli-web service.\n"; fi
     sudo systemctl start auxcli-web  
 }
 
 update_conf() {
-    if $debug; then "DEBUG (install.sh): Updating config files."; fi
+    if $debug; then printf "DEBUG (install.sh): Updating config files.\n"; fi
 
     # Have a larger one-time use instead of making a process to check for installed/available
 
     # Find config files from these backups
     for bkp_config in $(find /lib/auxcli-bkp /etc/auxcli-bkp -name '*.json'); do 
 
-        if $debug; then "\nDEBUG (install.sh): Backup config file:\t%s.\n" "${bkp_config}"; fi
+        if $debug; then printf "\nDEBUG (install.sh): Backup config file:\t%s.\n" "${bkp_config}"; fi
 
         # Get the new_config from modifying the bkp_config
         new_config="${bkp_config/auxcli-bkp/auxcli}"
-        if $debug; then "DEBUG (install.sh): New config file:\t\t%s.\n" "${new_config}"; fi
+        if $debug; then printf "DEBUG (install.sh): New config file:\t\t%s.\n" "${new_config}"; fi
 
         tmp="$new_config.tmp"
-        if $debug; then "DEBUG (install.sh): Temp config file:\t%s.\n" "${tmp}"; fi
+        if $debug; then printf "DEBUG (install.sh): Temp config file:\t%s.\n" "${tmp}"; fi
 
         if [ $new_config == "/etc/auxcli/commands.json" ]; then
 
-            if $debug; then "DEBUG (install.sh): Updating commands.json\n"; fi
+            if $debug; then printf "DEBUG (install.sh): Updating commands.json\n"; fi
 
             # Get array of available things
             available=($(jq -r '.[] | select(.available == true) | .name' $bkp_config)) 
-            if $debug; then "DEBUG (install.sh): Available commands from bkp_config: %s\n" "${available[*]}"; fi
+            if $debug; then printf "DEBUG (install.sh): Available commands from bkp_config: %s\n" "${available[*]}"; fi
 
             # Write those to the new config
             for command in "${available[@]}"; do
-                if $debug; then "DEBUG (install.sh): Setting command %s to available in the new_config.\n" "${command}"; fi
+                if $debug; then printf "DEBUG (install.sh): Setting command %s to available in the new_config.\n" "${command}"; fi
                 jq --arg com "$command" '(.[] | select( .name == $com ) | .available) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
 
         elif [ $new_config == "/etc/auxcli/components.json" ]; then
 
-            if $debug; then "DEBUG (install.sh): Updating components.json\n"; fi
+            if $debug; then printf "DEBUG (install.sh): Updating components.json\n"; fi
 
             # Get array of installed things
             installed=($(jq '.[] | select(.installed == true) | .name' $bkp_config)) 
-            if $debug; then "DEBUG (install.sh): Installed components from bkp_config: %s\n" "${installed[*]}"; fi
+            if $debug; then printf "DEBUG (install.sh): Installed components from bkp_config: %s\n" "${installed[*]}"; fi
             enabled=($(jq '.[] | select(.enabled == true) | .name' $bkp_config))  
-            if $debug; then "DEBUG (install.sh): Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
+            if $debug; then printf "DEBUG (install.sh): Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
             disabled=($(jq '.[] | select(.enabled == false) | .name' $bkp_config)) 
-            if $debug; then "DEBUG (install.sh): Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
+            if $debug; then printf "DEBUG (install.sh): Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
 
             # Write those to the new config
             for component in "${installed[@]}"; do
-                if $debug; then "DEBUG (install.sh): Setting component %s to installed in the new_config.\n" "${component}"; fi
+                if $debug; then printf "DEBUG (install.sh): Setting component %s to installed in the new_config.\n" "${component}"; fi
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
             for component in "${enabled[@]}"; do
-                if $debug; then "DEBUG (install.sh): Setting component %s to enabled in the new_config.\n" "${component}"; fi
+                if $debug; then printf "DEBUG (install.sh): Setting component %s to enabled in the new_config.\n" "${component}"; fi
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
             for component in "${disabled[@]}"; do
-                if $debug; then "DEBUG (install.sh): Setting component %s to disabled in the new_config.\n" "${component}"; fi
+                if $debug; then printf "DEBUG (install.sh): Setting component %s to disabled in the new_config.\n" "${component}"; fi
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
 
         elif [ $new_config == "/etc/auxcli/config.json" ]; then
 
-            if $debug; then "DEBUG (install.sh): Updating config.json\n"; fi
+            if $debug; then printf "DEBUG (install.sh): Updating config.json\n"; fi
 
             # Get new version number
             new_ver=$(jq -r '.version' $new_config)
-            if $debug; then "DEBUG (install.sh): New Version is %s.\n" "${new_ver}"; fi
+            if $debug; then printf "DEBUG (install.sh): New Version is %s.\n" "${new_ver}"; fi
 
             # Merge
             jq -s '.[0] * .[1]' $new_config $bkp_config | sudo tee $tmp 1> /dev/null
@@ -154,28 +154,28 @@ update_conf() {
 
 cleanup() {
     if [ -e /home/pi/auxcli ]; then
-        if $debug; then "DEBUG (install.sh): /home/pi/auxcli exists."; fi
-        if $debug; then "DEBUG (install.sh): Removing /home/pi/auxcli"; fi
+        if $debug; then printf "DEBUG (install.sh): /home/pi/auxcli exists.\n"; fi
+        if $debug; then printf "DEBUG (install.sh): Removing /home/pi/auxcli\n"; fi
         sudo rm -rf /home/pi/auxcli
     fi
     if [ -e /home/pi/auxcli-bkp ]; then
-        if $debug; then "DEBUG (install.sh): /home/pi/auxcli-bkp exists."; fi
-        if $debug; then "DEBUG (install.sh): Removing /home/pi/auxcli-bkp"; fi
+        if $debug; then printf "DEBUG (install.sh): /home/pi/auxcli-bkp exists.\n"; fi
+        if $debug; then printf "DEBUG (install.sh): Removing /home/pi/auxcli-bkp\n"; fi
         sudo rm -rf /home/pi/auxcli-bkp
     fi
     if [ -e /bin/auxcli-bkp ]; then
-        if $debug; then "DEBUG (install.sh): /bin/auxcli-bkp exists."; fi
-        if $debug; then "DEBUG (install.sh): Removing /bin/auxcli-bkp"; fi
+        if $debug; then printf "DEBUG (install.sh): /bin/auxcli-bkp exists.\n"; fi
+        if $debug; then printf "DEBUG (install.sh): Removing /bin/auxcli-bkp\n"; fi
         sudo rm -rf /bin/auxcli-bkp
     fi
     if [ -e /lib/auxcli-bkp ]; then
-        if $debug; then "DEBUG (install.sh): /lib/auxcli-bkp exists."; fi
-        if $debug; then "DEBUG (install.sh): Removing /lib/auxcli-bkp"; fi
+        if $debug; then printf "DEBUG (install.sh): /lib/auxcli-bkp exists.\n"; fi
+        if $debug; then printf "DEBUG (install.sh): Removing /lib/auxcli-bkp\n"; fi
         sudo rm -rf /lib/auxcli-bkp
     fi
     if [ -e /etc/auxcli-bkp ]; then
-        if $debug; then "DEBUG (install.sh): /etc/auxcli-bkp exists."; fi
-        if $debug; then "DEBUG (install.sh): Removing /etc/auxcli-bkp"; fi
+        if $debug; then printf "DEBUG (install.sh): /etc/auxcli-bkp exists.\n"; fi
+        if $debug; then printf "DEBUG (install.sh): Removing /etc/auxcli-bkp\n"; fi
         sudo rm -rf /etc/auxcli-bkp
     fi
 }
