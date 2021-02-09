@@ -26,8 +26,8 @@ readarray -t commands < <(jq -r '.[] | select( .available != null) | .name' $con
 readarray -t commands_desc < <(jq -r '.[] | select( .available != null) | .short_desc' $config_commands)
 
 # Component information
-readarray -t components < <(jq -r '.[] | select( .installed != null) | .name' $config_components)
-readarray -t components_desc < <(jq -r '.[] | select( .installed != null) | .short_desc' $config_components)
+readarray -t components < <(jq -r '.[] | .name' $config_components)
+readarray -t components_desc < <(jq -r '.[] | .short_desc' $config_components)
 readarray -t configuration < <(jq -r '.[] | select(.type == "configuration") | .name' $config_components)
 readarray -t hardware < <(jq -r '.[] | select(.type == "hardware") | .name' $config_components)
 readarray -t tool < <(jq -r '.[] | select(.type == "tool") | .name' $config_components)
