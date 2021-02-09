@@ -6,8 +6,8 @@ config_nfc=$(jq -r '.[] | select( .name == "nfc" ) | .config_path' $config_comma
 auxcli debug-printf "DEBUG (nfc): Config path: %s\n" "$config_nfc"
 
 # Arguments for nfc
-readarray -t args_short < <(q -r '.[].arg_short' $config_nfc)
-readarray -t args_long < <(q -r '.[].arg_long' $config_nfc)
+readarray -t args_short < <(jq -r '.[].arg_short' $config_nfc)
+readarray -t args_long < <(jq -r '.[].arg_long' $config_nfc)
 readarray -t args_desc < <(jq '.[].short_desc' $config_nfc)
 readarray -t defaults < <(jq '.[].default' $config_nfc)
 args=("${args_short[@]}" "${args_long[@]}")

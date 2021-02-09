@@ -6,8 +6,8 @@ config_changehost=$(jq -r '.[] | select( .name == "changehost" ) | .config_path'
 auxcli debug-printf "DEBUG (changehost): Config path: %s\n" "$config_changehost"
 
 # Arguments for changehost
-readarray -t args_short < <(q -r '.[].arg_short' $config_changehost)
-readarray -t args_long < <(q -r '.[].arg_long' $config_changehost)
+readarray -t args_short < <(jq -r '.[].arg_short' $config_changehost)
+readarray -t args_long < <(jq -r '.[].arg_long' $config_changehost)
 readarray -t args_desc < <(jq '.[].short_desc' $config_changehost)
 args=("${args_short[@]}" "${args_long[@]}")
 

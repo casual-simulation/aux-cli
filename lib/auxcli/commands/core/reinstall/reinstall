@@ -6,8 +6,8 @@ config_reinstall=$(jq -r '.[] | select( .name == "reinstall" ) | .config_path' $
 auxcli debug-printf "DEBUG (reinstall): Config path: %s\n" "$config_reinstall"
 
 # Arguments for reinstall
-readarray -t args_short < <(q -r '.[].arg_short' $config_reinstall)
-readarray -t args_long < <(q -r '.[].arg_long' $config_reinstall)
+readarray -t args_short < <(jq -r '.[].arg_short' $config_reinstall)
+readarray -t args_long < <(jq -r '.[].arg_long' $config_reinstall)
 readarray -t args_desc < <(jq '.[].short_desc' $config_reinstall)
 args=("${args_short[@]}" "${args_long[@]}")
 

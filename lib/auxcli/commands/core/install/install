@@ -6,8 +6,8 @@ config_install=$(jq -r '.[] | select( .name == "install" ) | .config_path' $conf
 auxcli debug-printf "DEBUG (install): Config path: %s\n" "$config_install"
 
 # Arguments for install
-readarray -t args_short < <(q -r '.[].arg_short' $config_install)
-readarray -t args_long < <(q -r '.[].arg_long' $config_install)
+readarray -t args_short < <(jq -r '.[].arg_short' $config_install)
+readarray -t args_long < <(jq -r '.[].arg_long' $config_install)
 readarray -t args_desc < <(jq '.[].short_desc' $config_install)
 args=("${args_short[@]}" "${args_long[@]}")
 

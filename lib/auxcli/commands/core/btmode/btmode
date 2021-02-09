@@ -6,8 +6,8 @@ config_btmode=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' $config
 auxcli debug-printf "DEBUG (btmode): Config path: %s\n" "$config_btmode"
 
 # Arguments for btmode
-readarray -t args_short < <(q -r '.[].arg_short' $config_btmode)
-readarray -t args_long < <(q -r '.[].arg_long' $config_btmode)
+readarray -t args_short < <(jq -r '.[].arg_short' $config_btmode)
+readarray -t args_long < <(jq -r '.[].arg_long' $config_btmode)
 readarray -t args_desc < <(jq '.[].short_desc' $config_btmode)
 args=("${args_short[@]}" "${args_long[@]}")
 
