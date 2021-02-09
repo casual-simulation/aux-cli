@@ -34,7 +34,7 @@ err_check() {
     # Check to see if the arguments include everything
     . $path_to_helper/debug-printf "DEBUG (install): Everything check.\n"
     if [[ "everything" == "$1" ]]; then
-        exit 1
+        exit 0
     fi
 
     # First error check
