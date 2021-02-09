@@ -27,7 +27,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (changehost): First error check."
+    . $path_to_helper/debug-printf "DEBUG (changehost): First error check.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument to change the hostname.\n"
         usage
@@ -35,7 +35,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (changehost): Second error check."
+    . $path_to_helper/debug-printf "DEBUG (changehost): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli changehost -h for help.\n\n"
@@ -51,14 +51,14 @@ set_hostname() {
     if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
         printf "\n\"%s\" is an invalid argument for \"%s\".\n" "$2" "$1"
         printf "Run auxcli changehost -h for help.\n\n"
-        exit 1
+        return 1
     fi
 
     # Check if new hostname is different
     . $path_to_helper/debug-printf "DEBUG (changehost): Hostname different check.\n"
     if [ "$host" == "$2" ]; then
         printf "Your hostname is already %s.\n" "$2"
-        exit 1
+        return 1
     fi
 
     if hostnamectl >/dev/null 2>&1; then
@@ -93,7 +93,7 @@ set_hostname() {
     else
         printf "Hostname was not changed. Your version of UNIX might not be currently supported.\n"
         . $path_to_helper/debug-printf "DEBUG (changehost): Setting 'changed' to 'false'.\n"
-        exit 1
+        return 1
     fi
 }
 
