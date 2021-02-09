@@ -3,8 +3,8 @@ set -e
 
 if $(jq --arg command "$1" -r '.[] | select( .name == $command ) | .available' /etc/auxcli/commands.json); then
     . /lib/auxcli/commands/helper/debug-printf "DEBUG (available): %s is available.\n" "$1"
-    exit 0
+    return 0
 else
     . /lib/auxcli/commands/helper/debug-printf "DEBUG (available): %s is not available.\n" "$1"
-    exit 1
+    return 1
 fi
