@@ -7,7 +7,8 @@ set -e
 #### Commands run with an absolute path will not have
 #### access to the variables. (This next debug-check as an example.)
 
-path_helper="/lib/auxcli/commands/helper"
+#### Call all helper commands directly to avoid confusing looping
+path_to_helper="/lib/auxcli/commands/helper"
 . $path_to_helper/debug-check
 
 # Config paths
