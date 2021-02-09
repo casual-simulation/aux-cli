@@ -108,7 +108,7 @@ run_cmd "$@"
 
 . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Checking reboot settings.\n"
 . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): Only applying reboot if current command potentially requires one.\n"
-if auxcli requires-reboot $1; then
+if /lib/auxcli/commands/helper/auxcli requires-reboot $1; then
     . /lib/auxcli/commands/helper/debug-printf "DEBUG (auxcli): %s potentially requires a reboot.\n" "$1"
     . /lib/auxcli/commands/helper/reboot-apply
 fi
