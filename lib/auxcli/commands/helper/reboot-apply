@@ -7,12 +7,12 @@ if $(jq -r '.reboot_required' /etc/auxcli/config.json); then
     if $(jq -r '.reboot_on_exit' /etc/auxcli/config.json); then
         . $path_to_helper/debug-printf "DEBUG (reboot-apply): Rebooting now.\n"
         sudo reboot now
-    else
-        read -rep $'Press "y" to reboot now or press anything else to wait.\n' -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            . $path_to_helper/debug-printf "DEBUG (reboot-apply): Rebooting now.\n"
-            sudo reboot now
-        fi
+    # else
+    #     read -rep $'Press "y" to reboot now or press anything else to wait.\n' -n 1 -r
+    #     if [[ $REPLY =~ ^[Yy]$ ]]; then
+    #         . $path_to_helper/debug-printf "DEBUG (reboot-apply): Rebooting now.\n"
+    #         sudo reboot now
+    #     fi
     fi
 else
     . $path_to_helper/debug-printf "DEBUG (reboot-apply): No reboot required.\n"

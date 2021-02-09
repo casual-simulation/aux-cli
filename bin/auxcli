@@ -108,8 +108,4 @@ err_check "$@"
 run_cmd "$@"
 
 . $path_to_helper/debug-printf "DEBUG (auxcli): Checking reboot settings.\n"
-. $path_to_helper/debug-printf "DEBUG (auxcli): Only applying reboot if current command potentially requires one.\n"
-if . $path_to_helper/requires-reboot $1; then
-    . $path_to_helper/debug-printf "DEBUG (auxcli): %s potentially requires a reboot.\n" "$1"
-    . $path_to_helper/reboot-apply
-fi
+. $path_to_helper/reboot-apply
