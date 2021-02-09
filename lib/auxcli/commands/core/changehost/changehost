@@ -51,14 +51,14 @@ set_hostname() {
     if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
         printf "\n\"%s\" is an invalid argument for \"%s\".\n" "$2" "$1"
         printf "Run auxcli changehost -h for help.\n\n"
-        return 1
+        exit 1
     fi
 
     # Check if new hostname is different
     . $path_to_helper/debug-printf "DEBUG (changehost): Hostname different check.\n"
     if [ "$host" == "$2" ]; then
         printf "Your hostname is already %s.\n" "$2"
-        return 0
+        exit 0
     fi
 
     if hostnamectl >/dev/null 2>&1; then
@@ -93,7 +93,7 @@ set_hostname() {
     else
         printf "Hostname was not changed. Your version of UNIX might not be currently supported.\n"
         . $path_to_helper/debug-printf "DEBUG (changehost): Setting 'changed' to 'false'.\n"
-        return 1
+        exit 1
     fi
 }
 
