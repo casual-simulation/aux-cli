@@ -3,7 +3,7 @@
     "autoupdate_aux": false,
     "autoupdate_cli": false,
     "autoupdate_pi": false,
-    "debug": false,
+    "debug": true,
     "btmode": "none",
     "reboot_required": false,
     "reboot_on_exit": false

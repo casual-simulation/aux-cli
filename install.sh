@@ -56,7 +56,7 @@ deploy_files() {
 
 }
 
-enable_services(){
+enable_services() {
     if $debug; then printf "DEBUG (install.sh): Enabling auxcli-web service.\n"; fi
     sudo systemctl enable auxcli-web
     
