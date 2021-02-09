@@ -30,6 +30,13 @@ usage() {
 }
 
 err_check() {
+    # Everything check
+    # Check to see if the arguments include everything
+    auxcli debug-printf "DEBUG (install): Everything check.\n"
+    if [[ "everything" == "$1" ]]; then
+        exit 1
+    fi
+
     # First error check
     # Show the usage menu if there aren't any arguments
     auxcli debug-printf "DEBUG (install): First error check.\n"
