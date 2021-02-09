@@ -3,7 +3,7 @@ set -e
 
 # Config path for update
 config_update=$(jq -r '.[] | select( .name == "update" ) | .config_path' $config_commands)
-auxcli debug-printf "DEBUG (update): Config path: %s\n" "$config_update"
+. $path_to_helper/debug-printf "DEBUG (update): Config path: %s\n" "$config_update"
 
 # Arguments for update
 readarray -t args_short < <(jq -r '.[].arg_short' $config_update)
@@ -31,7 +31,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    auxcli debug-printf "DEBUG (update): First error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): First error check.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -39,7 +39,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    auxcli debug-printf "DEBUG (update): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli update -h for help.\n\n"
@@ -53,37 +53,37 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
 
     -a | --aux)
-        auxcli debug-printf "DEBUG (update): Setting 'update_aux' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_aux' to 'true'.\n"
         update_aux=true
         shift # past argument
         ;;
     -A | --aux-auto)
-        auxcli debug-printf "DEBUG (update): Setting 'automatic_update_aux' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_aux' to 'true'.\n"
         automatic_update_aux=true
         shift # past argument
         ;;
     -c | --cli)
-        auxcli debug-printf "DEBUG (update): Setting 'update_cli' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_cli' to 'true'.\n"
         update_cli=true
         shift # past argument
         ;;
     -C | --cli-auto)
-        auxcli debug-printf "DEBUG (update): Setting 'automatic_update_cli' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_cli' to 'true'.\n"
         automatic_update_cli=true
         shift # past argument
         ;;
     -p | --pi)
-        auxcli debug-printf "DEBUG (update): Setting 'update_pi' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_pi' to 'true'.\n"
         update_pi=true
         shift # past argument
         ;;
     -P | --pi-auto)
-        auxcli debug-printf "DEBUG (update): Setting 'automatic_update_pi' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_pi' to 'true'.\n"
         automatic_update_pi=true
         shift # past argument
         ;;
     -y)
-        auxcli debug-printf "DEBUG (update): Setting 'agree' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'agree' to 'true'.\n"
         agree=true
         shift # past argument
         ;;
@@ -96,7 +96,7 @@ done
 
 vercomp () {
     if [[ $1 == $2 ]]; then
-        auxcli debug-printf "DEBUG (update): Version numbers are the same.\n"
+        . $path_to_helper/debug-printf "DEBUG (update): Version numbers are the same.\n"
         return 1
     fi
     local IFS=.
@@ -111,11 +111,11 @@ vercomp () {
             ver2[i]=0
         fi
         if ((10#${ver1[i]} > 10#${ver2[i]})); then
-            auxcli debug-printf "DEBUG (update): New Version number is higher.\n"
+            . $path_to_helper/debug-printf "DEBUG (update): New Version number is higher.\n"
             return 0
         fi
         if ((10#${ver1[i]} < 10#${ver2[i]})); then
-            auxcli debug-printf "DEBUG (update): New Version number is lower.\n"
+            . $path_to_helper/debug-printf "DEBUG (update): New Version number is lower.\n"
             return 1
         fi
     done
@@ -124,28 +124,28 @@ vercomp () {
 
 version_check() {
     printf "Checking for newer versions of AUXCLI...\n"
-    auxcli debug-printf "DEBUG (update): CURL the latest config.json\n"
+    . $path_to_helper/debug-printf "DEBUG (update): CURL the latest config.json\n"
     curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/etc/auxcli/config.json --output /home/pi/config.json
 
     new_version=$(jq -r '.version' /home/pi/config.json) 
     old_version=$(jq -r '.version' $config_main)
-    auxcli debug-printf "DEBUG (update): New Version: %s\n" "$new_version"
-    auxcli debug-printf "DEBUG (update): Old Version: %s\n" "$old_version"
+    . $path_to_helper/debug-printf "DEBUG (update): New Version: %s\n" "$new_version"
+    . $path_to_helper/debug-printf "DEBUG (update): Old Version: %s\n" "$old_version"
     sudo rm -rf /home/pi/config.json
 
-    auxcli debug-printf "DEBUG (update): Compare version numbers.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Compare version numbers.\n"
     if vercomp $new_version $old_version; then
-        printf "There is a newer version of AUXCLI available.\n"
+        printf "There is a newer version of . $path_to_helper/available.\n"
         if $agree; then
-            auxcli debug-printf "DEBUG (update): Auto-agree was set.\n"
+            . $path_to_helper/debug-printf "DEBUG (update): Auto-agree was set.\n"
             return 0
         else
             read -rep $'Press "y" to update now, or press anything else to exit.\n' -n 1 -r
             if [[ $REPLY =~ ^[Yy]$ ]]; then
-                auxcli debug-printf "DEBUG (update): Agreed.\n"
+                . $path_to_helper/debug-printf "DEBUG (update): Agreed.\n"
                 return 0
             else
-                auxcli debug-printf "DEBUG (update): Disagreed.\n"
+                . $path_to_helper/debug-printf "DEBUG (update): Disagreed.\n"
                 return 1
             fi
         fi
@@ -156,78 +156,78 @@ version_check() {
 }
 
 update_aux() {
-    auxcli debug-printf "DEBUG (update): Running 'update_aux'.\n"
-    auxcli debug-printf "DEBUG (update): CURL the latest docker-compose.arm32.yml.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Running 'update_aux'.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): CURL the latest docker-compose.arm32.yml.\n"
     sudo curl https://raw.githubusercontent.com/casual-simulation/aux/master/docker/docker-compose.arm32.yml --output /home/pi/docker-compose.yml
     docker-compose -f /home/pi/docker-compose.yml pull && docker-compose -f /home/pi/docker-compose.yml up -d
 }
 
 automatic_update_aux() {
-    auxcli debug-printf "DEBUG (update): Running 'automatic_update_aux'.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Running 'automatic_update_aux'.\n"
     if ! jq -r '.autoupdate_aux' $config_main 1> /dev/null; then
         printf "Enabling Automatic updates for AUX.\n"
         (
             crontab -l
             echo "@daily auxcli update -a"
         ) | crontab -
-        auxcli write "config" "autoupdate_aux" "true"
+        . $path_to_helper/write "config" "autoupdate_aux" "true"
     else
         printf "Disabling Automatic updates for AUX.\n"
         crontab -l | grep -v "auxcli update -a" | crontab -
-        auxcli write "config" "autoupdate_aux" "false"
+        . $path_to_helper/write "config" "autoupdate_aux" "false"
     fi
 }
 
 update_cli() {
-    auxcli debug-printf "DEBUG (update): Running 'update_cli'.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Running 'update_cli'.\n"
     if version_check; then
-        auxcli debug-printf "DEBUG (update): CURL the latest config.json\n"
+        . $path_to_helper/debug-printf "DEBUG (update): CURL the latest config.json\n"
         curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/install.sh --output install.sh && sudo bash install.sh
         sudo rm -rf install.sh
     fi
 }
 
 automatic_update_cli() {
-    auxcli debug-printf "DEBUG (update): Running 'automatic_update_cli'.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Running 'automatic_update_cli'.\n"
     if ! jq -r '.autoupdate_cli' $config_main 1> /dev/null; then
         printf "Enabling Automatic updates for AUXCLI.\n"
         (
             crontab -l
             echo "@hourly auxcli update -c -y"
         ) | crontab -
-        auxcli write "config" "autoupdate_cli" "true"
+        . $path_to_helper/write "config" "autoupdate_cli" "true"
     else
         printf "Disabling Automatic updates for AUXCLI.\n"
         crontab -l | grep -v "auxcli update -c -y" | crontab -
-        auxcli write "config" "autoupdate_cli" "false"
+        . $path_to_helper/write "config" "autoupdate_cli" "false"
     fi
 }
 
 update_pi() {
-    auxcli debug-printf "DEBUG (update): Running 'update_pi'.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Running 'update_pi'.\n"
     sudo apt-get update && sudo apt-get upgrade -y
 }
 
 automatic_update_pi() {
-    auxcli debug-printf "DEBUG (update): Running 'automatic_update_pi'.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Running 'automatic_update_pi'.\n"
     if ! jq -r '.autoupdate_pi' $config_main 1> /dev/null; then
         printf "Enabling Automatic updates for your RaspberryPi (apt-get).\n"
         (
             crontab -l
             echo "@daily auxcli update -p"
         ) | crontab -
-        auxcli write "config" "autoupdate_pi" "true"
+        . $path_to_helper/write "config" "autoupdate_pi" "true"
     else
         printf "Disabling Automatic updates for your RaspberryPi (apt-get).\n"
         crontab -l | grep -v "auxcli update -p" | crontab -
-        auxcli write "config" "autoupdate_pi" "false"
+        . $path_to_helper/write "config" "autoupdate_pi" "false"
     fi
 
 }
 
 run_steps() {
-    auxcli debug-printf "DEBUG (update): DHCPCD set check.\n"
-    if auxcli available dhcpcd; then auxcli dhcpcd -s; fi
+    . $path_to_helper/debug-printf "DEBUG (update): DHCPCD set check.\n"
+    if . $path_to_helper/available dhcpcd; then auxcli dhcpcd -s; fi
 
     if $update_aux; then update_aux; fi
     if $automatic_update_aux; then automatic_update_aux; fi
@@ -236,8 +236,8 @@ run_steps() {
     if $update_pi; then update_pi; fi
     if $automatic_update_pi; then automatic_update_pi; fi
 
-    auxcli debug-printf "DEBUG (update): DHCPCD unset check.\n"
-    if auxcli available dhcpcd; then auxcli dhcpcd -u; fi
+    . $path_to_helper/debug-printf "DEBUG (update): DHCPCD unset check.\n"
+    if . $path_to_helper/available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 run_steps

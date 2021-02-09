@@ -3,7 +3,7 @@ set -e
 
 # Config path for uninstall
 config_uninstall=$(jq -r '.[] | select( .name == "uninstall" ) | .config_path' $config_commands)
-auxcli debug-printf "DEBUG (uninstall): Config path: %s\n" "$config_uninstall"
+. $path_to_helper/debug-printf "DEBUG (uninstall): Config path: %s\n" "$config_uninstall"
 
 # Arguments for uninstall
 readarray -t args_short < <(jq -r '.[].arg_short' $config_uninstall)
@@ -16,7 +16,7 @@ usage() {
     printf "Uninstall additional components of auxcli.\n\n"
     printf "COMPONENTS:\n"
     for ((i = 0; i < ${#components[@]}; i++)); do
-        if auxcli installed ${components[$i]}; then
+        if . $path_to_helper/installed ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
@@ -32,14 +32,14 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    auxcli debug-printf "DEBUG (uninstall): First error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (uninstall): First error check.\n"
     if [ $# -eq 0 ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a component
-    auxcli debug-printf "DEBUG (uninstall): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (uninstall): Second error check.\n"
     if [[ ! ${components[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component.\n" "$1"
         printf "Run 'auxcli uninstall -h' for help.\n\n"
@@ -48,7 +48,7 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the first argument isn't valid
-    auxcli debug-printf "DEBUG (install): Third error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (install): Third error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid argument.\n" "$1"
         printf "Run 'auxcli install -h' for help.\n\n"
@@ -57,40 +57,40 @@ err_check() {
 
     # Fourth error check
     # Throw an error messege if the component is already installed
-    auxcli debug-printf "DEBUG (install): Fourth error check.\n"
-    if ! auxcli installed "$1"; then
+    . $path_to_helper/debug-printf "DEBUG (install): Fourth error check.\n"
+    if ! . $path_to_helper/installed "$1"; then
         printf "\nThe \"%s\" component isn't installed.\n\n" "$1"
         exit 1
     fi
 }
 
 uninstall_component(){
-    auxcli debug-printf "DEBUG (uninstall): DHCPCD set check.\n"
-    if auxcli available dhcpcd; then auxcli dhcpcd -s; fi
+    . $path_to_helper/debug-printf "DEBUG (uninstall): DHCPCD set check.\n"
+    if . $path_to_helper/available dhcpcd; then auxcli dhcpcd -s; fi
     while [[ $# -gt 0 ]]; do
-        if auxcli requires-reboot "$1"; then
-            auxcli debug-printf "DEBUG (uninstall): %s requires a reboot.\n" "$1"
-            auxcli debug-printf "DEBUG (uninstall): Setting reboot_required to 'true'\n"
-            auxcli write "config" "reboot_required" "true"
+        if . $path_to_helper/requires-reboot "$1"; then
+            . $path_to_helper/debug-printf "DEBUG (uninstall): %s requires a reboot.\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (uninstall): Setting reboot_required to 'true'\n"
+            . $path_to_helper/write "config" "reboot_required" "true"
         fi
         if [[ ${hardware[*]} =~ $1 ]]; then
-            auxcli debug-printf "DEBUG (uninstall): %s is a 'hardware' component.\n" "$1"
-            auxcli debug-printf "DEBUG (uninstall): Uninstalling: %s...\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (uninstall): %s is a 'hardware' component.\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (uninstall): Uninstalling: %s...\n" "$1"
             . /lib/auxcli/components/hardware/$1/uninstall
         fi
         if [[ ${tool[*]} =~ $1 ]]; then
-            auxcli debug-printf "DEBUG (uninstall): %s is a 'tool' component.\n" "$1"
-            auxcli debug-printf "DEBUG (uninstall): Uninstalling: %s...\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (uninstall): %s is a 'tool' component.\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (uninstall): Uninstalling: %s...\n" "$1"
             . /lib/auxcli/components/tool/$1/uninstall
         fi
         shift
     done
-    auxcli debug-printf "DEBUG (uninstall): DHCPCD unset check.\n"
-    if auxcli available dhcpcd; then auxcli dhcpcd -u; fi
+    . $path_to_helper/debug-printf "DEBUG (uninstall): DHCPCD unset check.\n"
+    if . $path_to_helper/available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 uninstall_everything(){
-    auxcli debug-printf "DEBUG (uninstall): Uninstalling everything...\n"
+    . $path_to_helper/debug-printf "DEBUG (uninstall): Uninstalling everything...\n"
     uninstall_component "${tool[@]}"
 }
 
@@ -103,8 +103,8 @@ while [[ $# -gt 0 ]]; do
         shift # past argument
         ;;
     -r | --reboot)
-        auxcli debug-printf "DEBUG (uninstall): Setting reboot_on_exit to 'true'\n"
-        auxcli write "config" "reboot_on_exit" "true"
+        . $path_to_helper/debug-printf "DEBUG (uninstall): Setting reboot_on_exit to 'true'\n"
+        . $path_to_helper/write "config" "reboot_on_exit" "true"
         shift # past argument
         ;;
     -h | -help | --help)

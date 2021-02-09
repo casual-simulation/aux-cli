@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 
-auxcli debug-printf "DEBUG (conf): Opening auxcli config.json\n"
+. $path_to_helper/debug-printf "DEBUG (conf): Opening auxcli config.json\n"
 sudo nano /etc/auxcli/config.json

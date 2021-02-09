@@ -3,7 +3,7 @@ set -e
 
 # Config path for btmode
 config_btmode=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' $config_commands)
-auxcli debug-printf "DEBUG (btmode): Config path: %s\n" "$config_btmode"
+. $path_to_helper/debug-printf "DEBUG (btmode): Config path: %s\n" "$config_btmode"
 
 # Arguments for btmode
 readarray -t args_short < <(jq -r '.[].arg_short' $config_btmode)
@@ -12,7 +12,7 @@ readarray -t args_desc < <(jq '.[].short_desc' $config_btmode)
 args=("${args_short[@]}" "${args_long[@]}")
 
 previous_mode=$(jq -r '.btmode' $config_main)
-auxcli debug-printf "DEBUG (btmode): Previous mode: %s\n" "$previous_mode"
+. $path_to_helper/debug-printf "DEBUG (btmode): Previous mode: %s\n" "$previous_mode"
 
 usage() {
     printf "\nUsage:    auxcli btmode [OPTIONS]\n\n"
@@ -27,7 +27,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    auxcli debug-printf "DEBUG (btmode): First error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (btmode): First error check.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument to change the bluetooth mode.\n"
         usage
@@ -35,7 +35,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    auxcli debug-printf "DEBUG (btmode): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (btmode): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli btmode -h for help.\n\n"
@@ -48,61 +48,61 @@ err_check "$@"
 while [[ $# -gt 0 ]]; do
     case "$1" in
     none)
-        auxcli debug-printf "DEBUG (btmode): Setting btmode to 'none'\n"
-        auxcli write "config" "btmode" "none"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Setting btmode to 'none'\n"
+        . $path_to_helper/write "config" "btmode" "none"
         if [ "$previous_mode" == "tether" ]; then
-            auxcli debug-printf "DEBUG (btmode): Previous mode was 'tether'\n"
-            auxcli debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-tether.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Previous mode was 'tether'\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-tether.\n"
             sudo systemctl stop auxcli-bt-tether
-            auxcli debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-tether.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-tether.\n"
             sudo systemctl disable auxcli-bt-tether
-            auxcli debug-printf "DEBUG (btmode): Setting reboot_required to 'true'\n"
-            auxcli write "config" "reboot_required" "true"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Setting reboot_required to 'true'\n"
+            . $path_to_helper/write "config" "reboot_required" "true"
         elif [ "$previous_mode" == "serial" ]; then
-            auxcli debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
             sudo systemctl stop auxcli-bt-serial-scan
-            auxcli debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
             sudo systemctl disable auxcli-bt-serial-scan
         fi
         shift # past argument
         ;;
     tether)
-        auxcli debug-printf "DEBUG (btmode): Setting btmode to 'tether'\n"
-        auxcli write "config" "btmode" "tether"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Setting btmode to 'tether'\n"
+        . $path_to_helper/write "config" "btmode" "tether"
         if [ "$previous_mode" == "serial" ]; then
-            auxcli debug-printf "DEBUG (btmode): Previous mode was 'serial'\n"
-            auxcli debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Previous mode was 'serial'\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
             sudo systemctl stop auxcli-bt-serial-scan
-            auxcli debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
             sudo systemctl disable auxcli-bt-serial-scan
         fi
-        auxcli debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-tether.\n"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-tether.\n"
         sudo systemctl enable auxcli-bt-tether
-        auxcli debug-printf "DEBUG (btmode): Starting service: auxcli-bt-tether.\n"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Starting service: auxcli-bt-tether.\n"
         sudo systemctl start auxcli-bt-tether
         shift # past argument
         ;;
     serial)
-        auxcli debug-printf "DEBUG (btmode): Setting btmode to 'serial'\n"
-        auxcli write "config" "btmode" "serial"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Setting btmode to 'serial'\n"
+        . $path_to_helper/write "config" "btmode" "serial"
         if [ "$previous_mode" == "tether" ]; then
-            auxcli debug-printf "DEBUG (btmode): Previous mode was 'tether'\n"
-            auxcli debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-tether.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Previous mode was 'tether'\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-tether.\n"
             sudo systemctl stop auxcli-bt-tether
-            auxcli debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-tether.\n"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-tether.\n"
             sudo systemctl disable auxcli-bt-tether
-            auxcli debug-printf "DEBUG (btmode): Setting reboot_required to 'true'\n"
-            auxcli write "config" "reboot_required" "true"
+            . $path_to_helper/debug-printf "DEBUG (btmode): Setting reboot_required to 'true'\n"
+            . $path_to_helper/write "config" "reboot_required" "true"
         fi
-        auxcli debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-serial-scan.\n"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-serial-scan.\n"
         sudo systemctl enable auxcli-bt-serial-scan
-        auxcli debug-printf "DEBUG (btmode): Starting service: auxcli-bt-serial-scan.\n"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Starting service: auxcli-bt-serial-scan.\n"
         sudo systemctl start auxcli-bt-serial-scan
         shift # past argument
         ;;
     -r | --reboot)
-        auxcli debug-printf "DEBUG (btmode): Setting reboot_on_exit to 'true'\n"
-        auxcli write "config" "reboot_on_exit" "true"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Setting reboot_on_exit to 'true'\n"
+        . $path_to_helper/write "config" "reboot_on_exit" "true"
         shift # past argument
         ;;
     -h | -help | --help)

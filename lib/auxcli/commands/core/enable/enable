@@ -6,9 +6,9 @@ usage() {
     printf "Enable system related components of auxcli.\n\n"
     printf "COMPONENTS:\n"
     for ((i = 0; i < ${#components[@]}; i++)); do
-        if auxcli enabled ${components[$i]}; then
+        if . $path_to_helper/enabled ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
-        elif ! auxcli enabled ${components[$i]}; then
+        elif ! . $path_to_helper/enabled ${components[$i]}; then
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         fi
     done
@@ -20,14 +20,14 @@ err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
     # or if the argument is "-h" or "--help"
-    auxcli debug-printf "DEBUG (enable): First error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (enable): First error check.\n"
     if [ $# -eq 0 ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a component
-    auxcli debug-printf "DEBUG (enable): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (enable): Second error check.\n"
     if [[ ! ${components[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component.\n" "$1"
         printf "Run 'auxcli enable -h' for help.\n\n"
@@ -36,8 +36,8 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the component is already enabled
-    auxcli debug-printf "DEBUG (enable): Third error check.\n"
-    if auxcli enabled "$1"; then
+    . $path_to_helper/debug-printf "DEBUG (enable): Third error check.\n"
+    if . $path_to_helper/enabled "$1"; then
         printf "\nThe \"%s\" component is already enabled.\n\n" "$1"
         exit 1
     fi
@@ -45,7 +45,7 @@ err_check() {
 
 enable_component(){
     while [[ $# -gt 0 ]]; do
-        auxcli debug-printf "DEBUG (enable): Enabling component: %s\n" "$1"
+        . $path_to_helper/debug-printf "DEBUG (enable): Enabling component: %s\n" "$1"
         . /lib/auxcli/components/configuration/$1/enable
         shift
     done
