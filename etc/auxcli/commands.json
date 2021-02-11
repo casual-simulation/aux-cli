@@ -36,7 +36,7 @@
         "arguments": false,
         "requires_reboot": false,
         "command_path": "/lib/auxcli/commands/core/disable/disable",
-        "config_path": "",
+        "config_path": "/lib/auxcli/commands/core/disable/config.json",
         "short_desc": "Disable system related components of auxcli."
     },
     {
@@ -46,7 +46,7 @@
         "arguments": false,
         "requires_reboot": false,
         "command_path": "/lib/auxcli/commands/core/enable/enable",
-        "config_path": "",
+        "config_path": "/lib/auxcli/commands/core/enable/config.json",
         "short_desc": "Enable system related components of auxcli."
     },
     {
