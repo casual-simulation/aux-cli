@@ -101,30 +101,27 @@ update_conf() {
             if $debug; then printf "DEBUG (install.sh): Updating components.json\n"; fi
 
             # Get array of installed things
-            installed=($(jq '.[] | select(.installed == true or .installed == "true") | .name' $bkp_config)) 
+            installed=($(jq -r '.[] | select(.installed == true) | .name' $bkp_config)) 
             if $debug; then printf "DEBUG (install.sh): Installed components from bkp_config: %s\n" "${installed[*]}"; fi
-            enabled=($(jq '.[] | select(.enabled == true or .enabled == "true") | .name' $bkp_config))  
+            enabled=($(jq -r '.[] | select(.enabled == true) | .name' $bkp_config))  
             if $debug; then printf "DEBUG (install.sh): Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
-            disabled=($(jq '.[] | select(.enabled == false or .enabled == "false") | .name' $bkp_config)) 
+            disabled=($(jq -r '.[] | select(.enabled == false) | .name' $bkp_config)) 
             if $debug; then printf "DEBUG (install.sh): Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
 
             # Write those to the new config
             for component in "${installed[@]}"; do
-                if $debug; then printf "DEBUG (install.sh): Setting component %s to installed in the new_config.\n" $component; fi
-                jq --arg com $component '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp 1> /dev/null
+                if $debug; then printf "DEBUG (install.sh): Setting component %s to installed in the new_config.\n" "${component}"; fi
+                jq --arg com "$component" -r '(.[] | select( .name == $com ) | .installed) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
             for component in "${enabled[@]}"; do
-                if $debug; then printf "DEBUG (install.sh): Setting component %s to enabled in the new_config.\n" $component; fi
-                cat $new_config
-                sudo jq --arg com $component '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp 1> /dev/null
-                cat $tmp
+                if $debug; then printf "DEBUG (install.sh): Setting component %s to enabled in the new_config.\n" "${component}"; fi
+                jq --arg com "$component" -r '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
-                cat $new_config
             done
             for component in "${disabled[@]}"; do
-                if $debug; then printf "DEBUG (install.sh): Setting component %s to disabled in the new_config.\n" $component; fi
-                jq --arg com $component '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp 1> /dev/null
+                if $debug; then printf "DEBUG (install.sh): Setting component %s to disabled in the new_config.\n" "${component}"; fi
+                jq --arg com "$component" -r '(.[] | select( .name == $com ) | .enabled) = false' $new_config | sudo tee $tmp 1> /dev/null
                 sudo mv -f $tmp $new_config
             done
 
@@ -141,7 +138,7 @@ update_conf() {
             sudo mv -f $tmp $new_config
 
             # Write new version back onto the new file
-            jq --arg ver "$new_ver" '(.version) = $ver' $new_config | sudo tee $tmp 1> /dev/null
+            jq --arg ver "$new_ver" -r '(.version) = $ver' $new_config | sudo tee $tmp 1> /dev/null
             sudo mv -f $tmp $new_config
 
         # elif [ $new_config == "/etc/auxcli/devices.json" ]; then
