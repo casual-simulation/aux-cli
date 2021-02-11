@@ -9,6 +9,7 @@ install_path=$(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc
 # Add in our custom scripts to bypass interactivity
 . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Updating the files in RaspiWiFi_modified.\n"
 sudo cp -f "$install_path/initial_setup.py" $install_path/RaspiWiFi_modified
+sudo cp -f "$install_path/setup_lib.py" $install_path/RaspiWiFi_modified
 sudo cp -f "$install_path/config.json" $install_path/RaspiWiFi_modified
 sudo cp -f "$install_path/reset_lib.py" $install_path/RaspiWiFi_modified/libs/reset_device
 

@@ -21,7 +21,6 @@ install_ans = (data["settings"]["install_ans"])
 if os.getuid():
     sys.exit('You need root access to install!')
 
-os.system('clear')
 print()
 print()
 print("###################################")
