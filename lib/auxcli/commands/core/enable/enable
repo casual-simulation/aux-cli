@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+# Config path for enable
+config_enable=$(jq -r '.[] | select( .name == "enable" ) | .config_path' $config_commands)
+. $path_to_helper/debug-printf "DEBUG (enable): Config path: %s\n" "$config_enable"
+
+# Arguments for enable
+readarray -t args_short < <(jq -r '.[].arg_short' $config_enable)
+readarray -t args_long < <(jq -r '.[].arg_long' $config_enable)
+readarray -t args_desc < <(jq '.[].short_desc' $config_enable)
+args=("${args_short[@]}" "${args_long[@]}")
+
 usage() {
     printf "\nUsage:        auxcli enable [COMPONENT]\n\n"
     printf "Enable system related components of auxcli.\n\n"
@@ -12,31 +22,33 @@ usage() {
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         fi
     done
-    printf "\t    %-2s\t%-14s\t%s\n" "-h" "--help" "Displays this usage information."
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
     exit 1
 }
 
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    # or if the argument is "-h" or "--help"
-    . $path_to_helper/debug-printf "DEBUG (enable): First error check.\n"
-    if [ $# -eq 0 ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    . $path_to_helper/debug-printf "DEBUG (enable): Error Check: 1 of 3\n"
+    if [ $# -eq 0 ]; then
         usage
     fi
 
     # Second error check
-    # Throw an error messege if the first argument isn't a component
-    . $path_to_helper/debug-printf "DEBUG (enable): Second error check.\n"
-    if [[ ! ${components[*]} =~ $1 ]]; then
-        printf "\n\"%s\" is not a valid component.\n" "$1"
+    # Throw an error messege if the first argument isn't valid
+    . $path_to_helper/debug-printf "DEBUG (enable): Error Check: 2 of 3\n"
+    if [[ ! ${components[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
+        printf "\n\"%s\" is not a valid component or argument.\n" "$1"
         printf "Run 'auxcli enable -h' for help.\n\n"
         exit 1
     fi
 
+
     # Third error check
     # Throw an error messege if the component is already enabled
-    . $path_to_helper/debug-printf "DEBUG (enable): Third error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (enable): Error Check: 3 of 3\n"
     if . $path_to_helper/enabled "$1"; then
         printf "\nThe \"%s\" component is already enabled.\n\n" "$1"
         exit 1
@@ -44,12 +56,31 @@ err_check() {
 }
 
 enable_component(){
-    while [[ $# -gt 0 ]]; do
-        . $path_to_helper/debug-printf "DEBUG (enable): Enabling component: %s\n" "$1"
-        . /lib/auxcli/components/configuration/$1/enable
-        shift
-    done
+    if . $path_to_helper/requires-reboot $1; then
+        . $path_to_helper/debug-printf "DEBUG (enable): %s requires a reboot.\n" "$1"
+        . $path_to_helper/debug-printf "DEBUG (enable): Setting reboot_required to 'true'\n"
+        . $path_to_helper/write "config" "reboot_required" "true"
+    fi
+    . $path_to_helper/debug-printf "DEBUG (enable): Enabling component: %s\n" "$1"
+    . /lib/auxcli/components/configuration/$1/enable
 }
 
 err_check "$@"
-enable_component "$@"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -r | --reboot)
+        . $path_to_helper/debug-printf "DEBUG (enable): Setting reboot_on_exit to 'true'\n"
+        . $path_to_helper/write "config" "reboot_on_exit" "true"
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    *)
+        enable_component "$1"
+        shift # past argument
+        ;;
+    esac
+done
