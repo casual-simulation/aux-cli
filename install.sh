@@ -116,8 +116,11 @@ update_conf() {
             done
             for component in "${enabled[@]}"; do
                 if $debug; then printf "DEBUG (install.sh): Setting component %s to enabled in the new_config.\n" "${component}"; fi
+                cat $new_config
                 jq --arg com "$component" '(.[] | select( .name == $com ) | .enabled) = true' $new_config | sudo tee $tmp 1> /dev/null
+                cat $tmp
                 sudo mv -f $tmp $new_config
+                cat $new_config
             done
             for component in "${disabled[@]}"; do
                 if $debug; then printf "DEBUG (install.sh): Setting component %s to disabled in the new_config.\n" "${component}"; fi
