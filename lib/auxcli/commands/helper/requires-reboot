@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if $(jq --arg component "$1" -r '.[] | select( .name == $component ) | .requires_reboot' /etc/auxcli/components.json); then
+if [[ $(jq --arg component "$1" -r '.[] | select( .name == $component ) | .requires_reboot' /etc/auxcli/components.json) == "true" ]]; then
     . $path_to_helper/debug-printf "DEBUG (requires-reboot): %s requires reboot.\n" "$1"
     return 0
 else
