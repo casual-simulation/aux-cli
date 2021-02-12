@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-sudo apt-get install -y bluez-tools python-dbus python-gobject python-gobject-2
+sudo apt-get install -y \
+    bluez-tools \
+    python-dbus \
+    python-gobject \
+    python-gobject-2
 
 old_dtimeout=$(grep DiscoverableTimeout /etc/bluetooth/main.conf)
 new_dtimeout="DiscoverableTimeout = 0"
