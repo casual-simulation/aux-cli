@@ -1,6 +1,6 @@
 [Unit]
 Description=Check for another WLAN
-After=network.target
+After=auxcli-reboot-reset.service
 StartLimitIntervalSec=0
 
 [Service]

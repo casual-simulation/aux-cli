@@ -270,6 +270,16 @@
         "short_desc": "Checks if a reboot is required and then prompts for a reboot."
     },
     {
+        "name": "reboot-reset",
+        "type": "helper",
+        "available": true,
+        "arguments": false,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/helper/reboot-reset",
+        "config_path": "",
+        "short_desc": "Resets reboot flags to false."
+    },
+    {
         "name": "requires-reboot",
         "type": "helper",
         "available": true,

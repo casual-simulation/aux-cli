@@ -1,0 +1,14 @@
+[Unit]
+Description=Resets reboot flags to false.
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/env bash /lib/auxcli/commands/helper/reboot-reset
+
+[Install]
+WantedBy=multi-user.target
