@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+path_to_helper="/lib/auxcli/commands/helper"
 hostapd_conf="/etc/hostapd/hostapd.conf"
 raspiwifi_conf="/etc/raspiwifi/raspiwifi.conf"
 host=$(hostname)
