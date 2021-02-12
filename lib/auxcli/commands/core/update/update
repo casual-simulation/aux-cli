@@ -11,12 +11,12 @@ readarray -t args_long < <(jq -r '.[].arg_long' $config_update)
 readarray -t args_desc < <(jq '.[].short_desc' $config_update)
 args=("${args_short[@]}" "${args_long[@]}")
 
-# update_aux=false
-# automatic_update_aux=false
-# update_cli=false
-# automatic_update_cli=false
-# update_pi=false
-# automatic_update_pi=false
+update_aux=false
+automatic_update_aux=false
+update_cli=false
+automatic_update_cli=false
+update_pi=false
+automatic_update_pi=false
 
 usage() {
     printf "\nUsage:    auxcli update [OPTIONS]\n\n"
@@ -31,7 +31,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (update): First error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Error check 1 of 2.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -39,7 +39,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (update): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (update): Error check 2 of 2.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli update -h for help.\n\n"
