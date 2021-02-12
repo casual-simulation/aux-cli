@@ -2,6 +2,7 @@
 set -e
 
 path_to_helper="/lib/auxcli/commands/helper"
+debug=true
 wpa_conf="/etc/wpa_supplicant/wpa_supplicant.conf"
 
 . $path_to_helper/debug-printf "DEBUG (wpa-checker): Checking for wpa_supplicant...\n"

@@ -2,6 +2,7 @@
 set -e
 
 path_to_helper="/lib/auxcli/commands/helper"
+debug=true
 
 # Check if there is an extra wlan present and use it
 . $path_to_helper/debug-printf "DEBUG (wlan-checker): Checking for wlan1...\n"

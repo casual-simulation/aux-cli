@@ -2,6 +2,7 @@
 set -e
 
 path_to_helper="/lib/auxcli/commands/helper"
+debug=true
 dnsmasq_conf="/etc/dnsmasq.conf"
 
 . $path_to_helper/debug-printf "DEBUG (dnsmasq-checker): Checking for dnsmasq...\n"
