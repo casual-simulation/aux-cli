@@ -105,7 +105,7 @@ update_conf() {
             if $debug; then printf "DEBUG (install.sh): Installed components from bkp_config: %s\n" "${installed[*]}"; fi
             enabled=($(jq -r '.[] | select(.enabled == true or .enabled == "true") | .name' $bkp_config))  
             if $debug; then printf "DEBUG (install.sh): Enabled components from bkp_config: %s\n" "${enabled[*]}"; fi
-            disabled=($(jq -r '.[] | select(.enabled == false or .installed == "false") | .name' $bkp_config)) 
+            disabled=($(jq -r '.[] | select(.enabled == false or .enabled == "false") | .name' $bkp_config)) 
             if $debug; then printf "DEBUG (install.sh): Disabled components from bkp_config: %s\n" "${disabled[*]}"; fi
 
             # Write those to the new config
