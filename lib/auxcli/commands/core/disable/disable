@@ -51,7 +51,7 @@ err_check() {
     . $path_to_helper/debug-printf "DEBUG (disable): Error Check: 3 of 3\n"
     if ! . $path_to_helper/enabled "$1"; then
         printf "\nThe \"%s\" component is already disabled.\n\n" "$1"
-        exit 1
+        exit 0
     fi
 }
 
