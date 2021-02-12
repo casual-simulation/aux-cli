@@ -49,7 +49,7 @@ usage() {
             printf "\t[ ] %-24s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
         fi
     done
-    printf "\t%-4s\t\t\t\t%s\n" "help" "Displays this usage information."
+    printf "\t    %-4s\t\t\t\t%s\n" "help" "Displays this usage information."
     printf "\nRun 'auxcli COMMAND --help' for more information on a command.\n\n"
     exit 1
 }

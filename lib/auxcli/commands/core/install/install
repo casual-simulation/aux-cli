@@ -24,7 +24,7 @@ usage() {
     done
     printf "\t    %-10s\t\t\t%s\n" "everything" "Install all tools."
     for ((i = 0; i < ${#args_desc[@]}; i++)); do
-        printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+        printf "\t    %-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
