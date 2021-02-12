@@ -38,6 +38,24 @@ sudo systemctl enable auxcli-wpa-checker
 . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wpa-checker.\n"
 sudo systemctl start auxcli-wpa-checker
 
+# Install python dependencies through apt-get to reduce errors
+sudo apt-get install -y \
+    python3 \
+    python3-rpi.gpio \
+    python3-pip \
+    dnsmasq \
+    hostapd \
+    python3-markupsafe \
+    python3-jinja2 \
+    python3-werkzeug \
+    python3-itsdangerous \
+    python3-click \
+    python3-flask \
+    python3-six \
+    python3-cffi \
+    python3-cryptography \
+    python3-openssl
+
 # Set installed/available to true before we hit a reboot
 . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Writing to config files.\n"
 . $path_to_helper/write "components" "raspiwifi" "installed" "true"
