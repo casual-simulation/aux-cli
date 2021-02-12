@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-if $debug; then printf "$@"; fi
+if $debug; then printf "$@"; fi >> /boot/debug.log
