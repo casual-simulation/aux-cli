@@ -98,7 +98,7 @@ install_everything(){
 
     # Install all the things
     . $path_to_helper/debug-printf "DEBUG (install): Installing everything...\n"
-    install_component "${tool[@]}"
+    auxcli install "${tool[@]}"
 }
 
 err_check "$@"
