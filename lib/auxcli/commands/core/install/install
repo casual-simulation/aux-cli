@@ -8,7 +8,7 @@ config_install=$(jq -r '.[] | select( .name == "install" ) | .config_path' $conf
 # Arguments for install
 readarray -t args_short < <(jq -r '.[].arg_short' $config_install)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_install)
-readarray -t args_desc < <(jq '.[].short_desc' $config_install)
+readarray -t args_desc < <(jq -r '.[].short_desc' $config_install)
 args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {
@@ -30,36 +30,21 @@ usage() {
 }
 
 err_check() {
-    # Everything check
-    # Check to see if the arguments include everything
-    . $path_to_helper/debug-printf "DEBUG (install): Everything check.\n"
-    if [[ "everything" == "$1" ]]; then
-        return 0
-    fi
-
     # First error check
-    # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (install): Error Check: 1 of 3\n"
-    if [ $# -eq 0 ]; then
-        usage
-    fi
-
-    # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (install): Error Check: 2 of 3\n"
+    . $path_to_helper/debug-printf "DEBUG (install): Error Check: 1 of 2: %s\n" "$1"
     if [[ ! ${components[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component or argument.\n" "$1"
         printf "Run 'auxcli install -h' for help.\n\n"
         exit 1
     fi
 
-    # Third error check
+    # Second error check
     # Throw an error messege if the component is already installed
-    . $path_to_helper/debug-printf "DEBUG (install): Error Check: 3 of 3\n"
+    . $path_to_helper/debug-printf "DEBUG (install): Error Check: 2 of 2: %s\n" "$1"
     if . $path_to_helper/installed "$1"; then
         printf "\nThe \"%s\" component is already installed.\n\n" "$1"
-        shift
-        return 0
+        return 1
     fi
 }
 
@@ -99,12 +84,19 @@ install_everything(){
 
     # Install all the things
     . $path_to_helper/debug-printf "DEBUG (install): Installing everything...\n"
-    auxcli install "${tool[@]}"
+    install_component "${tool[@]}"
 }
 
-err_check "$@"
+# Show the usage menu if there aren't any arguments
+. $path_to_helper/debug-printf "DEBUG (install): Empty Check.\n"
+if [ $# -eq 0 ]; then usage; fi
+
+# Check to see if the arguments include everything
+. $path_to_helper/debug-printf "DEBUG (install): Everything Check.\n"
+if [[ "$1" == "everything" ]]; then return 0; fi
 
 while [[ $# -gt 0 ]]; do
+    if ! err_check "$1"; then shift; continue; fi
     case "$1" in
     everything)
         install_everything
