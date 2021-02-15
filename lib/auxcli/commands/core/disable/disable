@@ -15,11 +15,11 @@ usage() {
     printf "\nUsage:        auxcli disable [COMPONENT]\n\n"
     printf "Disable system related components of auxcli.\n\n"
     printf "COMPONENTS:\n"
-    for ((i = 0; i < ${#components[@]}; i++)); do
-        if . $path_to_helper/enabled ${components[$i]}; then
-            printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
-        elif ! . $path_to_helper/enabled ${components[$i]}; then
-            printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
+    for ((i = 0; i < ${#components_e[@]}; i++)); do
+        if . $path_to_helper/enabled ${components_e[$i]}; then
+            printf "\t[x] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
+        else
+            printf "\t[ ] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
         fi
     done
     for ((i = 0; i < ${#args_desc[@]}; i++)); do
@@ -39,7 +39,7 @@ err_check() {
     # Second error check
     # Throw an error messege if the first argument isn't valid
     . $path_to_helper/debug-printf "DEBUG (disable): Error Check: 2 of 3\n"
-    if [[ ! ${components[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
+    if [[ ! ${components_e[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component or argument.\n" "$1"
         printf "Run 'auxcli disable -h' for help.\n\n"
         exit 1
