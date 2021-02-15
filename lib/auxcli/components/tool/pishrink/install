@@ -10,6 +10,6 @@ install_path=$(jq -r '.[] | select( .name == "pishrink" ) | .install_path' /etc/
 sudo chmod +x $install_path/pishrink.sh
 
 . $path_to_helper/debug-printf "DEBUG (pishrink-install): Copying pishrink to /usr/local/bin\n"
-sudo mv -f $install_path/pishrink.sh /usr/local/bin
+sudo cp -f $install_path/pishrink.sh /usr/local/bin
 
 . $path_to_helper/write "components" "pishrink" "installed" "true"
