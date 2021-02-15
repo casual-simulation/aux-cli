@@ -3,7 +3,7 @@
         "arg_short": "-r",
         "arg_long": "--reboot",
         "type": "",
-        "short_desc": "Automatically reboot after install(s) finish."
+        "short_desc": "Automatically reboot if needed after disable(s) finish."
     },
     {
         "arg_short": "-h",

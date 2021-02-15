@@ -8,7 +8,7 @@ config_update=$(jq -r '.[] | select( .name == "update" ) | .config_path' $config
 # Arguments for update
 readarray -t args_short < <(jq -r '.[].arg_short' $config_update)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_update)
-readarray -t args_desc < <(jq '.[].short_desc' $config_update)
+readarray -t args_desc < <(jq -r '.[].short_desc' $config_update)
 args=("${args_short[@]}" "${args_long[@]}")
 
 update_aux=false

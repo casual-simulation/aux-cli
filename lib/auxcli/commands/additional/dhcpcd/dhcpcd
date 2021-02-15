@@ -8,7 +8,7 @@ config_dhcpcd=$(jq -r '.[] | select( .name == "dhcpcd" ) | .config_path' $config
 # Arguments for dhcpcd
 readarray -t args_short < <(jq -r '.[].arg_short' $config_dhcpcd)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_dhcpcd)
-readarray -t args_desc < <(jq '.[].short_desc' $config_dhcpcd)
+readarray -t args_desc < <(jq -r '.[].short_desc' $config_dhcpcd)
 args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {

@@ -8,7 +8,7 @@ config_disable=$(jq -r '.[] | select( .name == "disable" ) | .config_path' $conf
 # Arguments for disable
 readarray -t args_short < <(jq -r '.[].arg_short' $config_disable)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_disable)
-readarray -t args_desc < <(jq '.[].short_desc' $config_disable)
+readarray -t args_desc < <(jq -r '.[].short_desc' $config_disable)
 args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {

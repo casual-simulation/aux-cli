@@ -8,7 +8,7 @@ config_btmode=$(jq -r '.[] | select( .name == "btmode" ) | .config_path' $config
 # Arguments for btmode
 readarray -t args_short < <(jq -r '.[].arg_short' $config_btmode)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_btmode)
-readarray -t args_desc < <(jq '.[].short_desc' $config_btmode)
+readarray -t args_desc < <(jq -r '.[].short_desc' $config_btmode)
 args=("${args_short[@]}" "${args_long[@]}")
 
 previous_mode=$(jq -r '.btmode' $config_main)

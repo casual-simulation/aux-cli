@@ -9,7 +9,7 @@
         "arg_short": "-r",
         "arg_long": "--reboot",
         "type": "",
-        "short_desc": "Automatically reboot after hostname change."
+        "short_desc": "Automatically reboot if needed after hostname change."
     },
     {
         "arg_short": "-h",

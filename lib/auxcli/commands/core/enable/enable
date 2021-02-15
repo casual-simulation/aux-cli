@@ -8,7 +8,7 @@ config_enable=$(jq -r '.[] | select( .name == "enable" ) | .config_path' $config
 # Arguments for enable
 readarray -t args_short < <(jq -r '.[].arg_short' $config_enable)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_enable)
-readarray -t args_desc < <(jq '.[].short_desc' $config_enable)
+readarray -t args_desc < <(jq -r '.[].short_desc' $config_enable)
 args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {

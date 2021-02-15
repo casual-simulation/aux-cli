@@ -8,7 +8,7 @@ config_backup=$(jq -r '.[] | select( .name == "backup" ) | .config_path' $config
 # Arguments for backup
 readarray -t args_short < <(jq -r '.[].arg_short' $config_backup)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_backup)
-readarray -t args_desc < <(jq '.[].short_desc' $config_backup)
+readarray -t args_desc < <(jq -r '.[].short_desc' $config_backup)
 readarray -t defaults < <(jq '.[].default' $config_backup)
 args=("${args_short[@]}" "${args_long[@]}")
 
