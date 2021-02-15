@@ -13,12 +13,12 @@ args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {
     printf "\nUsage:        auxcli install [ARGUMENT] [COMPONENT]\n\n"
+    printf "Install additional components of auxcli.\n\n"
     printf "ARGUMENTS:\n"
     for ((i = 0; i < ${#args_desc[@]}; i++)); do
         printf "\t    %-2s\t%-10s\t\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
-    printf "Install additional components of auxcli.\n\n"
-    printf "COMPONENTS:\n"
+    printf "\nCOMPONENTS:\n"
     for ((i = 0; i < ${#components[@]}; i++)); do
         if . $path_to_helper/installed ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
