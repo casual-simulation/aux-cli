@@ -78,7 +78,7 @@ reinstall_component(){
 }
 
 # Show the usage menu if there aren't any arguments
-. $path_to_helper/debug-printf "DEBUG (install): Empty Check.\n"
+. $path_to_helper/debug-printf "DEBUG (reinstall): Empty Check.\n"
 if [ $# -eq 0 ]; then usage; fi
 
 while [[ $# -gt 0 ]]; do
