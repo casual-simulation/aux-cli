@@ -12,18 +12,19 @@ readarray -t args_desc < <(jq -r '.[].short_desc' $config_reinstall)
 args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {
-    printf "\nUsage:        auxcli reinstall [COMPONENT]\n\n"
+    printf "\nUsage:        auxcli reinstall [ARGUMENT] [COMPONENT]\n\n"
     printf "Reinstall additional components of auxcli.\n\n"
-    printf "COMPONENTS:\n"
+    printf "ARGUMENTS:\n"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
+    printf "\nCOMPONENTS:\n"
     for ((i = 0; i < ${#components[@]}; i++)); do
         if . $path_to_helper/installed ${components[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components[$i]}" "${components_desc[$i]}"
         fi
-    done
-    for ((i = 0; i < ${#args_desc[@]}; i++)); do
-        printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
