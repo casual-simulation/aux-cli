@@ -32,24 +32,17 @@ usage() {
 
 err_check() {
     # First error check
-    # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (uninstall): Error Check: 1 of 3\n"
-    if [ $# -eq 0 ]; then
-        usage
-    fi
-
-    # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (uninstall): Error Check: 2 of 3\n"
+    . $path_to_helper/debug-printf "DEBUG (uninstall): Error Check: 1 of 2: %s\n" "$1"
     if [[ ! ${components[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component or argument.\n" "$1"
         printf "Run 'auxcli uninstall -h' for help.\n\n"
         exit 1
     fi
 
-    # Third error check
+    # Second error check
     # Throw an error messege if the component is already installed
-    . $path_to_helper/debug-printf "DEBUG (uninstall): Error Check: 3 of 3\n"
+    . $path_to_helper/debug-printf "DEBUG (uninstall): Error Check: 2 of 2: %s\n" "$1"
     if ! . $path_to_helper/installed "$1"; then
         printf "\nThe \"%s\" component isn't installed.\n\n" "$1"
         exit 0
@@ -86,9 +79,16 @@ uninstall_everything(){
     uninstall_component "${tool[@]}"
 }
 
-err_check "$@"
+# Show the usage menu if there aren't any arguments
+. $path_to_helper/debug-printf "DEBUG (uninstall): Empty Check.\n"
+if [ $# -eq 0 ]; then usage; fi
+
+# Check to see if the arguments include everything
+. $path_to_helper/debug-printf "DEBUG (uninstall): Everything Check.\n"
+if [[ "$1" == "everything" ]]; then return 0; fi
 
 while [[ $# -gt 0 ]]; do
+    if ! err_check "$1"; then shift; continue; fi
     case "$1" in
     everything)
         uninstall_everything
