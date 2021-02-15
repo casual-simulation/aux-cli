@@ -14,16 +14,17 @@ args=("${args_short[@]}" "${args_long[@]}")
 usage() {
     printf "\nUsage:        auxcli enable [COMPONENT]\n\n"
     printf "Enable system related components of auxcli.\n\n"
-    printf "COMPONENTS:\n"
+    printf "ARGUMENTS:\n"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        printf "\t%-2s\t%-10s\t\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+    done
+    printf "\nCOMPONENTS:\n"
     for ((i = 0; i < ${#components_e[@]}; i++)); do
         if . $path_to_helper/enabled ${components_e[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
         fi
-    done
-    for ((i = 0; i < ${#args_desc[@]}; i++)); do
-        printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
