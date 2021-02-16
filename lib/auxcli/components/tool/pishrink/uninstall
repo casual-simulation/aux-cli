@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-. $path_to_helper/debug-printf "DEBUG (pishrink-uninstall): Uninstalling Pishrink.\n"
+auxcli-debug-printf "DEBUG (pishrink-uninstall): Uninstalling Pishrink.\n"
 
-. $path_to_helper/debug-printf "DEBUG (pishrink-install): Removing /usr/local/bin/pishrink.sh\n"
+auxcli-debug-printf "DEBUG (pishrink-install): Removing /usr/local/bin/pishrink.sh\n"
 sudo rm -rf /usr/local/bin/pishrink.sh
 
-. $path_to_helper/write "components" "pishrink" "installed" "false"
+auxcli-write "components" "pishrink" "installed" "false"

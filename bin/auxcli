@@ -4,12 +4,9 @@ set -e
 #### Commands can access any variables set in this file
 #### as long as they are run as an 'auxcli [command]'.
 
-#### Commands run with an absolute path will not have
-#### access to the variables. (This next debug-check as an example.)
-
-#### Call all helper commands directly to avoid confusing looping
-path_to_helper="/lib/auxcli/commands/helper"
-. $path_to_helper/debug-check
+#### Helper commands will not have access to the 
+#### variables. (This next debug-check as an example.)
+auxcli-debug-check
 
 # Config paths
 config_main="/etc/auxcli/config.json"
@@ -45,7 +42,7 @@ usage() {
     printf "COMMANDS:\n"
     for ((i = 0; i < ${#commands[@]}; i++)); do
         if [[ ! ${helper[*]} =~ ${commands[$i]} ]]; then 
-            if . $path_to_helper/available ${commands[$i]}; then
+            if auxcli-available ${commands[$i]}; then
                 # \t        Tab
                 # [ ]       Marked if available
                 # %-24s     Left-Aligned column 24 spaces wide that contains the first 's' string
@@ -67,14 +64,14 @@ err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments after `auxcli`
     # or if the command is "help"
-    . $path_to_helper/debug-printf "DEBUG (auxcli): First error check.\n"
+    auxcli-debug-printf "DEBUG (auxcli): First error check.\n"
     if [ $# -eq 0 ] || [ "$1" == "help" ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't a command
-    . $path_to_helper/debug-printf "DEBUG (auxcli): Second error check.\n"
+    auxcli-debug-printf "DEBUG (auxcli): Second error check.\n"
     if [[ ! ${commands[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid command.\n" "$1"
         printf "Run 'auxcli help' for help.\n\n"
@@ -83,8 +80,8 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the first argument isn't an available command
-    . $path_to_helper/debug-printf "DEBUG (auxcli): Third error check.\n"
-    if ! . $path_to_helper/available "$1"; then
+    auxcli-debug-printf "DEBUG (auxcli): Third error check.\n"
+    if ! auxcli-available "$1"; then
         printf "\nThe \"%s\" command is not available. Install the correct component first.\n\n" "$1"
         exit 1
     fi
@@ -93,22 +90,22 @@ err_check() {
 run_cmd() {
     # Set the first argument to be the command and then shift past it
     command_path=$(jq --arg cmd "$1" -r '.[] | select( .name == $cmd ) | .command_path' $config_commands)
-    . $path_to_helper/debug-printf "DEBUG (auxcli): The command path is %s.\n" "$command_path"
+    auxcli-debug-printf "DEBUG (auxcli): The command path is %s.\n" "$command_path"
     shift
 
     # Add all other arguments to an array
     while [[ $# -gt 0 ]]; do
-        . $path_to_helper/debug-printf "DEBUG (auxcli): Adding %s to the command argument array.\n" "$1"
+        auxcli-debug-printf "DEBUG (auxcli): Adding %s to the command argument array.\n" "$1"
         command_args+=("$1")
         shift
     done
 
     # If there are no arguments for the command, just run the command
     if [ ${#command_args[@]} -eq 0 ]; then
-        . $path_to_helper/debug-printf "DEBUG (auxcli): Running command: %s\n" "${command_path}"
+        auxcli-debug-printf "DEBUG (auxcli): Running command: %s\n" "${command_path}"
         . "${command_path}"
     else
-        . $path_to_helper/debug-printf "DEBUG (auxcli): Running command with args: %s %s\n" "${command_path}" "${command_args[*]}"
+        auxcli-debug-printf "DEBUG (auxcli): Running command with args: %s %s\n" "${command_path}" "${command_args[*]}"
         . "${command_path}" "${command_args[@]}"
     fi
 }
@@ -116,5 +113,5 @@ run_cmd() {
 err_check "$@"
 run_cmd "$@"
 
-. $path_to_helper/debug-printf "DEBUG (auxcli): Checking reboot settings.\n"
-. $path_to_helper/reboot-apply
+auxcli-debug-printf "DEBUG (auxcli): Checking reboot settings.\n"
+auxcli-reboot-apply

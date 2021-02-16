@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-. $path_to_helper/debug-printf "DEBUG (serial-console-disable): Disabling serial-console.\n"
+auxcli-debug-printf "DEBUG (serial-console-disable): Disabling serial-console.\n"
 
 # Disable Serial Console from tying up the process
-. $path_to_helper/debug-printf "DEBUG (serial-console-disable): Removing serial0 from /boot/cmdline.txt\n"
+auxcli-debug-printf "DEBUG (serial-console-disable): Removing serial0 from /boot/cmdline.txt\n"
 sudo sed -i "s/console=serial0,115200 //g" /boot/cmdline.txt
-. $path_to_helper/debug-printf "DEBUG (serial-console-disable): Removing ttyAMA0 from /boot/cmdline.txt\n"
+auxcli-debug-printf "DEBUG (serial-console-disable): Removing ttyAMA0 from /boot/cmdline.txt\n"
 sudo sed -i "s/console=ttyAMA0,115200 //g" /boot/cmdline.txt
 
-. $path_to_helper/write "components" "serial-console" "enabled" "false"
+auxcli-write "components" "serial-console" "enabled" "false"

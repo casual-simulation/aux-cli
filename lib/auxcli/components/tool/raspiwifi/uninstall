@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-. $path_to_helper/debug-printf "DEBUG (raspiwifi-uninstall): Uninstalling Raspiwifi.\n"
+auxcli-debug-printf "DEBUG (raspiwifi-uninstall): Uninstalling Raspiwifi.\n"
 
 # Set installed/available to false before we hit a reboot
-. $path_to_helper/debug-printf "DEBUG (raspiwifi-uninstall): Writing to config files.\n"
-. $path_to_helper/write "components" "raspiwifi" "installed" "false"
-. $path_to_helper/write "commands" "dhcpcd" "available" "false"
-. $path_to_helper/write "commands" "hotspot" "available" "false"
+auxcli-debug-printf "DEBUG (raspiwifi-uninstall): Writing to config files.\n"
+auxcli-write "components" "raspiwifi" "installed" "false"
+auxcli-write "commands" "dhcpcd" "available" "false"
+auxcli-write "commands" "hotspot" "available" "false"
 
-. $path_to_helper/debug-printf "DEBUG (raspiwifi-uninstall): Running uninstall script.\n"
+auxcli-debug-printf "DEBUG (raspiwifi-uninstall): Running uninstall script.\n"
 sudo python3 /usr/lib/raspiwifi/uninstall.py

@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=pi
-ExecStart=/usr/bin/env bash /lib/auxcli/commands/helper/hotspot-checker
+ExecStart=/usr/bin/env bash /lib/auxcli/commands/helper/auxcli-hotspot-checker
 
 [Install]
 WantedBy=multi-user.target

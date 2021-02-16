@@ -23,7 +23,7 @@ sudo systemctl disable systemd-networkd
 sudo systemctl stop systemd-networkd
     
 
-. $path_to_helper/write "components" "tethering-ble" "installed" "false"
+auxcli-write "components" "tethering-ble" "installed" "false"
 
 if [ $(jq -r '.btmode' /etc/auxcli/config.json) == "tether" ]; then
     auxcli btmode "none"

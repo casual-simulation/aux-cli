@@ -1,18 +1,18 @@
 #!/bin/bash
 set -e
 
-. $path_to_helper/debug-printf "DEBUG (serial-console-enable): Enabling serial-console.\n"
+auxcli-debug-printf "DEBUG (serial-console-enable): Enabling serial-console.\n"
 
 if ! sudo grep "console=serial0" "/boot/cmdline.txt"; then
-    . $path_to_helper/debug-printf "DEBUG (serial-console-enable): serial0 not found.\n"
-    . $path_to_helper/debug-printf "DEBUG (serial-console-enable): Adding serial0\n"
+    auxcli-debug-printf "DEBUG (serial-console-enable): serial0 not found.\n"
+    auxcli-debug-printf "DEBUG (serial-console-enable): Adding serial0\n"
     printf "console=serial0,115200" | sudo tee -a /boot/cmdline.txt
 fi
 
 if ! sudo grep "console=ttyAMA0" "/boot/cmdline.txt"; then
-    . $path_to_helper/debug-printf "DEBUG (serial-console-enable): ttyAMA0 not found.\n"
-    . $path_to_helper/debug-printf "DEBUG (serial-console-enable): Adding ttyAMA0\n"
+    auxcli-debug-printf "DEBUG (serial-console-enable): ttyAMA0 not found.\n"
+    auxcli-debug-printf "DEBUG (serial-console-enable): Adding ttyAMA0\n"
     printf "console=ttyAMA0,115200" | sudo tee -a /boot/cmdline.txt
 fi
 
-. $path_to_helper/write "components" "serial-console" "enabled" "true"
+auxcli-write "components" "serial-console" "enabled" "true"

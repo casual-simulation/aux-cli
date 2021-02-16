@@ -28,4 +28,4 @@ fi
 exit 0
 EOT
 
-. $path_to_helper/write "components" "zerotier" "installed" "true"
+auxcli-write "components" "zerotier" "installed" "true"

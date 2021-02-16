@@ -3,7 +3,7 @@ set -e
 
 # Config path for enable
 config_enable=$(jq -r '.[] | select( .name == "enable" ) | .config_path' $config_commands)
-. $path_to_helper/debug-printf "DEBUG (enable): Config path: %s\n" "$config_enable"
+auxcli-debug-printf "DEBUG (enable): Config path: %s\n" "$config_enable"
 
 # Arguments for enable
 readarray -t args_short < <(jq -r '.[].arg_short' $config_enable)
@@ -20,7 +20,7 @@ usage() {
     done
     printf "\nCOMPONENTS:\n"
     for ((i = 0; i < ${#components_e[@]}; i++)); do
-        if . $path_to_helper/enabled ${components_e[$i]}; then
+        if auxcli-enabled ${components_e[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
@@ -32,14 +32,14 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (enable): Error Check: 1 of 3\n"
+    auxcli-debug-printf "DEBUG (enable): Error Check: 1 of 3\n"
     if [ $# -eq 0 ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (enable): Error Check: 2 of 3\n"
+    auxcli-debug-printf "DEBUG (enable): Error Check: 2 of 3\n"
     if [[ ! ${components_e[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component or argument.\n" "$1"
         printf "Run 'auxcli enable -h' for help.\n\n"
@@ -49,20 +49,20 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the component is already enabled
-    . $path_to_helper/debug-printf "DEBUG (enable): Error Check: 3 of 3\n"
-    if . $path_to_helper/enabled "$1"; then
+    auxcli-debug-printf "DEBUG (enable): Error Check: 3 of 3\n"
+    if auxcli-enabled "$1"; then
         printf "\nThe \"%s\" component is already enabled.\n\n" "$1"
         exit 0
     fi
 }
 
 enable_component(){
-    if . $path_to_helper/requires-reboot $1; then
-        . $path_to_helper/debug-printf "DEBUG (enable): %s requires a reboot.\n" "$1"
-        . $path_to_helper/debug-printf "DEBUG (enable): Setting reboot_required to 'true'\n"
-        . $path_to_helper/write "config" "reboot_required" "true"
+    if auxcli-requires-reboot $1; then
+        auxcli-debug-printf "DEBUG (enable): %s requires a reboot.\n" "$1"
+        auxcli-debug-printf "DEBUG (enable): Setting reboot_required to 'true'\n"
+        auxcli-write "config" "reboot_required" "true"
     fi
-    . $path_to_helper/debug-printf "DEBUG (enable): Enabling component: %s\n" "$1"
+    auxcli-debug-printf "DEBUG (enable): Enabling component: %s\n" "$1"
     . /lib/auxcli/components/configuration/$1/enable
 }
 
@@ -71,8 +71,8 @@ err_check "$@"
 while [[ $# -gt 0 ]]; do
     case "$1" in
     -r | --reboot)
-        . $path_to_helper/debug-printf "DEBUG (enable): Setting reboot_on_exit to 'true'\n"
-        . $path_to_helper/write "config" "reboot_on_exit" "true"
+        auxcli-debug-printf "DEBUG (enable): Setting reboot_on_exit to 'true'\n"
+        auxcli-write "config" "reboot_on_exit" "true"
         shift # past argument
         ;;
     -h | -help | --help)

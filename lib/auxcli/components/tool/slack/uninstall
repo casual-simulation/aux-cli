@@ -4,4 +4,4 @@ set -e
 sudo rm -rf /usr/bin/slack
 sudo sed -i "/# Slack Start/,/# Slack End/d" /etc/rc.local
 
-. $path_to_helper/write "components" "slack" "installed" "false"
+auxcli-write "components" "slack" "installed" "false"

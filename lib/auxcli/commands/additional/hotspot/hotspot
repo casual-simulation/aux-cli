@@ -3,7 +3,7 @@ set -e
 
 # Config path for hotspot
 config_hotspot=$(jq -r '.[] | select( .name == "hotspot" ) | .config_path' $config_commands)
-. $path_to_helper/debug-printf "DEBUG (hotspot): Config path: %s\n" "$config_hotspot"
+auxcli-debug-printf "DEBUG (hotspot): Config path: %s\n" "$config_hotspot"
 
 # Arguments for hotspot
 readarray -t args_short < <(jq -r '.[].arg_short' $config_hotspot)
@@ -24,7 +24,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (hotspot): First error check.\n"
+    auxcli-debug-printf "DEBUG (hotspot): First error check.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -32,7 +32,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Second error check.\n"
+    auxcli-debug-printf "DEBUG (hotspot): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli hotspot -h for help.\n\n"
@@ -41,26 +41,26 @@ err_check() {
 }
 
 hotspot_check() {
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Checking for 'hostapd' process.\n"
+    auxcli-debug-printf "DEBUG (hotspot): Checking for 'hostapd' process.\n"
     if pgrep -x "hostapd" >/dev/null 2>&1; then
-        . $path_to_helper/debug-printf "DEBUG (hotspot): You are in hotspot mode.\n"
+        auxcli-debug-printf "DEBUG (hotspot): You are in hotspot mode.\n"
         return 0
     else
-        . $path_to_helper/debug-printf "DEBUG (hotspot): You are not in hotspot mode.\n"
+        auxcli-debug-printf "DEBUG (hotspot): You are not in hotspot mode.\n"
         return 1
     fi
 }
 
 hotspot_enable() {
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Enabling hotspot.\n"
+    auxcli-debug-printf "DEBUG (hotspot): Enabling hotspot.\n"
     sudo python3 /usr/lib/raspiwifi/reset_device/manual_reset.py
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Hotspot enabled.\n"
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Setting reboot_required to 'true'\n"
-    . $path_to_helper/write "config" "reboot_required" "true"
+    auxcli-debug-printf "DEBUG (hotspot): Hotspot enabled.\n"
+    auxcli-debug-printf "DEBUG (hotspot): Setting reboot_required to 'true'\n"
+    auxcli-write "config" "reboot_required" "true"
 }
 
 hotspot_disable() {
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Disabling hotspot.\n"
+    auxcli-debug-printf "DEBUG (hotspot): Disabling hotspot.\n"
     # From app.py def set_ap_client_mode()
     sudo rm -f /etc/raspiwifi/host_mode || printf "/etc/raspiwifi/host_mode does not exist.\n"
     sudo rm /etc/cron.raspiwifi/aphost_bootstrapper || printf "/etc/cron.raspiwifi/aphost_bootstrapper does not exist.\n"
@@ -70,9 +70,9 @@ hotspot_disable() {
     sudo mv /etc/dhcpcd.conf.original /etc/dhcpcd.conf || sudo cp /lib/auxcli/modules/raspi-wifi/dhcpcd.conf /etc/dhcpcd.conf
     sudo mv /etc/wpa_supplicant/wpa_supplicant.conf.original /etc/wpa_supplicant/wpa_supplicant.conf || printf "Your original wpa_supplicant.conf is missing.\n"
 
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Hotspot disabled.\n"
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Setting reboot_required to 'true'\n"
-    . $path_to_helper/write "config" "reboot_required" "true"
+    auxcli-debug-printf "DEBUG (hotspot): Hotspot disabled.\n"
+    auxcli-debug-printf "DEBUG (hotspot): Setting reboot_required to 'true'\n"
+    auxcli-write "config" "reboot_required" "true"
 }
 
 err_check "$@"
@@ -93,8 +93,8 @@ while [[ $# -gt 0 ]]; do
         break # past argument
         ;;
     -r | --reboot)
-        . $path_to_helper/debug-printf "DEBUG (hotspot): Setting reboot_on_exit to 'true'\n"
-        . $path_to_helper/write "config" "reboot_on_exit" "true"
+        auxcli-debug-printf "DEBUG (hotspot): Setting reboot_on_exit to 'true'\n"
+        auxcli-write "config" "reboot_on_exit" "true"
         shift # past argument
         ;;
     -h | -help | --help)

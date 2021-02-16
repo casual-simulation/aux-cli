@@ -29,7 +29,7 @@ usbmount_docker_check() {
 run_steps() {
     docker_check
     
-    if . $path_to_helper/installed "usbmount"; then
+    if auxcli-installed "usbmount"; then
         usbmount_docker_check
     fi
 

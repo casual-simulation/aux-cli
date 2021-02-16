@@ -3,4 +3,4 @@ set -e
 
 sudo apt-get remove -y usbmuxd
     
-. $path_to_helper/write "components" "tethering-usb" "installed" "false"
+auxcli-write "components" "tethering-usb" "installed" "false"

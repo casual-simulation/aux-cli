@@ -3,7 +3,7 @@ set -e
 
 # Config path for changehost
 config_changehost=$(jq -r '.[] | select( .name == "changehost" ) | .config_path' $config_commands)
-. $path_to_helper/debug-printf "DEBUG (changehost): Config path: %s\n" "$config_changehost"
+auxcli-debug-printf "DEBUG (changehost): Config path: %s\n" "$config_changehost"
 
 # Arguments for changehost
 readarray -t args_short < <(jq -r '.[].arg_short' $config_changehost)
@@ -12,7 +12,7 @@ readarray -t args_desc < <(jq -r '.[].short_desc' $config_changehost)
 args=("${args_short[@]}" "${args_long[@]}")
 
 host=$(hostname)
-. $path_to_helper/debug-printf "DEBUG (changehost): Current hostname is: %s\n" "$host"
+auxcli-debug-printf "DEBUG (changehost): Current hostname is: %s\n" "$host"
 
 usage() {
     printf "\nUsage:    auxcli changehost [OPTIONS]\n\n"
@@ -27,14 +27,14 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (changehost): First error check.\n"
+    auxcli-debug-printf "DEBUG (changehost): First error check.\n"
     if [ $# -eq 0 ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (changehost): Second error check.\n"
+    auxcli-debug-printf "DEBUG (changehost): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli changehost -h for help.\n\n"
@@ -46,7 +46,7 @@ err_check() {
 set_hostname() {
 
     # Check if new hostname is provided/valid
-    . $path_to_helper/debug-printf "DEBUG (changehost): Hostname provided/valid check.\n"
+    auxcli-debug-printf "DEBUG (changehost): Hostname provided/valid check.\n"
     if [[ ${args[*]} =~ $2 ]] || [[ -z "$2" ]]; then
         printf "\n\"%s\" is an invalid argument for \"%s\".\n" "$2" "$1"
         printf "Run auxcli changehost -h for help.\n\n"
@@ -54,44 +54,44 @@ set_hostname() {
     fi
 
     # Check if new hostname is different
-    . $path_to_helper/debug-printf "DEBUG (changehost): Hostname different check.\n"
+    auxcli-debug-printf "DEBUG (changehost): Hostname different check.\n"
     if [ "$host" == "$2" ]; then
         printf "Your hostname is already %s.\n" "$2"
         return 0
     fi
 
     if hostnamectl >/dev/null 2>&1; then
-        . $path_to_helper/debug-printf "DEBUG (changehost): This system has the command 'hostnamectl'.\n"
+        auxcli-debug-printf "DEBUG (changehost): This system has the command 'hostnamectl'.\n"
         if [ -e /etc/hosts ]; then
-            . $path_to_helper/debug-printf "DEBUG (changehost): /etc/hosts exists.\n"
-            . $path_to_helper/debug-printf "DEBUG (changehost): Modifying /etc/hosts\n"
+            auxcli-debug-printf "DEBUG (changehost): /etc/hosts exists.\n"
+            auxcli-debug-printf "DEBUG (changehost): Modifying /etc/hosts\n"
             sudo sed -i "s/$host/$2/g" /etc/hosts
         fi
-        . $path_to_helper/debug-printf "DEBUG (changehost): Setting hostname with command 'hostnamectl'.\n"
+        auxcli-debug-printf "DEBUG (changehost): Setting hostname with command 'hostnamectl'.\n"
         sudo hostnamectl set-hostname "$2"
         printf "\nHostname has been changed from %s to %s\n" "$host" "$2"
-        . $path_to_helper/debug-printf "DEBUG (changehost): Setting reboot_required to 'true'\n"
-        . $path_to_helper/write "config" "reboot_required" "true"
+        auxcli-debug-printf "DEBUG (changehost): Setting reboot_required to 'true'\n"
+        auxcli-write "config" "reboot_required" "true"
     elif hostname >/dev/null 2>&1; then
-        . $path_to_helper/debug-printf "DEBUG (changehost): This system has the command 'hostname'.\n"
+        auxcli-debug-printf "DEBUG (changehost): This system has the command 'hostname'.\n"
         if [ -e /etc/hosts ]; then
-            . $path_to_helper/debug-printf "DEBUG (changehost): /etc/hosts exists.\n"
-            . $path_to_helper/debug-printf "DEBUG (changehost): Modifying /etc/hosts\n"
+            auxcli-debug-printf "DEBUG (changehost): /etc/hosts exists.\n"
+            auxcli-debug-printf "DEBUG (changehost): Modifying /etc/hosts\n"
             sudo sed -i "s/$host/$2/g" /etc/hosts
         fi
         if [ -e /etc/hostname ]; then
-            . $path_to_helper/debug-printf "DEBUG (changehost): /etc/hostname exists.\n"
-            . $path_to_helper/debug-printf "DEBUG (changehost): Modifying /etc/hostname\n"
+            auxcli-debug-printf "DEBUG (changehost): /etc/hostname exists.\n"
+            auxcli-debug-printf "DEBUG (changehost): Modifying /etc/hostname\n"
             sudo sed -i "s/$host/$2/g" /etc/hostname
         fi
-        . $path_to_helper/debug-printf "DEBUG (changehost): Setting hostname with command 'hostname'.\n"
+        auxcli-debug-printf "DEBUG (changehost): Setting hostname with command 'hostname'.\n"
         sudo hostname "$2"
         printf "\nHostname has been changed from %s to %s\n" "$host" "$2"
-        . $path_to_helper/debug-printf "DEBUG (changehost): Setting reboot_required to 'true'\n"
-        . $path_to_helper/write "config" "reboot_required" "true"
+        auxcli-debug-printf "DEBUG (changehost): Setting reboot_required to 'true'\n"
+        auxcli-write "config" "reboot_required" "true"
     else
         printf "Hostname was not changed. Your version of UNIX might not be currently supported.\n"
-        . $path_to_helper/debug-printf "DEBUG (changehost): Setting 'changed' to 'false'.\n"
+        auxcli-debug-printf "DEBUG (changehost): Setting 'changed' to 'false'.\n"
         return 1
     fi
 }
@@ -106,8 +106,8 @@ while [[ $# -gt 0 ]]; do
         shift # past value
         ;;
     -r | --reboot)
-        . $path_to_helper/debug-printf "DEBUG (changehost): Setting reboot_on_exit to 'true'\n"
-        . $path_to_helper/write "config" "reboot_on_exit" "true"
+        auxcli-debug-printf "DEBUG (changehost): Setting reboot_on_exit to 'true'\n"
+        auxcli-write "config" "reboot_on_exit" "true"
         shift # past argument
         ;;
     -h | -help | --help)
