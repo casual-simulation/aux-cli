@@ -12,7 +12,7 @@ readarray -t args_desc < <(jq -r '.[].short_desc' $config_enable)
 args=("${args_short[@]}" "${args_long[@]}")
 
 usage() {
-    printf "\nUsage:        auxcli enable [COMPONENT]\n\n"
+    printf "\nUsage:        auxcli enable [ARGUMENT] [COMPONENT]\n\n"
     printf "Enable system related components of auxcli.\n\n"
     printf "ARGUMENTS:\n"
     for ((i = 0; i < ${#args_desc[@]}; i++)); do
