@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-path_to_helper="/lib/auxcli/commands/helper"
+# Check the path to make sure helpers can be found
+if ! [[ "$PATH" == *":/lib/auxcli/commands/helper"* ]]; then
+  export PATH=$PATH:/lib/auxcli/commands/helper
+fi
+
 debug=true
 wpa_conf="/etc/wpa_supplicant/wpa_supplicant.conf"
 

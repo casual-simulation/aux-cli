@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-path_to_helper="/lib/auxcli/commands/helper"
+# Check the path to make sure helpers can be found
+if ! [[ "$PATH" == *":/lib/auxcli/commands/helper"* ]]; then
+  export PATH=$PATH:/lib/auxcli/commands/helper
+fi
+
 debug=true
 hostapd_conf="/etc/hostapd/hostapd.conf"
 raspiwifi_conf="/etc/raspiwifi/raspiwifi.conf"
