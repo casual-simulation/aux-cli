@@ -3,4 +3,4 @@ set -e
 
 version=$(jq -r '.version' $config_main)
 
-printf "%s" "${version}"
+printf "%s\n" "${version}"

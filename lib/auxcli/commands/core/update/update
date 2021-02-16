@@ -33,7 +33,6 @@ err_check() {
     # Show the usage menu if there aren't any arguments
     . $path_to_helper/debug-printf "DEBUG (update): Error check 1 of 2.\n"
     if [ $# -eq 0 ]; then
-        printf "\nYou need to pass an argument.\n"
         usage
     fi
 

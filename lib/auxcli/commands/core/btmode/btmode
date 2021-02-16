@@ -15,11 +15,19 @@ previous_mode=$(jq -r '.btmode' $config_main)
 . $path_to_helper/debug-printf "DEBUG (btmode): Previous mode: %s\n" "$previous_mode"
 
 usage() {
-    printf "\nUsage:    auxcli btmode [OPTIONS]\n\n"
+    printf "\nUsage:    auxcli btmode [ARGUMENT] [OPTIONS]\n\n"
     printf "A tool for configuring the bluetooth mode.\n\n"
-    printf "OPTIONS:\n"
+    printf "ARGUMENTS:\n"
     for ((i = 0; i < ${#args_desc[@]}; i++)); do
-        printf "\t%-6s\t%s\n" "${args_long[$i]}" "${args_desc[$i]}"
+        if [ -n "${args_short[$i]}" ]; then
+            printf "\t%-2s\t%-10s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+        fi
+    done
+    printf "\nOPTIONS:\n"
+    for ((i = 0; i < ${#args_desc[@]}; i++)); do
+        if [ -z "${args_short[$i]}" ]; then
+            printf "\t%-6s\t\t\t%s\n" "${args_long[$i]}" "${args_desc[$i]}"
+        fi
     done
     exit 1
 }
@@ -29,7 +37,6 @@ err_check() {
     # Show the usage menu if there aren't any arguments
     . $path_to_helper/debug-printf "DEBUG (btmode): First error check.\n"
     if [ $# -eq 0 ]; then
-        printf "\nYou need to pass an argument to change the bluetooth mode.\n"
         usage
     fi
 

@@ -29,7 +29,6 @@ err_check() {
     # Show the usage menu if there aren't any arguments
     . $path_to_helper/debug-printf "DEBUG (changehost): First error check.\n"
     if [ $# -eq 0 ]; then
-        printf "\nYou need to pass an argument to change the hostname.\n"
         usage
     fi
 

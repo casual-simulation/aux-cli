@@ -21,7 +21,7 @@ usage() {
     printf "Changes the target version of casualOS.\n\n"
     printf "OPTIONS:\n"
     for ((i = 0; i < ${#args_desc[@]}; i++)); do
-        printf "\t%-2s\t%-7s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+        printf "\t%-2s\t%-9s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
@@ -31,7 +31,6 @@ err_check() {
     # Show the usage menu if there aren't any arguments
     . $path_to_helper/debug-printf "DEBUG (targetversion): First error check.\n"
     if [ $# -eq 0 ]; then
-        printf "\nYou need to pass an argument.\n"
         usage
     fi
 
