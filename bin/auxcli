@@ -24,6 +24,9 @@ config_devices_tmp="/etc/auxcli/devices.json.tmp"
 # Command information
 readarray -t commands < <(jq -r '.[] | select( .available != null) | .name' $config_commands)
 readarray -t commands_desc < <(jq -r '.[] | select( .available != null) | .short_desc' $config_commands)
+readarray -t additional < <(jq -r '.[] | select(.type == "additional") | .name' $config_commands)
+readarray -t core < <(jq -r '.[] | select(.type == "core") | .name' $config_commands)
+readarray -t helper < <(jq -r '.[] | select(.type == "helper") | .name' $config_commands)
 
 # Component information
 readarray -t components < <(jq -r '.[] | .name' $config_components)
@@ -41,19 +44,21 @@ usage() {
     printf "Command line tools for AUX dealing more with the hardware/server than auxplayer itself.\n\n"
     printf "COMMANDS:\n"
     for ((i = 0; i < ${#commands[@]}; i++)); do
-        if . $path_to_helper/available ${commands[$i]}; then
-            # \t        Tab
-            # [ ]       Marked if available
-            # %-24s     Left-Aligned column 24 spaces wide that contains the first 's' string
-            # \t        Tabs
-            # %s        The second string passed as an argument
-            # \n        Newline
-            printf "\t[x] %-24s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
-        else
-            printf "\t[ ] %-24s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
+        if [[ ! ${helper[*]} =~ ${commands[$i]} ]]; then 
+            if . $path_to_helper/available ${commands[$i]}; then
+                # \t        Tab
+                # [ ]       Marked if available
+                # %-24s     Left-Aligned column 24 spaces wide that contains the first 's' string
+                # \t        Tabs
+                # %s        The second string passed as an argument
+                # \n        Newline
+                printf "\t[x] %-13s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
+            else
+                printf "\t[ ] %-13s\t%s\n" "${commands[$i]}" "${commands_desc[$i]}"
+            fi
         fi
     done
-    printf "\t    %-4s\t\t\t\t%s\n" "help" "Displays this usage information."
+    printf "\t    %-13s\t%s\n" "help" "Displays this usage information."
     printf "\nRun 'auxcli COMMAND --help' for more information on a command.\n\n"
     exit 1
 }
