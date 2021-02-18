@@ -3,10 +3,18 @@ set -e
 
 path_to_helper="/lib/auxcli/commands/helper"
 
-printf "DEBUG (first-boot): Pulling docker-compose images.\n"
-docker-compose -f /home/pi/docker-compose.yml pull 
+if [ -f /etc/auxcli/config.json ]; then
+    first_boot=$(jq -r '.first_boot' /etc/auxcli/config.json) 
+else
+    first_boot=true
+fi
 
-printf "DEBUG (first-boot): Starting docker-compose images.\n"
-docker-compose -f /home/pi/docker-compose.yml up -d
+if $first_boot; then
+    printf "DEBUG (first-boot): Pulling docker-compose images.\n"
+    docker-compose -f /home/pi/docker-compose.yml pull 
 
-. $path_to_helper/write "config" "first_boot" "false"
+    printf "DEBUG (first-boot): Starting docker-compose images.\n"
+    docker-compose -f /home/pi/docker-compose.yml up -d
+
+    . $path_to_helper/write "config" "first_boot" "false"
+fi
