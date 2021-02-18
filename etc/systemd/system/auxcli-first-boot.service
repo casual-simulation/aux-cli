@@ -1,0 +1,14 @@
+[Unit]
+Description=First Boot Setup for casualOS.
+After=auxcli-hotspot-checker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStart=/usr/bin/env bash /lib/auxcli/commands/helper/first-boot
+
+[Install]
+WantedBy=multi-user.target

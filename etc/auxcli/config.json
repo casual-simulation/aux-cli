@@ -6,5 +6,6 @@
     "debug": true,
     "btmode": "none",
     "reboot_required": false,
-    "reboot_on_exit": false
+    "reboot_on_exit": false,
+    "first_boot": true
 }

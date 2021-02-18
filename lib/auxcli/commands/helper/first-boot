@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+path_to_helper="/lib/auxcli/commands/helper"
+
+printf "DEBUG (first-boot): Pulling docker-compose images.\n"
+docker-compose -f /home/pi/docker-compose.yml pull 
+
+printf "DEBUG (first-boot): Starting docker-compose images.\n"
+docker-compose -f /home/pi/docker-compose.yml up -d
+
+. $path_to_helper/write "config" "first_boot" "false"
