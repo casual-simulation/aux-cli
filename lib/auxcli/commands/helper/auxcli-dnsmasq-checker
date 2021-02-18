@@ -1,11 +1,7 @@
 #!/bin/bash
 set -e
 
-# Check the path to make sure helpers can be found
-if ! [[ "$PATH" == *":/lib/auxcli/commands/helper"* ]]; then
-  export PATH=$PATH:/lib/auxcli/commands/helper
-fi
-
+path_to_helper="/lib/auxcli/commands/helper"
 debug=true
 dnsmasq_conf="/etc/dnsmasq.conf"
 

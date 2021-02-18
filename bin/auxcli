@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
 
-# Check the path to make sure helpers can be found
-if ! [[ "$PATH" == *":/lib/auxcli/commands/helper"* ]]; then
-  export PATH=$PATH:/lib/auxcli/commands/helper
-fi
-
 #### Commands can access any variables set in this file
 #### as long as they are run as an 'auxcli [command]'.
 
