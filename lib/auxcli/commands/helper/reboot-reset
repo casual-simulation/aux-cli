@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+path_to_helper="/lib/auxcli/commands/helper"
+
 . $path_to_helper/debug-printf "DEBUG (reboot-reset): Resetting reboot_on_exit to false.\n"
 . $path_to_helper/write "config" "reboot_on_exit" "false"
 
