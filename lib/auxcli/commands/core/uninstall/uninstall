@@ -31,6 +31,12 @@ usage() {
 }
 
 err_check() {
+    # Check to see if the arguments include everything
+    . $path_to_helper/debug-printf "DEBUG (install): Everything Check.\n"
+    if [[ "$1" == "everything" ]]; then 
+        return 0
+    fi
+
     # First error check
     # Throw an error messege if the first argument isn't valid
     . $path_to_helper/debug-printf "DEBUG (uninstall): Error Check: 1 of 2: %s\n" "$1"
@@ -82,10 +88,6 @@ uninstall_everything(){
 # Show the usage menu if there aren't any arguments
 . $path_to_helper/debug-printf "DEBUG (uninstall): Empty Check.\n"
 if [ $# -eq 0 ]; then usage; fi
-
-# Check to see if the arguments include everything
-. $path_to_helper/debug-printf "DEBUG (uninstall): Everything Check.\n"
-if [[ "$1" == "everything" ]]; then return 0; fi
 
 while [[ $# -gt 0 ]]; do
     if ! err_check "$1"; then shift; continue; fi
