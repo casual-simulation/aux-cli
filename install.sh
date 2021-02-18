@@ -57,11 +57,14 @@ deploy_files() {
 }
 
 enable_services() {
+    if $debug; then printf "DEBUG (install.sh): Enabling auxcli-reboot-reset service.\n"; fi
+    sudo systemctl enable auxcli-reboot-reset
+
+    if $debug; then printf "DEBUG (install.sh): Enabling auxcli-first-boot service.\n"; fi
+    sudo systemctl enable auxcli-first-boot
+    
     if $debug; then printf "DEBUG (install.sh): Enabling auxcli-web service.\n"; fi
     sudo systemctl enable auxcli-web
-    
-    if $debug; then printf "DEBUG (install.sh): Starting auxcli-web service.\n"; fi
-    sudo systemctl start auxcli-web  
 }
 
 update_conf() {
