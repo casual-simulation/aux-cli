@@ -3,8 +3,8 @@ set -e
 
 if [[ $(jq --arg component "$1" -r '.[] | select( .name == $component ) | .installed' /etc/auxcli/components.json) == "true" ]]; then
     auxcli-debug-printf "DEBUG (installed): %s is installed.\n" "$1"
-    exit 0
+    return 0
 else
     auxcli-debug-printf "DEBUG (installed): %s is not installed.\n" "$1"
-    exit 1
+    return 1
 fi
