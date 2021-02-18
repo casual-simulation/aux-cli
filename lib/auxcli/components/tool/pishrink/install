@@ -1,15 +1,15 @@
 #!/bin/bash
 set -e
 
-auxcli-debug-printf "DEBUG (pishrink-install): Installing Pishrink.\n"
+. $path_to_helper/debug-printf "DEBUG (pishrink-install): Installing Pishrink.\n"
 
 install_path=$(jq -r '.[] | select( .name == "pishrink" ) | .install_path' /etc/auxcli/components.json)
-auxcli-debug-printf "DEBUG (pishrink-install): install_path: %s\n" "$install_path"
+. $path_to_helper/debug-printf "DEBUG (pishrink-install): install_path: %s\n" "$install_path"
 
-auxcli-debug-printf "DEBUG (pishrink-install): Making pishrink executable.\n"
+. $path_to_helper/debug-printf "DEBUG (pishrink-install): Making pishrink executable.\n"
 sudo chmod +x $install_path/pishrink.sh
 
-auxcli-debug-printf "DEBUG (pishrink-install): Copying pishrink to /usr/local/bin\n"
+. $path_to_helper/debug-printf "DEBUG (pishrink-install): Copying pishrink to /usr/local/bin\n"
 sudo cp -f $install_path/pishrink.sh /usr/local/bin
 
-auxcli-write "components" "pishrink" "installed" "true"
+. $path_to_helper/write "components" "pishrink" "installed" "true"

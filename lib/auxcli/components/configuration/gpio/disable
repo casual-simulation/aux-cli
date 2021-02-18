@@ -1,19 +1,19 @@
 #!/bin/bash
 set -e
 
-auxcli-debug-printf "DEBUG (gpio-disable): Disabling gpio.\n"
+. $path_to_helper/debug-printf "DEBUG (gpio-disable): Disabling gpio.\n"
 
-auxcli-debug-printf "DEBUG (gpio-disable): Commenting out enabled gpio lines in /boot/config.txt\n"
+. $path_to_helper/debug-printf "DEBUG (gpio-disable): Commenting out enabled gpio lines in /boot/config.txt\n"
 sudo sed -i "s/^dtoverlay=gpio-no-irq/#dtoverlay=gpio-no-irq/g" /boot/config.txt
 if ! sudo grep "#dtoverlay=gpio-no-irq" "/boot/config.txt"; then
-    auxcli-debug-printf "DEBUG (gpio-disable): Disabled line isn't present.\n"
-    auxcli-debug-printf "DEBUG (gpio-disable): Adding a disabled line.\n"
+    . $path_to_helper/debug-printf "DEBUG (gpio-disable): Disabled line isn't present.\n"
+    . $path_to_helper/debug-printf "DEBUG (gpio-disable): Adding a disabled line.\n"
     echo "#dtoverlay=gpio-no-irq" | sudo tee -a /boot/config.txt
 fi
 
-auxcli-debug-printf "DEBUG (gpio-disable): Touching /etc/udev/rules.d/20-gpiomem.rules\n"
+. $path_to_helper/debug-printf "DEBUG (gpio-disable): Touching /etc/udev/rules.d/20-gpiomem.rules\n"
 sudo touch /etc/udev/rules.d/20-gpiomem.rules
-auxcli-debug-printf "DEBUG (gpio-disable): Removing gpio line from /etc/udev/rules.d/20-gpiomem.rules\n"
+. $path_to_helper/debug-printf "DEBUG (gpio-disable): Removing gpio line from /etc/udev/rules.d/20-gpiomem.rules\n"
 sudo sed -i "s/SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"//g" /etc/udev/rules.d/20-gpiomem.rules
 
-auxcli-write "components" "gpio" "enabled" "false"
+. $path_to_helper/write "components" "gpio" "enabled" "false"

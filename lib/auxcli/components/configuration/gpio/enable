@@ -1,22 +1,22 @@
 #!/bin/bash
 set -e
 
-auxcli-debug-printf "DEBUG (gpio-enable): Disabling gpio.\n"
+. $path_to_helper/debug-printf "DEBUG (gpio-enable): Disabling gpio.\n"
 
-auxcli-debug-printf "DEBUG (gpio-enable): Uncommenting enabled gpio lines in /boot/config.txt\n"
+. $path_to_helper/debug-printf "DEBUG (gpio-enable): Uncommenting enabled gpio lines in /boot/config.txt\n"
 sudo sed -i "s/^#dtoverlay=gpio-no-irq/dtoverlay=gpio-no-irq/g" /boot/config.txt
 if ! sudo grep "dtoverlay=gpio-no-irq" "/boot/config.txt"; then
-    auxcli-debug-printf "DEBUG (gpio-enable): Enabled line isn't present.\n"
-    auxcli-debug-printf "DEBUG (gpio-enable): Adding a enabled line.\n"
+    . $path_to_helper/debug-printf "DEBUG (gpio-enable): Enabled line isn't present.\n"
+    . $path_to_helper/debug-printf "DEBUG (gpio-enable): Adding a enabled line.\n"
     echo "dtoverlay=gpio-no-irq" | sudo tee -a /boot/config.txt
 fi
 
-auxcli-debug-printf "DEBUG (gpio-enable): Touching /etc/udev/rules.d/20-gpiomem.rules\n"
+. $path_to_helper/debug-printf "DEBUG (gpio-enable): Touching /etc/udev/rules.d/20-gpiomem.rules\n"
 sudo touch /etc/udev/rules.d/20-gpiomem.rules
 if ! sudo grep "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" "/etc/udev/rules.d/20-gpiomem.rules"; then
-    auxcli-debug-printf "DEBUG (gpio-enable): Gpio line isn't present.\n"
-    auxcli-debug-printf "DEBUG (gpio-enable): Adding a gpio line.\n"
+    . $path_to_helper/debug-printf "DEBUG (gpio-enable): Gpio line isn't present.\n"
+    . $path_to_helper/debug-printf "DEBUG (gpio-enable): Adding a gpio line.\n"
     echo "SUBSYSTEM==\"bcm2835-gpiomem\", KERNEL==\"gpiomem\", GROUP=\"gpio\", MODE=\"0660\"" | sudo tee -a /etc/udev/rules.d/20-gpiomem.rules
 fi
 
-auxcli-write "components" "gpio" "enabled" "true"
+. $path_to_helper/write "components" "gpio" "enabled" "true"

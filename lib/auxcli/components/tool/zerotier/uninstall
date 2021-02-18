@@ -4,4 +4,4 @@ set -e
 sudo apt-get remove zerotier-one
 sudo sed -i "/# ZeroTier Start/,/# ZeroTier End/d" /etc/rc.local
 
-auxcli-write "components" "zerotier" "installed" "false"
+. $path_to_helper/write "components" "zerotier" "installed" "false"

@@ -3,7 +3,7 @@ set -e
 
 # Config path for dhcpcd
 config_dhcpcd=$(jq -r '.[] | select( .name == "dhcpcd" ) | .config_path' $config_commands)
-auxcli-debug-printf "DEBUG (dhcpcd): Config path: %s\n" "$config_dhcpcd"
+. $path_to_helper/debug-printf "DEBUG (dhcpcd): Config path: %s\n" "$config_dhcpcd"
 
 # Arguments for dhcpcd
 readarray -t args_short < <(jq -r '.[].arg_short' $config_dhcpcd)
@@ -24,7 +24,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    auxcli-debug-printf "DEBUG (dhcpcd): Error Check: 1 of 2\n"
+    . $path_to_helper/debug-printf "DEBUG (dhcpcd): Error Check: 1 of 2\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -32,7 +32,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    auxcli-debug-printf "DEBUG (dhcpcd): Error Check: 2 of 2\n"
+    . $path_to_helper/debug-printf "DEBUG (dhcpcd): Error Check: 2 of 2\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli dhcpcd -h for help.\n\n"

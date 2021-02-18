@@ -1,41 +1,41 @@
 #!/bin/bash
 set -e
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Installing Raspiwifi.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Installing Raspiwifi.\n"
 
 install_path=$(jq -r '.[] | select( .name == "raspiwifi" ) | .install_path' /etc/auxcli/components.json)
-auxcli-debug-printf "DEBUG (raspiwifi-install): install_path: %s\n" "$install_path"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): install_path: %s\n" "$install_path"
 
 # Add in our custom scripts to bypass interactivity
-auxcli-debug-printf "DEBUG (raspiwifi-install): Updating the files in RaspiWiFi_modified.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Updating the files in RaspiWiFi_modified.\n"
 sudo cp -f "$install_path/initial_setup.py" $install_path/RaspiWiFi_modified
 sudo cp -f "$install_path/setup_lib.py" $install_path/RaspiWiFi_modified
 sudo cp -f "$install_path/config.json" $install_path/RaspiWiFi_modified
 sudo cp -f "$install_path/reset_lib.py" $install_path/RaspiWiFi_modified/libs/reset_device
 
 # Enable services before we hit a reboot
-auxcli-debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-dnsmasq-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-dnsmasq-checker.\n"
 sudo systemctl enable auxcli-dnsmasq-checker
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Starting auxcli-dnsmasq-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-dnsmasq-checker.\n"
 sudo systemctl start auxcli-dnsmasq-checker
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-hotspot-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-hotspot-checker.\n"
 sudo systemctl enable auxcli-hotspot-checker
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Starting auxcli-hotspot-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-hotspot-checker.\n"
 sudo systemctl start auxcli-hotspot-checker
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-wlan-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-wlan-checker.\n"
 sudo systemctl enable auxcli-wlan-checker
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wlan-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wlan-checker.\n"
 sudo systemctl start auxcli-wlan-checker
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-wpa-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-wpa-checker.\n"
 sudo systemctl enable auxcli-wpa-checker
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wpa-checker.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wpa-checker.\n"
 sudo systemctl start auxcli-wpa-checker
 
 # Install python dependencies through apt-get to reduce errors
@@ -57,14 +57,14 @@ sudo apt-get install -y \
     python3-openssl
 
 # Set installed/available to true before we hit a reboot
-auxcli-debug-printf "DEBUG (raspiwifi-install): Writing to config files.\n"
-auxcli-write "components" "raspiwifi" "installed" "true"
-auxcli-write "commands" "dhcpcd" "available" "true"
-auxcli-write "commands" "hotspot" "available" "true"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Writing to config files.\n"
+. $path_to_helper/write "components" "raspiwifi" "installed" "true"
+. $path_to_helper/write "commands" "dhcpcd" "available" "true"
+. $path_to_helper/write "commands" "hotspot" "available" "true"
 
 # Run the RaspiWiFi setup
-auxcli-debug-printf "DEBUG (raspiwifi-install): Changing directory to: %s/RaspiWiFi_modified\n" "$install_path"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Changing directory to: %s/RaspiWiFi_modified\n" "$install_path"
 cd $install_path/RaspiWiFi_modified
 
-auxcli-debug-printf "DEBUG (raspiwifi-install): Running setup script.\n"
+. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Running setup script.\n"
 sudo python3 initial_setup.py # Triggers a reboot

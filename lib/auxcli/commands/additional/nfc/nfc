@@ -3,7 +3,7 @@ set -e
 
 # Config path for nfc
 config_nfc=$(jq -r '.[] | select( .name == "nfc" ) | .config_path' $config_commands)
-auxcli-debug-printf "DEBUG (nfc): Config path: %s\n" "$config_nfc"
+. $path_to_helper/debug-printf "DEBUG (nfc): Config path: %s\n" "$config_nfc"
 
 # Arguments for nfc
 readarray -t args_short < <(jq -r '.[].arg_short' $config_nfc)
@@ -32,7 +32,7 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    auxcli-debug-printf "DEBUG (nfc): First error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (nfc): First error check.\n"
     if [ $# -eq 0 ]; then
         printf "\nYou need to pass an argument.\n"
         usage
@@ -40,7 +40,7 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    auxcli-debug-printf "DEBUG (nfc): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (nfc): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli nfc -h for help.\n\n"
@@ -49,7 +49,7 @@ err_check() {
 
     # Third error check
     # Throw an error messege if the first argument isn't valid
-    auxcli-debug-printf "DEBUG (nfc): Third error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (nfc): Third error check.\n"
     if [[ ${args[*]} =~ $2 ]]; then
         printf "\n\"%s\" is not a valid argument for \"%s\".\n" "$2" "$1"
         printf "Run auxcli nfc -h for help.\n\n"
@@ -63,11 +63,11 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
 
     -s | --ssid)
-        auxcli-debug-printf "DEBUG (nfc): Setting 'config_wifi' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (nfc): Setting 'config_wifi' to 'true'.\n"
         config_wifi=true
         if [[ ! ${args[*]} =~ $2 ]]; then
             ssid="$2"
-            auxcli-debug-printf "DEBUG (nfc): Setting 'ssid' to '%s'.\n" "$2"
+            . $path_to_helper/debug-printf "DEBUG (nfc): Setting 'ssid' to '%s'.\n" "$2"
             shift # past argument
             shift # past value
         else
@@ -76,11 +76,11 @@ while [[ $# -gt 0 ]]; do
         fi
         ;;
     -p | --password)
-        auxcli-debug-printf "DEBUG (nfc): Setting 'config_wifi' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (nfc): Setting 'config_wifi' to 'true'.\n"
         config_wifi=true
         if [[ ! ${args[*]} =~ $2 ]]; then
             password="$2"
-            auxcli-debug-printf "DEBUG (nfc): Setting 'password' to '%s'.\n" "$2"
+            . $path_to_helper/debug-printf "DEBUG (nfc): Setting 'password' to '%s'.\n" "$2"
             shift # past argument
             shift # past value
         else
@@ -89,11 +89,11 @@ while [[ $# -gt 0 ]]; do
         fi
         ;;
     -u | --url)
-        auxcli-debug-printf "DEBUG (nfc): Setting 'config_url' to 'true'.\n"
+        . $path_to_helper/debug-printf "DEBUG (nfc): Setting 'config_url' to 'true'.\n"
         config_url=true
         if [[ ! ${args[*]} =~ $2 ]]; then
             url="$2"
-            auxcli-debug-printf "DEBUG (nfc): Setting 'url' to '%s'.\n" "$2"
+            . $path_to_helper/debug-printf "DEBUG (nfc): Setting 'url' to '%s'.\n" "$2"
             shift # past argument
             shift # past value
         else

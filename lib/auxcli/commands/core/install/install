@@ -3,7 +3,7 @@ set -e
 
 # Config path for install
 config_install=$(jq -r '.[] | select( .name == "install" ) | .config_path' $config_commands)
-auxcli-debug-printf "DEBUG (install): Config path: %s\n" "$config_install"
+. $path_to_helper/debug-printf "DEBUG (install): Config path: %s\n" "$config_install"
 
 # Arguments for install
 readarray -t args_short < <(jq -r '.[].arg_short' $config_install)
@@ -20,7 +20,7 @@ usage() {
     done
     printf "\nCOMPONENTS:\n"
     for ((i = 0; i < ${#components_i[@]}; i++)); do
-        if auxcli-installed ${components_i[$i]}; then
+        if . $path_to_helper/installed ${components_i[$i]}; then
             printf "\t[x] %-24s\t%s\n" "${components_i[$i]}" "${components_i_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components_i[$i]}" "${components_i_desc[$i]}"
@@ -33,7 +33,7 @@ usage() {
 err_check() {
     # First error check
     # Throw an error messege if the first argument isn't valid
-    auxcli-debug-printf "DEBUG (install): Error Check: 1 of 2: %s\n" "$1"
+    . $path_to_helper/debug-printf "DEBUG (install): Error Check: 1 of 2: %s\n" "$1"
     if [[ ! ${components_i[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component or argument.\n" "$1"
         printf "Run 'auxcli install -h' for help.\n\n"
@@ -42,58 +42,58 @@ err_check() {
 
     # Second error check
     # Throw an error messege if the component is already installed
-    auxcli-debug-printf "DEBUG (install): Error Check: 2 of 2: %s\n" "$1"
-    if auxcli-installed "$1"; then
+    . $path_to_helper/debug-printf "DEBUG (install): Error Check: 2 of 2: %s\n" "$1"
+    if . $path_to_helper/installed "$1"; then
         printf "\nThe \"%s\" component is already installed.\n\n" "$1"
         return 1
     fi
 }
 
 install_component(){
-    auxcli-debug-printf "DEBUG (install): DHCPCD set check.\n"
-    if auxcli-available dhcpcd; then auxcli dhcpcd -s; fi
+    . $path_to_helper/debug-printf "DEBUG (install): DHCPCD set check.\n"
+    if . $path_to_helper/available dhcpcd; then auxcli dhcpcd -s; fi
     while [[ $# -gt 0 ]]; do
-        if auxcli-requires-reboot $1; then
-            auxcli-debug-printf "DEBUG (install): %s requires a reboot.\n" "$1"
-            auxcli-debug-printf "DEBUG (install): Setting reboot_required to 'true'\n"
-            auxcli-write "config" "reboot_required" "true"
+        if . $path_to_helper/requires-reboot $1; then
+            . $path_to_helper/debug-printf "DEBUG (install): %s requires a reboot.\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (install): Setting reboot_required to 'true'\n"
+            . $path_to_helper/write "config" "reboot_required" "true"
         fi
         if [[ ${hardware[*]} =~ $1 ]]; then
-            auxcli-debug-printf "DEBUG (install): %s is a 'hardware' component.\n" "$1"
-            auxcli-debug-printf "DEBUG (install): Installing: %s...\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (install): %s is a 'hardware' component.\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (install): Installing: %s...\n" "$1"
             . /lib/auxcli/components/hardware/$1/install
         fi
         if [[ ${tool[*]} =~ $1 ]]; then
-            auxcli-debug-printf "DEBUG (install): %s is a 'tool' component.\n" "$1"
-            auxcli-debug-printf "DEBUG (install): Installing: %s...\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (install): %s is a 'tool' component.\n" "$1"
+            . $path_to_helper/debug-printf "DEBUG (install): Installing: %s...\n" "$1"
             . /lib/auxcli/components/tool/$1/install
         fi
         shift
     done
-    auxcli-debug-printf "DEBUG (install): DHCPCD unset check.\n"
-    if auxcli-available dhcpcd; then auxcli dhcpcd -u; fi
+    . $path_to_helper/debug-printf "DEBUG (install): DHCPCD unset check.\n"
+    if . $path_to_helper/available dhcpcd; then auxcli dhcpcd -u; fi
 }
 
 install_everything(){
     # Enable all the things
-    auxcli-debug-printf "DEBUG (install): Enabling: gpio\n"
+    . $path_to_helper/debug-printf "DEBUG (install): Enabling: gpio\n"
     auxcli enable gpio
-    auxcli-debug-printf "DEBUG (install): Enabling: uart\n"
+    . $path_to_helper/debug-printf "DEBUG (install): Enabling: uart\n"
     auxcli enable uart
-    auxcli-debug-printf "DEBUG (install): Disabling: serial-console\n"
+    . $path_to_helper/debug-printf "DEBUG (install): Disabling: serial-console\n"
     auxcli disable serial-console
 
     # Install all the things
-    auxcli-debug-printf "DEBUG (install): Installing everything...\n"
+    . $path_to_helper/debug-printf "DEBUG (install): Installing everything...\n"
     install_component "${tool[@]}"
 }
 
 # Show the usage menu if there aren't any arguments
-auxcli-debug-printf "DEBUG (install): Empty Check.\n"
+. $path_to_helper/debug-printf "DEBUG (install): Empty Check.\n"
 if [ $# -eq 0 ]; then usage; fi
 
 # Check to see if the arguments include everything
-auxcli-debug-printf "DEBUG (install): Everything Check.\n"
+. $path_to_helper/debug-printf "DEBUG (install): Everything Check.\n"
 if [[ "$1" == "everything" ]]; then return 0; fi
 
 while [[ $# -gt 0 ]]; do
@@ -104,8 +104,8 @@ while [[ $# -gt 0 ]]; do
         shift # past argument
         ;;
     -r | --reboot)
-        auxcli-debug-printf "DEBUG (install): Setting reboot_on_exit to 'true'\n"
-        auxcli-write "config" "reboot_on_exit" "true"
+        . $path_to_helper/debug-printf "DEBUG (install): Setting reboot_on_exit to 'true'\n"
+        . $path_to_helper/write "config" "reboot_on_exit" "true"
         shift # past argument
         ;;
     -h | -help | --help)

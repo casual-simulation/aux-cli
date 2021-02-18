@@ -43,4 +43,4 @@ fi
 exit 0
 EOT
 
-auxcli-write "components" "slack" "installed" "true"
+. $path_to_helper/write "components" "slack" "installed" "true"

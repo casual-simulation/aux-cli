@@ -5,22 +5,22 @@ path_to_helper="/lib/auxcli/commands/helper"
 debug=true
 dnsmasq_conf="/etc/dnsmasq.conf"
 
-auxcli-debug-printf "DEBUG (dnsmasq-checker): Checking for dnsmasq...\n"
+. $path_to_helper/debug-printf "DEBUG (dnsmasq-checker): Checking for dnsmasq...\n"
 if [ -e "${dnsmasq_conf}" ]; then
     # Give a larger default range of IP Addresses with a longer timeout
-    auxcli-debug-printf "DEBUG (dnsmasq-checker): Extending IP range and timeout for dnsmasq...\n"
+    . $path_to_helper/debug-printf "DEBUG (dnsmasq-checker): Extending IP range and timeout for dnsmasq...\n"
     if sudo grep "^dhcp-range=" "${dnsmasq_conf}"; then
-        auxcli-debug-printf "DEBUG (dnsmasq-checker): Extending IP range.\n"
+        . $path_to_helper/debug-printf "DEBUG (dnsmasq-checker): Extending IP range.\n"
         sudo sed -i "s/^dhcp-range=.*/dhcp-range=10.0.0.10,10.0.0.110,12h/g" "${dnsmasq_conf}"
     else
-        auxcli-debug-printf "DEBUG (dnsmasq-checker): No dhcp-range found. Adding IP range.\n"
+        . $path_to_helper/debug-printf "DEBUG (dnsmasq-checker): No dhcp-range found. Adding IP range.\n"
         echo "dhcp-range=10.0.0.10,10.0.0.110,12h" | sudo tee -a "${dnsmasq_conf}"
     fi
 
     # Add the auxplayer name
-    auxcli-debug-printf "DEBUG (dnsmasq-checker): Verifying 'auxplayer.com' address is present...\n"
+    . $path_to_helper/debug-printf "DEBUG (dnsmasq-checker): Verifying 'auxplayer.com' address is present...\n"
     if ! sudo grep "address=/auxplayer.com/10.0.0.1" "${dnsmasq_conf}"; then
-        auxcli-debug-printf "DEBUG (dnsmasq-checker): No auxplayer address found. Adding address.\n"
+        . $path_to_helper/debug-printf "DEBUG (dnsmasq-checker): No auxplayer address found. Adding address.\n"
         echo "address=/auxplayer.com/10.0.0.1" | sudo tee -a "${dnsmasq_conf}"
     fi
 fi

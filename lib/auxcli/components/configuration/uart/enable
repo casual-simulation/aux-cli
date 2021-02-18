@@ -1,22 +1,22 @@
 #!/bin/bash
 set -e
 
-auxcli-debug-printf "DEBUG (uart-enable): Enabling uart.\n"
+. $path_to_helper/debug-printf "DEBUG (uart-enable): Enabling uart.\n"
 
 # If it finds UART, make sure it's on
-auxcli-debug-printf "DEBUG (uart-enable): Checking for commented enabled uart.\n"
+. $path_to_helper/debug-printf "DEBUG (uart-enable): Checking for commented enabled uart.\n"
 sudo sed -i "s/^#enable_uart=1/enable_uart=1/g" /boot/config.txt
 
-auxcli-debug-printf "DEBUG (uart-enable): Checking for commented disabled uart.\n"
+. $path_to_helper/debug-printf "DEBUG (uart-enable): Checking for commented disabled uart.\n"
 sudo sed -i "s/^#enable_uart=0/enable_uart=1/g" /boot/config.txt
 
-auxcli-debug-printf "DEBUG (uart-enable): Checking for disabled uart.\n"
+. $path_to_helper/debug-printf "DEBUG (uart-enable): Checking for disabled uart.\n"
 sudo sed -i "s/^enable_uart=0/enable_uart=1/g" /boot/config.txt
 
 if ! sudo grep "enable_uart=1" "/boot/config.txt"; then
-    auxcli-debug-printf "DEBUG (uart-enable): enable_uart was not detected at all.\n"
-    auxcli-debug-printf "DEBUG (uart-enable): Adding an enabled line.\n"
+    . $path_to_helper/debug-printf "DEBUG (uart-enable): enable_uart was not detected at all.\n"
+    . $path_to_helper/debug-printf "DEBUG (uart-enable): Adding an enabled line.\n"
     printf "\n# Enable UART\nenable_uart=1\n" | sudo tee -a /boot/config.txt
 fi
 
-auxcli-write "components" "uart" "enabled" "true"
+. $path_to_helper/write "components" "uart" "enabled" "true"

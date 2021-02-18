@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-
-auxcli-debug-printf "DEBUG (reboot-reset): Resetting reboot_on_exit to false.\n"
-auxcli-write "config" "reboot_on_exit" "false"
-
-auxcli-debug-printf "DEBUG (reboot-reset): Resetting reboot_required to false.\n"
-auxcli-write "config" "reboot_required" "false"

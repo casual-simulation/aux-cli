@@ -6,4 +6,4 @@ sudo apt-get install -y usbmuxd
 sudo systemctl enable usbmuxd
 sudo systemctl start usbmuxd
 
-auxcli-write "components" "tethering-usb" "installed" "true"
+. $path_to_helper/write "components" "tethering-usb" "installed" "true"

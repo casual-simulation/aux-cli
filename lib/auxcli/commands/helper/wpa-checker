@@ -5,23 +5,23 @@ path_to_helper="/lib/auxcli/commands/helper"
 debug=true
 wpa_conf="/etc/wpa_supplicant/wpa_supplicant.conf"
 
-auxcli-debug-printf "DEBUG (wpa-checker): Checking for wpa_supplicant...\n"
+. $path_to_helper/debug-printf "DEBUG (wpa-checker): Checking for wpa_supplicant...\n"
 if [ -e "${wpa_conf}" ]; then
-    auxcli-debug-printf "DEBUG (wpa-checker): Found wpa_supplicant. Verifying country and scan_ssid values...\n"
+    . $path_to_helper/debug-printf "DEBUG (wpa-checker): Found wpa_supplicant. Verifying country and scan_ssid values...\n"
     if sudo grep "country=" "${wpa_conf}"; then
-        auxcli-debug-printf "DEBUG (wpa-checker): Setting country to 'US'.\n"
+        . $path_to_helper/debug-printf "DEBUG (wpa-checker): Setting country to 'US'.\n"
         sudo sed -i "s/^country=.*/country=US/g" "${wpa_conf}"
     else
-        auxcli-debug-printf "DEBUG (wpa-checker): Adding country 'US'.\n"
+        . $path_to_helper/debug-printf "DEBUG (wpa-checker): Adding country 'US'.\n"
         line_number=$(sudo grep -ne '^$' "${wpa_conf}" | grep -Eo '^[^:]+')
         sudo sed -i "${line_number}i country=US" "${wpa_conf}"
     fi
 
     if sudo grep "scan_ssid=" "${wpa_conf}"; then
-        auxcli-debug-printf "DEBUG (wpa-checker): Setting scan_ssid to '1'.\n"
+        . $path_to_helper/debug-printf "DEBUG (wpa-checker): Setting scan_ssid to '1'.\n"
         sudo sed -i "s/^scan_ssid=.*/scan_ssid=1/g" "${wpa_conf}"
     else
-        auxcli-debug-printf "DEBUG (wpa-checker): Adding scan_ssid '1'.\n"
+        . $path_to_helper/debug-printf "DEBUG (wpa-checker): Adding scan_ssid '1'.\n"
         line_number=$(sudo grep -n "network=" "${wpa_conf}" | grep -Eo '^[^:]+')
         line_number=$((line_number + 1))
         sudo sed -i "${line_number}i \\ \\ \\ \\ scan_ssid=1" "${wpa_conf}"

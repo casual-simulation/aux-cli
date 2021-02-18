@@ -3,7 +3,7 @@ set -e
 
 # Config path for targetversion
 config_targetversion=$(jq -r '.[] | select( .name == "targetversion" ) | .config_path' $config_commands)
-auxcli-debug-printf "DEBUG (targetversion): Config path: %s\n" "$config_targetversion"
+. $path_to_helper/debug-printf "DEBUG (targetversion): Config path: %s\n" "$config_targetversion"
 
 # Arguments for targetversion
 readarray -t args_short < <(jq -r '.[].arg_short' $config_targetversion)
@@ -29,14 +29,14 @@ usage() {
 err_check() {
     # First error check
     # Show the usage menu if there aren't any arguments
-    auxcli-debug-printf "DEBUG (targetversion): First error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (targetversion): First error check.\n"
     if [ $# -eq 0 ]; then
         usage
     fi
 
     # Second error check
     # Throw an error messege if the first argument isn't valid
-    auxcli-debug-printf "DEBUG (targetversion): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (targetversion): Second error check.\n"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli targetversion -h for help.\n\n"
@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
     -f | --file)
         if [[ ! ${args[*]} =~ $2 ]]; then
             file="$2"
-            auxcli-debug-printf "DEBUG (targetversion): Setting 'file' to '%s'.\n" "$2"
+            . $path_to_helper/debug-printf "DEBUG (targetversion): Setting 'file' to '%s'.\n" "$2"
             shift # past argument
             shift # past value
         else
@@ -63,7 +63,7 @@ while [[ $# -gt 0 ]]; do
     -v | --version)
         if [[ ! ${args[*]} =~ $2 ]]; then
             version="$2"
-            auxcli-debug-printf "DEBUG (targetversion): Setting 'version' to '%s'.\n" "$2"
+            . $path_to_helper/debug-printf "DEBUG (targetversion): Setting 'version' to '%s'.\n" "$2"
             shift # past argument
             shift # past value
         else
@@ -73,7 +73,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     -r | --restart)
         restart_casualOS=true
-        auxcli-debug-printf "DEBUG (targetversion): Setting restart_casualOS to 'true'\n"
+        . $path_to_helper/debug-printf "DEBUG (targetversion): Setting restart_casualOS to 'true'\n"
         shift # past argument
         ;;
     -h | -help | --help)
