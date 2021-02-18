@@ -1,6 +1,6 @@
 [Unit]
 Description=Docker to Host Communication
-After=auxcli-hotspot-checker.service
+After=auxcli-reboot-reset.service
 StartLimitIntervalSec=0
 
 [Service]

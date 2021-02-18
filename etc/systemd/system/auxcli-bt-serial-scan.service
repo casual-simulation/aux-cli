@@ -1,6 +1,6 @@
 [Unit]
 Description=Bluetooth Serial Scan
-After=auxcli-hotspot-checker.service
+After=auxcli-first-boot.service
 StartLimitIntervalSec=0
 
 [Service]

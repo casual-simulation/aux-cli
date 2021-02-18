@@ -1,6 +1,6 @@
 [Unit]
 Description=First Boot Setup for casualOS.
-After=auxcli-hotspot-checker.service
+After=auxcli-reboot-reset.service
 StartLimitIntervalSec=0
 
 [Service]
