@@ -2,80 +2,79 @@
 set -e
 
 path_to_helper="/lib/auxcli/commands/helper"
-debug=true
 hostapd_conf="/etc/hostapd/hostapd.conf"
 raspiwifi_conf="/etc/raspiwifi/raspiwifi.conf"
 host=$(hostname)
 
 mac_check() {
-    . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Checking the MAC...\n"
+    printf "DEBUG (hotspot-checker): Checking the MAC...\n"
 
     oldfour=$(grep -Eo "ssid=.*? ...." $hostapd_conf | tail -c 5)
-    . $path_to_helper/debug-printf "DEBUG (hotspot-checker): The last 4 characters of the old MAC are: %s\n" "$oldfour"
+    printf "DEBUG (hotspot-checker): The last 4 characters of the old MAC are: %s\n" "$oldfour"
 
     newfour=$(tail -c 6 /sys/class/net/eth0/address | tr --delete :)
-    . $path_to_helper/debug-printf "DEBUG (hotspot-checker): The last 4 characters of the new MAC are: %s\n" "$newfour"
+    printf "DEBUG (hotspot-checker): The last 4 characters of the new MAC are: %s\n" "$newfour"
 }
 
 mac_set() {
     if [ "$oldfour" != "$newfour" ]; then
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): The MAC is different...\n"
+        printf "DEBUG (hotspot-checker): The MAC is different...\n"
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Updating the MAC...\n"
+        printf "DEBUG (hotspot-checker): Updating the MAC...\n"
         sudo sed -i "s/$oldfour/$newfour/g" $hostapd_conf
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
+        printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
         . $path_to_helper/write "config" "reboot_required" "true"
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
+        printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
         . $path_to_helper/write "config" "reboot_on_exit" "true"
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): MAC has been updated.\n"
+        printf "DEBUG (hotspot-checker): MAC has been updated.\n"
     else
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): MAC Address matches.\n"
+        printf "DEBUG (hotspot-checker): MAC Address matches.\n"
     fi
 }
 
 hostname_check() {
-    . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Checking the hostname...\n"
+    printf "DEBUG (hotspot-checker): Checking the hostname...\n"
 
     oldhost=$(grep -Eo "ssid=.*" $hostapd_conf | sed 's/.\{5\}$//' | sed "s/^ssid=//g")
-    . $path_to_helper/debug-printf "DEBUG (hotspot-checker): The hostapd old hostname is: %s\n" "$oldhost"
+    printf "DEBUG (hotspot-checker): The hostapd old hostname is: %s\n" "$oldhost"
 
     oldhost2=$(grep -Eo "ssid_prefix=.*" $raspiwifi_conf | sed "s/^ssid_prefix=//g")
-    . $path_to_helper/debug-printf "DEBUG (hotspot-checker): The raspiwifi old hostname is: %s\n" "$oldhost2"
+    printf "DEBUG (hotspot-checker): The raspiwifi old hostname is: %s\n" "$oldhost2"
 }
 
 hostname_set() {
     if [ "$host" != "$oldhost" ]; then
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): hostapd hostname has changed.\n"
+        printf "DEBUG (hotspot-checker): hostapd hostname has changed.\n"
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Updating the hostapd hostname.\n"
+        printf "DEBUG (hotspot-checker): Updating the hostapd hostname.\n"
         sudo sed -i "s/$oldhost/$host/g" $hostapd_conf
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
+        printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
         . $path_to_helper/write "config" "reboot_required" "true"
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
+        printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
         . $path_to_helper/write "config" "reboot_on_exit" "true"
 
     else
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): hostapd hostname has not changed.\n"
+        printf "DEBUG (hotspot-checker): hostapd hostname has not changed.\n"
     fi
     if [ "$host" != "$oldhost2" ]; then
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): raspiwifi hostname has changed.\n"
+        printf "DEBUG (hotspot-checker): raspiwifi hostname has changed.\n"
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Updating the raspiwifi hostname.\n"
+        printf "DEBUG (hotspot-checker): Updating the raspiwifi hostname.\n"
         sudo sed -i "s/$oldhost2/$host/g" $raspiwifi_conf
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
+        printf "DEBUG (hotspot-checker): Setting reboot_required to 'true'\n"
         . $path_to_helper/write "config" "reboot_required" "true"
 
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
+        printf "DEBUG (hotspot-checker): Setting reboot_on_exit to 'true'\n"
         . $path_to_helper/write "config" "reboot_on_exit" "true"
 
     else
-        . $path_to_helper/debug-printf "DEBUG (hotspot-checker): raspiwifi hostname has not changed.\n"
+        printf "DEBUG (hotspot-checker): raspiwifi hostname has not changed.\n"
     fi
 }
 
