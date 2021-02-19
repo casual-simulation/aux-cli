@@ -4,9 +4,8 @@ After=auxcli-reboot-reset.service
 StartLimitIntervalSec=0
 
 [Service]
-Type=simple
-Restart=always
-RestartSec=1
+Type=oneshot
+Restart=no
 User=pi
 ExecStart=/usr/bin/env bash /lib/auxcli/commands/helper/wlan-checker
 
