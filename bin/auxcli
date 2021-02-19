@@ -21,7 +21,7 @@ config_components_tmp="/etc/auxcli/components.json.tmp"
 config_devices="/etc/auxcli/devices.json"
 config_devices_tmp="/etc/auxcli/devices.json.tmp"
 
-. $path_to_helper/debug-printf "DEBUG (auxcli): CONFIG PATHS\n"
+. $path_to_helper/debug-printf "\nDEBUG (auxcli): CONFIG PATHS\n"
 . $path_to_helper/debug-printf "DEBUG (auxcli): config_main: %s\n" "$config_main"
 . $path_to_helper/debug-printf "DEBUG (auxcli): config_main_tmp: %s\n" "$config_main_tmp"
 . $path_to_helper/debug-printf "DEBUG (auxcli): config_commands: %s\n" "$config_commands"
@@ -38,7 +38,7 @@ readarray -t additional < <(jq -r '.[] | select(.type == "additional") | .name' 
 readarray -t core < <(jq -r '.[] | select(.type == "core") | .name' $config_commands)
 readarray -t helper < <(jq -r '.[] | select(.type == "helper") | .name' $config_commands)
 
-. $path_to_helper/debug-printf "DEBUG (auxcli): COMMAND INFO\n"
+. $path_to_helper/debug-printf "\nDEBUG (auxcli): COMMAND INFO\n"
 . $path_to_helper/debug-printf "DEBUG (auxcli): commands: %s\n" "${commands[@]}"
 . $path_to_helper/debug-printf "DEBUG (auxcli): commands_desc: %s\n" "${commands_desc[@]}"
 . $path_to_helper/debug-printf "DEBUG (auxcli): additional: %s\n" "${additional[@]}"
@@ -56,7 +56,7 @@ readarray -t configuration < <(jq -r '.[] | select(.type == "configuration") | .
 readarray -t hardware < <(jq -r '.[] | select(.type == "hardware") | .name' $config_components)
 readarray -t tool < <(jq -r '.[] | select(.type == "tool") | .name' $config_components)
 
-. $path_to_helper/debug-printf "DEBUG (auxcli): COMPONENT INFO\n"
+. $path_to_helper/debug-printf "\nDEBUG (auxcli): COMPONENT INFO\n"
 . $path_to_helper/debug-printf "DEBUG (auxcli): components: %s\n" "${components[@]}"
 . $path_to_helper/debug-printf "DEBUG (auxcli): components_desc: %s\n" "${components_desc[@]}"
 . $path_to_helper/debug-printf "DEBUG (auxcli): components_i: %s\n" "${components_i[@]}"
