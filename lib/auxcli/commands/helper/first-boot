@@ -3,16 +3,6 @@ set -e
 
 path_to_helper="/lib/auxcli/commands/helper"
 
-# Config paths
-config_main="/etc/auxcli/config.json"
-config_main_tmp="/etc/auxcli/config.json.tmp"
-config_commands="/etc/auxcli/commands.json"
-config_commands_tmp="/etc/auxcli/commands.json.tmp"
-config_components="/etc/auxcli/components.json"
-config_components_tmp="/etc/auxcli/components.json.tmp"
-config_devices="/etc/auxcli/devices.json"
-config_devices_tmp="/etc/auxcli/devices.json.tmp"
-
 if [ -f /etc/auxcli/config.json ]; then
     first_boot=$(jq -r '.first_boot' /etc/auxcli/config.json) 
 else

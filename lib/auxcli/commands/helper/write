@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+# Config paths
+config_main="/etc/auxcli/config.json"
+config_main_tmp="/etc/auxcli/config.json.tmp"
+config_commands="/etc/auxcli/commands.json"
+config_commands_tmp="/etc/auxcli/commands.json.tmp"
+config_components="/etc/auxcli/components.json"
+config_components_tmp="/etc/auxcli/components.json.tmp"
+config_devices="/etc/auxcli/devices.json"
+config_devices_tmp="/etc/auxcli/devices.json.tmp"
+
 # . $path_to_helper/write [file] [OPTIONAL: command/component] [key] [value]
 
 while [[ $# -gt 0 ]]; do
