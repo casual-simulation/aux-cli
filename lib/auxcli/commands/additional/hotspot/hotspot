@@ -23,16 +23,8 @@ usage() {
 
 err_check() {
     # First error check
-    # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (hotspot): First error check.\n"
-    if [ $# -eq 0 ]; then
-        printf "\nYou need to pass an argument.\n"
-        usage
-    fi
-
-    # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (hotspot): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (hotspot): Error Check: 1 of 1: %s\n" "$1"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli hotspot -h for help.\n\n"
@@ -75,9 +67,12 @@ hotspot_disable() {
     . $path_to_helper/write "config" "reboot_required" "true"
 }
 
-err_check "$@"
+# Show the usage menu if there aren't any arguments
+. $path_to_helper/debug-printf "DEBUG (hotspot): Empty Check.\n"
+if [ $# -eq 0 ]; then usage; fi
 
 while [[ $# -gt 0 ]]; do
+    if ! err_check "$1"; then shift; continue; fi
     case "$1" in
 
     -c | --check) #Set Hostname

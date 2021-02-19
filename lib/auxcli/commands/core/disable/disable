@@ -31,15 +31,8 @@ usage() {
 
 err_check() {
     # First error check
-    # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (disable): Error Check: 1 of 3\n"
-    if [ $# -eq 0 ]; then
-        usage
-    fi
-
-    # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (disable): Error Check: 2 of 3\n"
+    . $path_to_helper/debug-printf "DEBUG (disable): Error Check: 1 of 2: %s\n" "$1"
     if [[ ! ${components_e[*]} =~ $1 ]] && [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is not a valid component or argument.\n" "$1"
         printf "Run 'auxcli disable -h' for help.\n\n"
@@ -47,9 +40,9 @@ err_check() {
     fi
 
 
-    # Third error check
+    # Second error check
     # Throw an error messege if the component is already disabled
-    . $path_to_helper/debug-printf "DEBUG (disable): Error Check: 3 of 3\n"
+    . $path_to_helper/debug-printf "DEBUG (disable): Error Check: 2 of 2: %s\n" "$1"
     if ! . $path_to_helper/enabled "$1"; then
         printf "\nThe \"%s\" component is already disabled.\n\n" "$1"
         exit 0
@@ -66,9 +59,12 @@ disable_component(){
     . /lib/auxcli/components/configuration/$1/disable
 }
 
-err_check "$@"
+# Show the usage menu if there aren't any arguments
+. $path_to_helper/debug-printf "DEBUG (disable): Empty Check.\n"
+if [ $# -eq 0 ]; then usage; fi
 
 while [[ $# -gt 0 ]]; do
+    if ! err_check "$1"; then shift; continue; fi
     case "$1" in
     -r | --reboot)
         . $path_to_helper/debug-printf "DEBUG (disable): Setting reboot_on_exit to 'true'\n"

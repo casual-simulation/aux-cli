@@ -34,15 +34,8 @@ usage() {
 
 err_check() {
     # First error check
-    # Show the usage menu if there aren't any arguments
-    . $path_to_helper/debug-printf "DEBUG (btmode): First error check.\n"
-    if [ $# -eq 0 ]; then
-        usage
-    fi
-
-    # Second error check
     # Throw an error messege if the first argument isn't valid
-    . $path_to_helper/debug-printf "DEBUG (btmode): Second error check.\n"
+    . $path_to_helper/debug-printf "DEBUG (btmode): Error Check: 1 of 1: %s\n" "$1"
     if [[ ! ${args[*]} =~ $1 ]]; then
         printf "\n\"%s\" is an invalid argument.\n" "$1"
         printf "Run auxcli btmode -h for help.\n\n"
@@ -50,9 +43,12 @@ err_check() {
     fi
 }
 
-err_check "$@"
+# Show the usage menu if there aren't any arguments
+. $path_to_helper/debug-printf "DEBUG (btmode): Empty Check.\n"
+if [ $# -eq 0 ]; then usage; fi
 
 while [[ $# -gt 0 ]]; do
+    if ! err_check "$1"; then shift; continue; fi
     case "$1" in
     none)
         . $path_to_helper/debug-printf "DEBUG (btmode): Setting btmode to 'none'\n"
