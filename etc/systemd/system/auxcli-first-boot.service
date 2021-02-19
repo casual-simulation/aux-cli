@@ -4,9 +4,8 @@ After=auxcli-reboot-reset.service
 StartLimitIntervalSec=0
 
 [Service]
-Type=oneshot
-Restart=no
-User=pi
+Type=simple
+User=root
 ExecStart=/usr/bin/env bash /lib/auxcli/commands/helper/first-boot
 
 [Install]

@@ -4,9 +4,8 @@ After=network.target
 StartLimitIntervalSec=0
 
 [Service]
-Type=oneshot
-Restart=no
-User=pi
+Type=simple
+User=root
 ExecStart=/usr/bin/env bash /lib/auxcli/commands/helper/reboot-reset
 
 [Install]
