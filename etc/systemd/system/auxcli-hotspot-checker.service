@@ -1,8 +1,6 @@
 [Unit]
 Description=Checks if the hostname/mac needs to be updated for hotspot.
-After=auxcli-reboot-reset.service
 After=auxcli-wpa-checker.service
-Before=auxcli-first-boot.service
 StartLimitIntervalSec=0
 
 [Service]

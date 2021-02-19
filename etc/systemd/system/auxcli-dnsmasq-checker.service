@@ -1,8 +1,6 @@
 [Unit]
 Description=Extend IP Range and Timeout for dnsmasq
-After=auxcli-reboot-reset.service
 After=auxcli-wlan-checker.service
-Before=auxcli-first-boot.service
 StartLimitIntervalSec=0
 
 [Service]

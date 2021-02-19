@@ -1,6 +1,6 @@
 [Unit]
 Description=Bluetooth Tether
-After=auxcli-first-boot.service
+After=auxcli-web.service
 StartLimitIntervalSec=0
 
 [Service]

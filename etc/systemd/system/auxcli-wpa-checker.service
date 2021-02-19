@@ -1,8 +1,6 @@
 [Unit]
 Description=Verifies WPA settings work with wlan0 and wlan1.
-After=auxcli-reboot-reset.service
 After=auxcli-dnsmasq-checker.service
-Before=auxcli-first-boot.service
 StartLimitIntervalSec=0
 
 [Service]
