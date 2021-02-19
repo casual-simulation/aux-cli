@@ -9,7 +9,7 @@ else
     first_boot=true
 fi
 
-if $first_boot; then
+if [[ $first_boot == "true" ]]; then
     printf "DEBUG (first-boot): Pulling docker-compose images.\n"
     docker-compose -f /home/pi/docker-compose.yml pull 
 

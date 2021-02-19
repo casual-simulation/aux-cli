@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-if $(jq -r '.reboot_required' /etc/auxcli/config.json); then
+if [[ $(jq -r '.reboot_required' /etc/auxcli/config.json) == "true" ]]; then
     . $path_to_helper/debug-printf "DEBUG (reboot-apply): Reboot required.\n"
     printf "You need to reboot for the changes to take effect.\n"
-    if $(jq -r '.reboot_on_exit' /etc/auxcli/config.json); then
+    if [[ $(jq -r '.reboot_on_exit' /etc/auxcli/config.json) == "true" ]]; then
         . $path_to_helper/debug-printf "DEBUG (reboot-apply): Rebooting now.\n"
         sudo reboot now
     # else
@@ -16,7 +16,7 @@ if $(jq -r '.reboot_required' /etc/auxcli/config.json); then
     fi
 else
     . $path_to_helper/debug-printf "DEBUG (reboot-apply): No reboot required.\n"
-    if $(jq -r '.reboot_on_exit' /etc/auxcli/config.json); then
+    if [[ $(jq -r '.reboot_on_exit' /etc/auxcli/config.json) == "true" ]]; then
         . $path_to_helper/debug-printf "DEBUG (reboot-apply): Not rebooting on exit.\n"
         . $path_to_helper/debug-printf "DEBUG (reboot-apply): Setting reboot_on_exit to 'false'\n"
         . $path_to_helper/write "config" "reboot_on_exit" "false"
