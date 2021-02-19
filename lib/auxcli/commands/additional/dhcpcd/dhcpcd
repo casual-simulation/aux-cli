@@ -16,7 +16,7 @@ usage() {
     printf "Wrapper for setting and unsetting dhcpcd settings.\n\n"
     printf "OPTIONS:\n"
     for ((i = 0; i < ${#args_desc[@]}; i++)); do
-        printf "\t%-2s\t%-7s\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
+        printf "\t%-2s\t%-7s\t\t%s\n" "${args_short[$i]}" "${args_long[$i]}" "${args_desc[$i]}"
     done
     exit 1
 }
