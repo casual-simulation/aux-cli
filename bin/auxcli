@@ -72,7 +72,7 @@ usage() {
     printf "Command line tools for AUX dealing more with the hardware/server than auxplayer itself.\n\n"
     printf "COMMANDS:\n"
     for ((i = 0; i < ${#commands[@]}; i++)); do
-        if [[ ! ${helper[*]} =~ ${commands[$i]} ]]; then 
+        if [[ ${core[*]} =~ ${commands[$i]} ]] || [[ ${additional[*]} =~ ${commands[$i]} ]]; then 
             if . $path_to_helper/available ${commands[$i]}; then
                 # \t        Tab
                 # [ ]       Marked if available
