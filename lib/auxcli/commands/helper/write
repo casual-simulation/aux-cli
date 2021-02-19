@@ -7,7 +7,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
     commands)
         . $path_to_helper/debug-printf "DEBUG (write): Writing to commands.json.\n"
-        jq --arg command "$2" --arg key "$3" --arg value "$4" '(.[] | select (.name == $command) | .[$key]) = $value' $config_commands | sudo tee $config_commands_tmp 1> /dev/null
+        sudo jq --arg command "$2" --arg key "$3" --arg value "$4" '(.[] | select (.name == $command) | .[$key]) = $value' $config_commands | sudo tee $config_commands_tmp 1> /dev/null
         sudo mv -f $config_commands_tmp $config_commands
         shift # past commands
         shift # past command
@@ -16,7 +16,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     components)
         . $path_to_helper/debug-printf "DEBUG (write): Writing to components.json.\n"
-        jq --arg component "$2" --arg key "$3" --arg value "$4" '(.[] | select (.name == $component) | .[$key]) = $value' $config_components | sudo tee $config_components_tmp 1> /dev/null
+        sudo jq --arg component "$2" --arg key "$3" --arg value "$4" '(.[] | select (.name == $component) | .[$key]) = $value' $config_components | sudo tee $config_components_tmp 1> /dev/null
         sudo mv -f $config_components_tmp $config_components
         shift # past components
         shift # past command
@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     config)
         . $path_to_helper/debug-printf "DEBUG (write): Writing to config.json.\n"
-        jq --arg key "$2" --arg value "$3" '(.[$key]) = $value' $config_main | sudo tee $config_main_tmp 1> /dev/null
+        sudo jq --arg key "$2" --arg value "$3" '(.[$key]) = $value' $config_main | sudo tee $config_main_tmp 1> /dev/null
         sudo mv -f $config_main_tmp $config_main
         shift # past config
         shift # past key
