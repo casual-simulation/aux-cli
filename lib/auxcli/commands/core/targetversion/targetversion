@@ -9,7 +9,7 @@ config_targetversion=$(jq -r '.[] | select( .name == "targetversion" ) | .config
 readarray -t args_short < <(jq -r '.[].arg_short' $config_targetversion)
 readarray -t args_long < <(jq -r '.[].arg_long' $config_targetversion)
 readarray -t args_desc < <(jq -r '.[].short_desc' $config_targetversion)
-readarray -t defaults < <(jq '.[].default' $config_targetversion)
+readarray -t defaults < <(jq -r '.[].default' $config_targetversion)
 args=("${args_short[@]}" "${args_long[@]}")
 
 # Default Variables
