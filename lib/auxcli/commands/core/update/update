@@ -39,56 +39,6 @@ err_check() {
     fi
 }
 
-# Show the usage menu if there aren't any arguments
-. $path_to_helper/debug-printf "DEBUG (update): Empty Check.\n"
-if [ $# -eq 0 ]; then usage; fi
-
-while [[ $# -gt 0 ]]; do
-    if ! err_check "$1"; then shift; continue; fi
-    case "$1" in
-
-    -a | --aux)
-        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_aux' to 'true'.\n"
-        update_aux=true
-        shift # past argument
-        ;;
-    -A | --aux-auto)
-        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_aux' to 'true'.\n"
-        automatic_update_aux=true
-        shift # past argument
-        ;;
-    -c | --cli)
-        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_cli' to 'true'.\n"
-        update_cli=true
-        shift # past argument
-        ;;
-    -C | --cli-auto)
-        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_cli' to 'true'.\n"
-        automatic_update_cli=true
-        shift # past argument
-        ;;
-    -p | --pi)
-        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_pi' to 'true'.\n"
-        update_pi=true
-        shift # past argument
-        ;;
-    -P | --pi-auto)
-        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_pi' to 'true'.\n"
-        automatic_update_pi=true
-        shift # past argument
-        ;;
-    -y)
-        . $path_to_helper/debug-printf "DEBUG (update): Setting 'agree' to 'true'.\n"
-        agree=true
-        shift # past argument
-        ;;
-    -h | -help | --help)
-        usage
-        shift # past argument
-        ;;
-    esac
-done
-
 vercomp () {
     if [[ $1 == $2 ]]; then
         . $path_to_helper/debug-printf "DEBUG (update): Version numbers are the same.\n"
@@ -234,5 +184,55 @@ run_steps() {
     . $path_to_helper/debug-printf "DEBUG (update): DHCPCD unset check.\n"
     if . $path_to_helper/available dhcpcd; then auxcli dhcpcd -u; fi
 }
+
+# Show the usage menu if there aren't any arguments
+. $path_to_helper/debug-printf "DEBUG (update): Empty Check.\n"
+if [ $# -eq 0 ]; then usage; fi
+
+while [[ $# -gt 0 ]]; do
+    if ! err_check "$1"; then shift; continue; fi
+    case "$1" in
+
+    -a | --aux)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_aux' to 'true'.\n"
+        update_aux=true
+        shift # past argument
+        ;;
+    -A | --aux-auto)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_aux' to 'true'.\n"
+        automatic_update_aux=true
+        shift # past argument
+        ;;
+    -c | --cli)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_cli' to 'true'.\n"
+        update_cli=true
+        shift # past argument
+        ;;
+    -C | --cli-auto)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_cli' to 'true'.\n"
+        automatic_update_cli=true
+        shift # past argument
+        ;;
+    -p | --pi)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'update_pi' to 'true'.\n"
+        update_pi=true
+        shift # past argument
+        ;;
+    -P | --pi-auto)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_pi' to 'true'.\n"
+        automatic_update_pi=true
+        shift # past argument
+        ;;
+    -y)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'agree' to 'true'.\n"
+        agree=true
+        shift # past argument
+        ;;
+    -h | -help | --help)
+        usage
+        shift # past argument
+        ;;
+    esac
+done
 
 run_steps
