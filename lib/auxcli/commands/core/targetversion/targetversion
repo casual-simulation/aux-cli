@@ -37,6 +37,15 @@ err_check() {
     fi
 }
 
+set_targetversion(){
+    if [ $version == "latest" ]; then
+        target_version="$version"
+    else
+        target_version="v$version"
+    fi
+    sudo sed -i -E "s@(^\s*.*aux-arm32:).*@\1$target_version'@g" $file
+}
+
 # Show the usage menu if there aren't any arguments
 . $path_to_helper/debug-printf "DEBUG (targetversion): Empty Check.\n"
 if [ $# -eq 0 ]; then usage; fi
@@ -78,15 +87,6 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
-
-set_targetversion(){
-    if [ $version == "latest" ]; then
-        target_version="$version"
-    else
-        target_version="v$version"
-    fi
-    sudo sed -i -E "s@(^\s*.*aux-arm32:).*@\1$target_version'@g" $file
-}
 
 set_targetversion
 if $restart_casualOS; then auxcli restart; fi
