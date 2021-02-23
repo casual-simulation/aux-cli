@@ -49,6 +49,16 @@ err_check() {
     fi
 }
 
+write_wifi(){
+    printf "Configuring NFC with WiFi credentials...\n"
+    sudo python3 /lib/auxcli/modules/nfc-hat/nfc_write_wifi.py -s "$ssid" -p "$password"
+}
+
+write_url(){
+    printf "Configuring NFC with URL...\n"
+    sudo python3 /lib/auxcli/modules/nfc-hat/nfc_write_url.py -u "$url"
+}
+
 # Show the usage menu if there aren't any arguments
 . $path_to_helper/debug-printf "DEBUG (nfc): Empty Check.\n"
 if [ $# -eq 0 ]; then usage; fi
@@ -102,16 +112,6 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
-
-write_wifi(){
-    printf "Configuring NFC with WiFi credentials...\n"
-    sudo python3 /lib/auxcli/modules/nfc-hat/nfc_write_wifi.py -s "$ssid" -p "$password"
-}
-
-write_url(){
-    printf "Configuring NFC with URL...\n"
-    sudo python3 /lib/auxcli/modules/nfc-hat/nfc_write_url.py -u "$url"
-}
 
 if $config_wifi; then write_wifi; fi
 if $config_url; then write_url; fi
