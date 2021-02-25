@@ -14,6 +14,9 @@ args=("${args_short[@]}" "${args_long[@]}")
 previous_mode=$(jq -r '.btmode' $config_main)
 . $path_to_helper/debug-printf "DEBUG (btmode): Previous mode: %s\n" "$previous_mode"
 
+bt_hotspot=$(jq -r '.bt_hotspot' $config_main)
+. $path_to_helper/debug-printf "DEBUG (btmode): bt_hotspot: %s\n" "$bt_hotspot"
+
 usage() {
     printf "\nUsage:    auxcli btmode [ARGUMENT] [OPTIONS]\n\n"
     printf "A tool for configuring the bluetooth mode.\n\n"
@@ -54,6 +57,8 @@ btmode_none(){
         sudo systemctl disable auxcli-bt-tether
         . $path_to_helper/debug-printf "DEBUG (btmode): Setting reboot_required to 'true'\n"
         . $path_to_helper/write "config" "reboot_required" "true"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Setting bt_hotspot to 'false'\n"
+        . $path_to_helper/write "config" "bt_hotspot" "false"
     elif [ "$previous_mode" == "serial" ]; then
         . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
         sudo systemctl stop auxcli-bt-serial-scan
@@ -76,6 +81,8 @@ btmode_tether(){
     sudo systemctl enable auxcli-bt-tether
     . $path_to_helper/debug-printf "DEBUG (btmode): Starting service: auxcli-bt-tether.\n"
     sudo systemctl start auxcli-bt-tether
+    . $path_to_helper/debug-printf "DEBUG (btmode): Setting bt_hotspot to 'true'\n"
+    . $path_to_helper/write "config" "bt_hotspot" "true"
 }
 
 btmode_serial(){
@@ -89,6 +96,8 @@ btmode_serial(){
         sudo systemctl disable auxcli-bt-tether
         . $path_to_helper/debug-printf "DEBUG (btmode): Setting reboot_required to 'true'\n"
         . $path_to_helper/write "config" "reboot_required" "true"
+        . $path_to_helper/debug-printf "DEBUG (btmode): Setting bt_hotspot to 'false'\n"
+        . $path_to_helper/write "config" "bt_hotspot" "false"
     fi
     . $path_to_helper/debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-serial-scan.\n"
     sudo systemctl enable auxcli-bt-serial-scan

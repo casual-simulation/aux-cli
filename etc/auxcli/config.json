@@ -5,6 +5,7 @@
     "autoupdate_pi": false,
     "debug": true,
     "btmode": "none",
+    "bt_hotspot": false,
     "reboot_required": false,
     "reboot_on_exit": false,
     "first_boot": true

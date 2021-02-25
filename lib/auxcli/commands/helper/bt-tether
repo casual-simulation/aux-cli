@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+bt_hotspot=$(jq -r '.bt_hotspot' /etc/auxcli/config.json)
+printf "DEBUG (btmode): bt_hotspot: %s\n" "$bt_hotspot"
+
 bluetooth_start() {
 
     echo "Starting up bluetoothctl..."
@@ -36,7 +39,7 @@ bluetooth_broadcast() {
 
 bluetooth_hotspot_check() {
     echo "Starting infinite loop that checks for connected bluetooth devices..."
-    while systemctl is-active --quiet auxcli-bt-tether; do
+    while [[ $bt_hotspot == "true" ]]; do
         sudo python /lib/auxcli/components/tool/tethering-ble/list-bt-devices.py &
         sleep 5
     done
