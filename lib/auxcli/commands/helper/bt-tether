@@ -36,10 +36,9 @@ bluetooth_broadcast() {
 
 bluetooth_hotspot_check() {
     echo "Starting infinite loop that checks for connected bluetooth devices..."
-    while $bluetooth_hotspot; do
+    while systemctl is-active --quiet auxcli-bt-tether; do
         sudo python /lib/auxcli/components/tool/tethering-ble/list-bt-devices.py &
         sleep 5
-        read_conf
     done
 }
 
