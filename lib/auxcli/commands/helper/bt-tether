@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-
 bluetooth_start() {
 
     echo "Starting up bluetoothctl..."
@@ -44,8 +43,6 @@ bluetooth_hotspot_check() {
     done
 }
 
-if [ $bt_mode == "tether" ]; then
-    bluetooth_start
-    bluetooth_broadcast
-    bluetooth_hotspot_check
-fi
+bluetooth_start
+bluetooth_broadcast
+bluetooth_hotspot_check
