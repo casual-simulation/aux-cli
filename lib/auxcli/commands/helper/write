@@ -10,6 +10,7 @@ config_components="/etc/auxcli/components.json"
 config_components_tmp="/etc/auxcli/components.json.tmp"
 config_devices="/etc/auxcli/devices.json"
 config_devices_tmp="/etc/auxcli/devices.json.tmp"
+readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
 
 # . $path_to_helper/write [file] [OPTIONAL: command/component] [key] [value]
 
@@ -41,13 +42,20 @@ while [[ $# -gt 0 ]]; do
         shift # past key
         shift # past value
         ;;
-    # devices)
-    #     jq --arg command "$2" --arg key "$3" --arg value $4 '(.[] | select (.name == $command) | .[$key]) = $value' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
-    #     sudo mv -f $config_devices_tmp $config_devices
-    #     shift # past devices
-    #     shift # past name
-    #     shift # past value
-    #     ;;
+    devices)
+        if [[ ! ${current_devices[*]} =~ $2 ]]; then
+            jq --arg mac "$2" --arg name "$3" --arg desc "$4" '. += [{"mac": $mac, "name": $name, "desc": $desc}]' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
+            sudo mv -f $config_devices_tmp $config_devices
+        fi
+        readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
+        if [ ! $3 == n/a ] && [[ ! ${current_devices[*]} =~ $3 ]]; then
+            jq --arg mac "$2" --arg name "$3" '(.[] | select (.mac == $mac) | .name) = $name' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
+            sudo mv -f $config_devices_tmp $config_devices
+        fi
+        shift # past mac
+        shift # past name
+        shift # past desc
+        ;;
     *)
         shift # past unknown command
         ;;

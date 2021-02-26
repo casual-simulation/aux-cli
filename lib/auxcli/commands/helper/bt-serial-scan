@@ -1,35 +1,24 @@
 #!/bin/bash
 
-devices_config="/etc/auxcli/devices.json"
+config_devices="/etc/auxcli/devices.json"
+path_to_helper="/lib/auxcli/commands/helper"
+readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
 
-# Get array of device names
-# Maybe give them a "custom ID" from casualOS to pass to this command?
-# Check if any of those are "on"
-#
-
-
-
-# only run if btmode is serial
-
-
-# If there are no known devices
-if [ "$device01_mac" == "" ]; then
-
-    # Discover devices
-    while [[ $(hcitool scan | grep "RNBT") == "" ]]; do
-        echo "No device Found!"
+scan_devices(){
+    readarray -t discovered_devices < <(hcitool scan)
+    for ((i = 1; i < ${#discovered_devices[@]}; i++)); do
+        device_mac=$(echo ${discovered_devices[i]} | awk '{print $1}')
+        device_name=$(echo ${discovered_devices[i]} | awk '{print $2}')
+        . $path_to_helper/write "devices" $device_mac $device_name $device_desc
     done
+}
 
-    # Save device info to config
-    device=$(hcitool scan | grep "RNBT")
-    device_mac=$(echo $device | awk '{print $1}')
-    device_name=$(echo $device | awk '{print $2}')
-    sudo sed -i "s/device01_mac=\"\"/device01_mac=\"$device_mac\"/g" /etc/bt-serial.conf
-    sudo sed -i "s/device01_name=\"\"/device01_name=\"$device_name\"/g" /etc/bt-serial.conf
+first_scan(){
+    while [ ${#current_devices[@]} -eq 0 ]; do
+        scan_devices
+        readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
+    done
+}
 
-    echo "device Found: $device"
-fi
-
-
-
-
+first_scan
+scan_devices
