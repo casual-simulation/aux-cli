@@ -9,7 +9,7 @@ scan_devices(){
     for ((i = 1; i < ${#discovered_devices[@]}; i++)); do
         device_mac=$(echo ${discovered_devices[i]} | awk '{print $1}')
         device_name=$(echo ${discovered_devices[i]} | awk '{print $2}')
-        . $path_to_helper/write "devices" $device_mac $device_name $device_desc
+        . $path_to_helper/write "devices" $device_mac $device_name true $device_desc
     done
 }
 

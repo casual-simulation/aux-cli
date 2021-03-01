@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
         # If the device doesn't already exist
         if [[ ! ${current_devices[*]} =~ $2 ]]; then
             # Add the device
-            jq --arg mac "$2" --arg name "$3" --arg desc "$4" '. += [{"mac": $mac, "name": $name, "active": true, "desc": $desc}]' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
+            jq --arg mac "$2" --arg name "$3" --arg desc "$5" '. += [{"mac": $mac, "name": $name, "active": true, "desc": $desc}]' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
             sudo mv -f $config_devices_tmp $config_devices
         fi
 
@@ -59,7 +59,7 @@ while [[ $# -gt 0 ]]; do
             jq --arg mac "$2" --arg name "$3" '(.[] | select (.mac == $mac) | .name) = $name' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
             sudo mv -f $config_devices_tmp $config_devices
         fi
-        
+
         shift # past mac
         shift # past name
         shift # past desc
