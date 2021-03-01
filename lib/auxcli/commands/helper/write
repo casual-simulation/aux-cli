@@ -60,6 +60,16 @@ while [[ $# -gt 0 ]]; do
             sudo mv -f $config_devices_tmp $config_devices
         fi
 
+        # Make sure the device list is up to date
+        readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
+        
+        # Activity update
+        if [ -n "$4" ] && [[ ${current_devices[*]} =~ $2 ]]; then
+            # Update the device active state
+            jq --arg mac "$2" --arg active "$4" '(.[] | select (.mac == $mac) | .active) = $active' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
+            sudo mv -f $config_devices_tmp $config_devices
+        fi
+
         shift # past mac
         shift # past name
         shift # past desc

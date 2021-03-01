@@ -9,7 +9,7 @@ scan_devices(){
     for ((i = 1; i < ${#discovered_devices[@]}; i++)); do
         device_mac=$(echo ${discovered_devices[i]} | awk '{print $1}')
         device_name=$(echo ${discovered_devices[i]} | awk '{print $2}')
-        . $path_to_helper/write "devices" $device_mac $device_name true $device_desc
+        . $path_to_helper/write "devices" $device_mac $device_name "" $device_desc
     done
 }
 
@@ -21,14 +21,17 @@ first_scan(){
 }
 
 active_check(){
+    # For each MAC in current_devices
     for ((i = 0; i < ${#current_devices[@]}; i++)); do
+        # If the MAC wasn't discovered on the last scan
         if [[ ! ${discovered_devices[*]} =~ ${current_devices[i]} ]]; then
-            . $path_to_helper/write "devices" $device_mac $device_name false $device_desc
+            # Set active false
+            . $path_to_helper/write "devices" "${current_devices[i]}" "" false ""
         else
-            . $path_to_helper/write "devices" $device_mac $device_name true $device_desc
+            # Set active true
+            . $path_to_helper/write "devices" "${current_devices[i]}" "" true ""
         fi
     done
-    sleep 5
 }
 
 first_scan
