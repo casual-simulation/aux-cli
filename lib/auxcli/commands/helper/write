@@ -43,15 +43,23 @@ while [[ $# -gt 0 ]]; do
         shift # past value
         ;;
     devices)
+        # If the device doesn't already exist
         if [[ ! ${current_devices[*]} =~ $2 ]]; then
-            jq --arg mac "$2" --arg name "$3" --arg desc "$4" '. += [{"mac": $mac, "name": $name, "desc": $desc}]' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
+            # Add the device
+            jq --arg mac "$2" --arg name "$3" --arg desc "$4" '. += [{"mac": $mac, "name": $name, "active": true, "desc": $desc}]' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
             sudo mv -f $config_devices_tmp $config_devices
         fi
+
+        # Make sure the device list is up to date
         readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
+
+        # If the device name isn't 'n/a' and it doesn't already exist
         if [ ! $3 == n/a ] && [[ ! ${current_devices[*]} =~ $3 ]]; then
+            # Update the device name of the corresponding mac
             jq --arg mac "$2" --arg name "$3" '(.[] | select (.mac == $mac) | .name) = $name' $config_devices | sudo tee $config_devices_tmp 1> /dev/null
             sudo mv -f $config_devices_tmp $config_devices
         fi
+        
         shift # past mac
         shift # past name
         shift # past desc

@@ -3,9 +3,9 @@
 config_devices="/etc/auxcli/devices.json"
 path_to_helper="/lib/auxcli/commands/helper"
 readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
+readarray -t discovered_devices < <(hcitool scan)
 
 scan_devices(){
-    readarray -t discovered_devices < <(hcitool scan)
     for ((i = 1; i < ${#discovered_devices[@]}; i++)); do
         device_mac=$(echo ${discovered_devices[i]} | awk '{print $1}')
         device_name=$(echo ${discovered_devices[i]} | awk '{print $2}')
@@ -20,5 +20,17 @@ first_scan(){
     done
 }
 
+active_check(){
+    for ((i = 0; i < ${#current_devices[@]}; i++)); do
+        if [[ ! ${discovered_devices[*]} =~ ${current_devices[i]} ]]; then
+            . $path_to_helper/write "devices" $device_mac $device_name false $device_desc
+        else
+            . $path_to_helper/write "devices" $device_mac $device_name true $device_desc
+        fi
+    done
+    sleep 5
+}
+
 first_scan
 scan_devices
+active_check
