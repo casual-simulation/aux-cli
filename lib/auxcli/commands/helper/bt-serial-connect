@@ -1,13 +1,6 @@
 #!/bin/bash
 set -e
 
-config_devices="/etc/auxcli/devices.json"
-path_to_helper="/lib/auxcli/commands/helper"
-readarray -t current_devices < <(jq -r '.[].mac' $config_devices)
-
-# old
-# sudo rfcomm connect "$1" $device01_mac 1 &
-
 # sudo rfcomm connect /dev/rfcomm0 AA:BB:CC:DD:EE 1 &
 # sudo rfcomm connect $device $mac $channel &
 sudo rfcomm connect "$1" "$2" "$3" &

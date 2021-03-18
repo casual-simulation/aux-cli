@@ -8,18 +8,19 @@ app = Flask(__name__)
 def post():
 
     data = json.loads(request.data)
-    command = data['command']
-    device = data['device']
-    mac = data['mac']
-    channel = data['channel']
+    command = (data['command'])
 
     # Connect the bluetooth serial device
     if command == "connect":
-        subprocess.call(['/lib/auxcli/helper/bt-serial-connect', device, mac, channel])
+        device_c = (data['device'])
+        mac = (data['mac'])
+        channel = (data['channel'])
+        subprocess.call(['/usr/bin/timeout', '60s', '/lib/auxcli/commands/helper/bt-serial-connect', device_c, mac, channel])
 
     # Disconnect the bluetooth serial device
     if command == "disconnect":
-        subprocess.call(['/lib/auxcli/helper/bt-serial-connect', device])
+        device_d = (data['device'])
+        subprocess.call(['/lib/auxcli/commands/helper/bt-serial-disconnect', device_d])
 
     return ''
  
