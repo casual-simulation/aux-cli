@@ -85,3 +85,5 @@ if . $path_to_helper/installed "raspiwifi"; then
     hostname_check
     hostname_set
 fi
+
+. $path_to_helper/reboot-apply

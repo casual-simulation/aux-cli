@@ -17,26 +17,26 @@ sudo cp -f "$install_path/reset_lib.py" $install_path/RaspiWiFi_modified/libs/re
 . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-dnsmasq-checker.\n"
 sudo systemctl enable auxcli-dnsmasq-checker
 
-. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-dnsmasq-checker.\n"
-sudo systemctl start auxcli-dnsmasq-checker
+# . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-dnsmasq-checker.\n"
+# sudo systemctl start auxcli-dnsmasq-checker
 
 . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-hotspot-checker.\n"
 sudo systemctl enable auxcli-hotspot-checker
 
-. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-hotspot-checker.\n"
-sudo systemctl start auxcli-hotspot-checker
+# . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-hotspot-checker.\n"
+# sudo systemctl start auxcli-hotspot-checker
 
 . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-wlan-checker.\n"
 sudo systemctl enable auxcli-wlan-checker
 
-. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wlan-checker.\n"
-sudo systemctl start auxcli-wlan-checker
+# . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wlan-checker.\n"
+# sudo systemctl start auxcli-wlan-checker
 
 . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Enabling auxcli-wpa-checker.\n"
 sudo systemctl enable auxcli-wpa-checker
 
-. $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wpa-checker.\n"
-sudo systemctl start auxcli-wpa-checker
+# . $path_to_helper/debug-printf "DEBUG (raspiwifi-install): Starting auxcli-wpa-checker.\n"
+# sudo systemctl start auxcli-wpa-checker
 
 # Install python dependencies through apt-get to reduce errors
 sudo apt-get install -y \
