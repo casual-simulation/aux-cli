@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# sudo rfcomm connect /dev/rfcomm0 AA:BB:CC:DD:EE 1 &
+# sudo rfcomm connect /dev/rfcomm0 00:06:66:B9:08:47 1 &
 # sudo rfcomm connect $device $mac $channel &
 sudo rfcomm connect "$1" "$2" "$3" &
 

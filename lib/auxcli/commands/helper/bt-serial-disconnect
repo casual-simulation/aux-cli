@@ -9,5 +9,8 @@ sudo rfcomm release "$1"
 readarray -t processes < <(pgrep -f "$1")
 
 for ((i = 0; i < ${#processes[@]}; i++)); do
-    sudo kill -9 "${processes[$i]}"
+    # kill -9 is SIGKILL which will immediately kill process and all child processes
+    # sudo kill -9 "${processes[$i]}"
+    # kill -15 is SIGTERM which will gracefully kill process but not the child processes
+    sudo kill -15 "${processes[$i]}"
 done

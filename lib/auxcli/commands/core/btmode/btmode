@@ -59,11 +59,11 @@ btmode_none(){
         sudo systemctl disable auxcli-bt-tether
         . $path_to_helper/debug-printf "DEBUG (btmode): Turning off bluetooth broadcast.\n"
         sudo hciconfig hci0 down
-    elif [ "$previous_mode" == "serial" ]; then
-        . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
-        sudo systemctl stop auxcli-bt-serial-scan
-        . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
-        sudo systemctl disable auxcli-bt-serial-scan
+    # elif [ "$previous_mode" == "serial" ]; then
+    #     . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
+    #     sudo systemctl stop auxcli-bt-serial-scan
+    #     . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
+    #     sudo systemctl disable auxcli-bt-serial-scan
     fi
 }
 
@@ -72,13 +72,13 @@ btmode_tether(){
     . $path_to_helper/write "config" "btmode" "tether"
     . $path_to_helper/debug-printf "DEBUG (btmode): Setting bt_hotspot to 'true'\n"
     . $path_to_helper/write "config" "bt_hotspot" "true"
-    if [ "$previous_mode" == "serial" ]; then
-        . $path_to_helper/debug-printf "DEBUG (btmode): Previous mode was 'serial'\n"
-        . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
-        sudo systemctl stop auxcli-bt-serial-scan
-        . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
-        sudo systemctl disable auxcli-bt-serial-scan
-    fi
+    # if [ "$previous_mode" == "serial" ]; then
+    #     . $path_to_helper/debug-printf "DEBUG (btmode): Previous mode was 'serial'\n"
+    #     . $path_to_helper/debug-printf "DEBUG (btmode): Stopping service: auxcli-bt-serial-scan.\n"
+    #     sudo systemctl stop auxcli-bt-serial-scan
+    #     . $path_to_helper/debug-printf "DEBUG (btmode): Disabling service: auxcli-bt-serial-scan.\n"
+    #     sudo systemctl disable auxcli-bt-serial-scan
+    # fi
     . $path_to_helper/debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-tether.\n"
     sudo systemctl enable auxcli-bt-tether
     . $path_to_helper/debug-printf "DEBUG (btmode): Starting service: auxcli-bt-tether.\n"
@@ -99,10 +99,10 @@ btmode_serial(){
         . $path_to_helper/debug-printf "DEBUG (btmode): Turning off bluetooth broadcast.\n"
         sudo hciconfig hci0 down
     fi
-    . $path_to_helper/debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-serial-scan.\n"
-    sudo systemctl enable auxcli-bt-serial-scan
-    . $path_to_helper/debug-printf "DEBUG (btmode): Starting service: auxcli-bt-serial-scan.\n"
-    sudo systemctl start auxcli-bt-serial-scan
+    # . $path_to_helper/debug-printf "DEBUG (btmode): Enabling service: auxcli-bt-serial-scan.\n"
+    # sudo systemctl enable auxcli-bt-serial-scan
+    # . $path_to_helper/debug-printf "DEBUG (btmode): Starting service: auxcli-bt-serial-scan.\n"
+    # sudo systemctl start auxcli-bt-serial-scan
 }
 
 # Show the usage menu if there aren't any arguments
