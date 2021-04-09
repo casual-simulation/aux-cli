@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+read -rep $'Type "nuke" to delete the database, or press anything else to exit.\n' -n 4 -r
+if [[ $REPLY == "nuke" ]]; then
+    . $path_to_helper/debug-printf "DEBUG (nuke): Nuke confirmed.\n"
+    auxcli stop
+    sudo rm -rf /data/db
+    docker-compose up -d
+else
+    . $path_to_helper/debug-printf "DEBUG (nuke): Nuke denied.\n"
+    return 1
+fi
+

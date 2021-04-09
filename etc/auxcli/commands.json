@@ -70,6 +70,16 @@
         "short_desc": "Install additional components of auxcli."
     },
     {
+        "name": "nuke",
+        "type": "core",
+        "available": true,
+        "arguments": true,
+        "requires_reboot": false,
+        "command_path": "/lib/auxcli/commands/core/nuke/nuke",
+        "config_path": "/lib/auxcli/commands/core/nuke/config.json",
+        "short_desc": "Stop casualOS, delete the database, and restart casualOS."
+    },
+    {
         "name": "reinstall",
         "type": "core",
         "available": true,
