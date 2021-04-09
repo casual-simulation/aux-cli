@@ -70,7 +70,7 @@ vercomp () {
 version_check() {
     printf "Checking for newer versions of AUXCLI...\n"
     . $path_to_helper/debug-printf "DEBUG (update): CURL the latest config.json\n"
-    curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/etc/auxcli/config.json --output /home/pi/config.json
+    curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/etc/auxcli/config.json --output /home/pi/config.json
 
     new_version=$(jq -r '.version' /home/pi/config.json) 
     old_version=$(jq -r '.version' $config_main)
@@ -127,7 +127,7 @@ update_cli() {
     . $path_to_helper/debug-printf "DEBUG (update): Running 'update_cli'.\n"
     if version_check; then
         . $path_to_helper/debug-printf "DEBUG (update): CURL the latest config.json\n"
-        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/2.0.0/install.sh --output install-cli.sh && sudo bash install-cli.sh
+        curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install-cli.sh && sudo bash install-cli.sh
         sudo rm -rf install-cli.sh
     fi
 }

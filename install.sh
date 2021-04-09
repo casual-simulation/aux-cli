@@ -21,8 +21,8 @@ backup() {
 
 clone_repo() {
     if $debug; then printf "DEBUG (install.sh): Cloning repo.\n"; fi
-    git clone --single-branch --branch 2.0.0 https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
-    # git clone https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
+    # git clone --single-branch --branch 2.0.0 https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
+    git clone https://github.com/casual-simulation/aux-cli.git /home/pi/auxcli
 }
 
 deploy_files() {
