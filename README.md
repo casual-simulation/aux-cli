@@ -1,188 +1,68 @@
-# aux-cli
-AUX-CLI is a collection of tools to help expedite and control your environment on your RaspberryPi that's running AUX. Some tools won't work at all unless you have AUX installed.
+# auxcli
+auxcli is a collection of tools to help expedite and control your environment on your RaspberryPi that's running casualOS. Some tools won't work at all unless you have casualOS installed.
 
-## Installing AUX-CLI
-All you need to do is curl the install.sh file and run it.  
+## Required Hardware:
+- 1 Raspberry Pi 4 Model B+  
+- 1 5.1V 2.5A USB-C Power Supply (Search Raspberry PI 4 B+ power supply)  
+- 1 8GB or larger MicroSD card 
 
-```bash
-curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
-```
+## Hardware Prep:
+1. Flash Raspberry Pi OS Lite  
+   * Download the Raspberry Pi OS Lite image from [ here. ](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip)  
+   * Flash onto the MicroSD card using Balena Etcher.  
+      * On macOS - You can install Etcher with Homebrew `brew cask install balenaetcher`
+      * On Win10 - You can install Etcher with Chocolatey `choco install etcher -y`
+2. Create Network Files
+   * Unplug the MicroSD card and replug it into your computer. It should now appear as a volume called "boot"
+   * Create an empty file named "ssh" and put it in the root of the MicroSD card
+   * Create another file named "wpa_supplicant.conf" with your wifi information and put it in the root of the MicroSD card
 
-If you are installing this independantly of AUX, make sure to install any/every components you need. A breakdown of the available commands are below.  
+            ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+            update_config=1
+            country=US
 
-## AUX-CLI
-```
-Usage:        aux-cli [COMMAND]  
+            network={
+                ssid="YOUR_WIFI_NAME"
+                psk="YOUR_WIFI_PASSWORD"
+                key_mgmt=WPA-PSK
+            }
 
-Command line tools for AUX dealing more with the hardware/server than auxplayer itself.  
+   * Modify the values of "ssid" and "psk" to a local network name and it's password. Make sure to save the file.
 
-COMMANDS:  
-install           Install pods/modules/packages to your pi that you can utilize with auxplayer. 
-uninstall         Uninstall pods/modules/packages to your pi that you can utilize with auxplayer. 
-reinstall         Alias for the uninstall and install commands.
-start             Start the docker processes for the aux server. 
-stop              Stop the docker processes for the aux server. 
-restart           Restart docker processes for the aux server. 
-update            Update to the latest version of aux server. 
-changehost        Change the hostname of your pi. Applies after restart. 
-dhcpcd            Wrapper for setting and unsetting dhcpcd settings. 
-hotspot           Tool for managing hotspot mode. 
-backup            Creates a backup img of your pi. 
-help              Displays this help information.
-version           Displays the aux-cli version.
-Run 'aux-cli COMMAND --help' for more information on a command. 
-```
+3. Setup the Raspberry Pi  
+   * Put the MicroSD card into the Raspberry Pi 
+   * Plug the Power Supply into the outlet and then into the Raspberry Pi 
 
+## Installing auxcli
+Once your pi is setup and powered on, connect to it via ssh. 
+   1. Open up the command line tool on the computer you are working from.
+      * On macOS - Terminal
+      * On Win10 - Command Prompt (If you have issues, run as Administrator)
+   2. Make sure it's on the network by running `ping raspberrypi.local`
+   3. You can  stop the command with `ctrl+c` or `cmd+c`
+   4. Once you have verified it's on the network, run the command `ssh pi@YOUR_IP_ADDRESS_FROM_THE_PING_COMMAND`
+      * Example: `ssh pi@192.168.0.1`
+   5. If you get a security popup, just reply `yes`
+   6. When it asks for a password, it should be `raspberry` by default
+   7. Once you're in, run this `curl` command to grab the install file and execute it. There are some optional flags you can run that are listed above the "vanilla" install command.
 
-### install
-```
-Usage:    install [OPTIONS]
+            casualOS+auxcli install:
+            OPTIONS:
+            -n    --hostname      Change the hostname during the setup.
+            -f    --full          Do a full install instead of just the core requirements.
+            -y    --yes           Auto skips 'Are you sure?'
+            -h    --help          Displays this help information.
+    
+            curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
 
-A tool install modules/pods/packages for your pi.
-
-Options:
-pishrink      Installs a tool for shrinking pi images.
-raspiwifi     Installs a tool to enable/disable hotspot mode.
-rfid          Installs a collection of tools to work with RFID a reader/writer.
-zerotier      Installs a tool to do stuff.
-tethering     Installs a collection of tools to allow tethering via usb or bluetooth.
-everything    Installs everything available
-```
-
-### uninstall 
-```
-Usage:    uninstall [OPTIONS]
-
-A tool install modules/pods/packages for your pi.
-
-Options:
-pishrink      Uninstalls a tool for shrinking pi images.
-raspiwifi     Uninstalls a tool to enable/disable hotspot mode.
-rfid          Uninstalls a collection of tools to work with RFID a reader/writer.
-zerotier      Uninstalls a tool to do stuff.
-tethering     Uninstalls a collection of tools to allow tethering via usb or bluetooth.
-everything    Uninstalls everything available
-```
-
-### reinstall
-```
-Usage:    reinstall [OPTIONS]
-
-A tool to reinstall modules/pods/packages for your pi.
-
-Options:
-pishrink      Reinstalls a tool for shrinking pi images.
-raspiwifi     Reinstalls a tool to enable/disable hotspot mode.
-rfid          Reinstalls a collection of tools to work with RFID a reader/writer.
-zerotier      Reinstalls a tool to do stuff.
-tethering     Reinstalls a collection of tools to allow tethering via usb or bluetooth.
-everything    Reinstalls everything available
-```
-
-### start
-```
-Usage:    start [OPTIONS]
-
-A command that starts up your AUX Docker images.
-```
-
-### stop
-```
-Usage:    stop [OPTIONS]
-
-A command that stops your AUX Docker images.
-```
-
-### restart
-```
-Usage:    stop [OPTIONS]
-
-A command that stops your AUX Docker images.
-```
-
-### update
-```
-Usage:    update [OPTIONS]
-
-A tool that wraps the commands for updating AUX and software installed via apt-get.
-
-Options:
--a    --aux           Updates AUX to the latest version.
--A    --aux_auto      Toggle automatic updates on or off for AUX.
--c    --cli           Updates CLI to the latest version.
--C    --cli_auto      Toggle automatic updates on or off for CLI.
--p    --pi            Updates the software for your RaspberryPi (apt-get).
--P    --pi_auto       Toggle automatic updates on or off for your RaspberryPi (apt-get).
--y                    Bypass prompt to update.
--h    --help          Displays this help information.
-```
-
-### changehost
-```
-Usage:    changehost [OPTIONS]
-
-A tool that wraps the commands for changing the hostname permanently and temporarily.
-
-Options:
--n    --hostname STRING   Takes a string to set as the new hostname.
--r    --reboot            Automatically reboot after hostname change.
--h    --help              Displays this help information.
-```
-
-### dhcpcd
-```
-Usage:    dhcpcd [OPTIONS]
-
-A tool that wraps the commands for allowing internet to passthrough a wired connection if available.
-
-Options:
--s    --set           Allows internet passthrough.
--u    --unset         Stops the internet passthrough.
--h    --help          Displays this help information.
-```
-
-### hotspot
-```
-Usage:    hotspot [OPTIONS]
-
-A tool that wraps the commands for allowing internet to passthrough a wired connection if available.
-
-Options:
--c    --check         Checks if you're in hotspot mode.
--e    --enable        Enables hotspot mode.
--d    --disable       Disables hotspot mode.
--h    --help          Displays this help information.
-```
-
-### backup
-```
-Usage:    backup.sh [OPTIONS]
-
-A tool that creates a complete backup image of your RaspberryPi with options to Shrink/Zip/Move/Upload it wherever you choose.
-
-OPTIONS:
--f    --filename STRING       Specify a filename to use. Default: ${hostn}-bkp.img
--m    --mountpoint STRING     Specify a mount point for your local storage device. Default: /mnt/usbstorage
--s    --storage STRING        Specify a local storage device to backup to. The script will try to find one if unspecified.
--l    --log STRING            Specify a location to output the log to. Default: /var/log/pi.backup.log
--S    --shrink STRING         Enable shrinking. Optional: Specify a string to append to the filename. Default: "-shrunk" Shrinking requires a device with at least 2x the storage space as your boot drive. NOTE: Sometimes drives are labeled incorrectly so double check. Actual storage might be slightly over or under the storage advertised. So 2x 4GB might not fit on an 8GB USB.
--Z    --zip                   Enable zipping the backup before moving it to its final destination. For simplicity's sake, it follows the storage requirements for shrinking.
--o    --overwrite             Overwrite any files as needed.
--y                            Bypass prompt to install dependencies.
--h    --help                  Displays this help information.
-```
-
-### version
-```
-Usage:    version [OPTIONS]
-
-A command that outputs the current aux-cli version.
-```
+            curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh --full --yes --hostname auxplayer
 
 
-### info
-```
-Usage:    info [OPTIONS]
 
-A command that outputs some potentially helpful system info.
-```
+            auxcli-only install:
+            curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install-cli.sh && sudo bash install-cli.sh
+    8. Once it completes, restart the pi.
+    9. You maybe have to wait 10-15 minutes for casualOS to finish pulling/installing in the background after the reboot.
+
+## Authors
+Created & Maintained by [ Wesley Mayle ](mailto:wesley@yeticgi.com)
