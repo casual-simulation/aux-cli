@@ -35,16 +35,16 @@ auxcli is a collection of tools to help expedite and control your environment on
 
 ## Installing auxcli
 Once your pi is setup and powered on, connect to it via ssh. 
-   1. Open up the command line tool on the computer you are working from.
-      * On macOS - Terminal
-      * On Win10 - Command Prompt (If you have issues, run as Administrator)
-   2. Make sure it's on the network by running `ping raspberrypi.local`
-   3. You can  stop the command with `ctrl+c` or `cmd+c`
-   4. Once you have verified it's on the network, run the command `ssh pi@YOUR_IP_ADDRESS_FROM_THE_PING_COMMAND`
-      * Example: `ssh pi@192.168.0.1`
-   5. If you get a security popup, just reply `yes`
-   6. When it asks for a password, it should be `raspberry` by default
-   7. Once you're in, run this `curl` command to grab the install file and execute it. There are some optional flags you can run that are listed above the "vanilla" install command.
+1. Open up the command line tool on the computer you are working from.
+    * On macOS - Terminal
+    * On Win10 - Command Prompt (If you have issues, run as Administrator)
+2. Make sure it's on the network by running `ping raspberrypi.local`
+3. You can  stop the command with `ctrl+c` or `cmd+c`
+4. Once you have verified it's on the network, run the command `ssh pi@YOUR_IP_ADDRESS_FROM_THE_PING_COMMAND`
+    * Example: `ssh pi@192.168.0.1`
+5. If you get a security popup, just reply `yes`
+6. When it asks for a password, it should be `raspberry` by default
+7. Once you're in, run this `curl` command to grab the install file and execute it. There are some optional flags you can run that are listed above the "vanilla" install command.
 
             casualOS+auxcli install:
             OPTIONS:
@@ -60,9 +60,10 @@ Once your pi is setup and powered on, connect to it via ssh.
 
 
             auxcli-only install:
-            curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install-cli.sh && sudo bash install-cli.sh
-    8. Once it completes, restart the pi.
-    9. You maybe have to wait 10-15 minutes for casualOS to finish pulling/installing in the background after the reboot.
+            curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install-cli.sh && sudo bash install-cli.sh  
+
+8. Once it completes, restart the pi.
+9. You maybe have to wait 10-15 minutes for casualOS to finish pulling/installing in the background after the reboot.
 
 ## Authors
 Created & Maintained by [ Wesley Mayle ](mailto:wesley@yeticgi.com)
