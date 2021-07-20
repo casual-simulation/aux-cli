@@ -6,7 +6,8 @@ DIR=$(cd $RDIR;pwd)
 
 # Install dependencies for usbmount
 echo "DEBUG: Setting up USBMount..."
-sudo apt-get install -y git debhelper build-essential ntfs-3g exfat-fuse exfat-utils usbmount
+sudo apt-get install -y git debhelper build-essential ntfs-3g exfat-fuse exfat-utils
+sudo apt-get install -y usbmount
 
 sudo mkdir -p /data
 sudo mkdir -p /data/drives
