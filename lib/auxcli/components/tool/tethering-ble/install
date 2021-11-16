@@ -1,11 +1,18 @@
 #!/bin/bash
 set -e
 
-sudo apt-get install -y \
-    bluez-tools \
-    python-dbus \
-    python-gobject \
-    python-gobject-2
+if grep bullseye /etc/os-release; then
+    sudo apt-get install -y \
+        bluez-tools \
+        python3-gi \
+        python3-dbus
+else
+    sudo apt-get install -y \
+        bluez-tools \
+        python-dbus \
+        python-gobject \
+        python-gobject-2
+fi
 
 old_dtimeout=$(grep DiscoverableTimeout /etc/bluetooth/main.conf)
 new_dtimeout="DiscoverableTimeout = 0"
