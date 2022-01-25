@@ -20,6 +20,16 @@
     "dependencies": {}
   },
   {
+    "name": "spi",
+    "type": "configuration",
+    "enabled": false,
+    "requires_reboot": true,
+    "install_path": "/lib/auxcli/components/configuration/spi",
+    "config_path": "/lib/auxcli/components/configuration/spi/config.json",
+    "short_desc": "A tool that lets you enable/disable spi.",
+    "dependencies": {}
+  },
+  {
     "name": "uart",
     "type": "configuration",
     "enabled": false,

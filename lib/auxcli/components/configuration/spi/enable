@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+. $path_to_helper/debug-printf "DEBUG (spi-enable): Enabling spi.\n"
+
+# If it finds SPI, make sure it's on
+. $path_to_helper/debug-printf "DEBUG (spi-enable): Checking for commented enabled spi.\n"
+sudo sed -i "s/^#dtparam=spi=on/dtparam=spi=on/g" /boot/config.txt
+
+. $path_to_helper/debug-printf "DEBUG (spi-enable): Checking for commented disabled spi.\n"
+sudo sed -i "s/^#dtparam=spi=off/dtparam=spi=on/g" /boot/config.txt
+
+. $path_to_helper/debug-printf "DEBUG (spi-enable): Checking for disabled spi.\n"
+sudo sed -i "s/^dtparam=spi=off/dtparam=spi=on/g" /boot/config.txt
+
+if ! sudo grep "dtparam=spi=on" "/boot/config.txt"; then
+    . $path_to_helper/debug-printf "DEBUG (spi-enable): enable_spi was not detected at all.\n"
+    . $path_to_helper/debug-printf "DEBUG (spi-enable): Adding an enabled line.\n"
+    printf "\n# Enable spi\ndtparam=spi=on\n" | sudo tee -a /boot/config.txt
+fi
+
+. $path_to_helper/write "components" "spi" "enabled" "true"
