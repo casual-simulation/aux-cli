@@ -17,6 +17,7 @@ update_cli=false
 automatic_update_cli=false
 update_pi=false
 automatic_update_pi=false
+force=false
 
 usage() {
     printf "\nUsage:    auxcli update [OPTIONS]\n\n"
@@ -94,6 +95,10 @@ version_check() {
                 return 1
             fi
         fi
+    elif $force; then
+        printf "You have the latest version of AUXCLI.\n"
+        printf "Forcing update anyways.\n"
+        return 0
     else
         printf "You have the latest version of AUXCLI.\n"
         return 1
@@ -221,6 +226,11 @@ while [[ $# -gt 0 ]]; do
     -P | --pi-auto)
         . $path_to_helper/debug-printf "DEBUG (update): Setting 'automatic_update_pi' to 'true'.\n"
         automatic_update_pi=true
+        shift # past argument
+        ;;
+    -f | --force)
+        . $path_to_helper/debug-printf "DEBUG (update): Setting 'force' to 'true'.\n"
+        force=true
         shift # past argument
         ;;
     -y)

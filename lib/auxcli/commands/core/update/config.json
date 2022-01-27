@@ -42,6 +42,12 @@
         "short_desc": "Bypass prompt to update."
     },
     {
+        "arg_short": "-f",
+        "arg_long": "--force",
+        "type": "",
+        "short_desc": "(auxcli only) Force an update even if you are current."
+    },
+    {
         "arg_short": "-h",
         "arg_long": "--help",
         "type": "",
