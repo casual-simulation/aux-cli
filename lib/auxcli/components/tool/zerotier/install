@@ -12,21 +12,21 @@ sudo sed -i '/^exit 0/d' /etc/rc.local
 sudo tee -a "/etc/rc.local" > /dev/null <<EOT
 # ZeroTier Start
 if [ -e /boot/zt ]; then
-    zt_network=\$(sed '1q;d' /boot/zt)
     zt_regenerate=\$(sed '2q;d' /boot/zt)
-
-    if [ -z \$zt_network ]; then
-        echo "No Network Provided"
-    else
-        mkdir -p "/var/lib/zerotier-one/networks.d"
-        touch "/var/lib/zerotier-one/networks.d/\${zt_network}.conf"
-    fi
+    zt_network=\$(sed '1q;d' /boot/zt)
 
     if [[ \$zt_regenerate = "true" ]]; then
         echo "it worked" | sudo tee -a /home/pi/zero
         sudo zerotier-idtool generate identity.secret identity.public
     else
         echo "Skipping Identity Regeneration"
+    fi
+
+    if [ -z \$zt_network ]; then
+        echo "No Network Provided"
+    else
+        mkdir -p "/var/lib/zerotier-one/networks.d"
+        touch "/var/lib/zerotier-one/networks.d/\${zt_network}.conf"
     fi
 
     rm /boot/zt
