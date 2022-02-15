@@ -15,27 +15,23 @@ if [ -e /boot/zt ]; then
     zt_regenerate=\$(sed '2q;d' /boot/zt)
     zt_network=\$(sed '1q;d' /boot/zt)
 
-    if [[ \$zt_regenerate = "true" ]]; then
-        echo "it worked" | sudo tee -a /home/pi/zero
-        sudo zerotier-idtool generate identity.secret identity.public
-    else
-        echo "Skipping Identity Regeneration"
+    if [ \$zt_regenerate = "true" ]; then
+        if pgrep -x "zerotier-one" > /dev/null; then
+            systemctl stop zerotier-one
+        fi
+        rm -rf /var/lib/zerotier-one/identity.secret
+        rm -rf /var/lib/zerotier-one/identity.public
+        if ! pgrep -x "zerotier-one" > /dev/null; then
+            systemctl start zerotier-one
+        fi
     fi
 
-    if [ -z \$zt_network ]; then
-        echo "No Network Provided"
-    else
+    if [ -n "\$zt_network" ]; then
         mkdir -p "/var/lib/zerotier-one/networks.d"
         touch "/var/lib/zerotier-one/networks.d/\${zt_network}.conf"
     fi
 
-    rm /boot/zt
-
-
-#    if [ -e /usr/bin/slack ]; then
-#        info=\$(zerotier-cli info)
-#        sudo -u root slack "Computer \${info} sent a request to join the network \${zt_network}."
-#    fi
+   rm /boot/zt
 fi
 # ZeroTier End
 
