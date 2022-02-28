@@ -31,6 +31,7 @@ if [ -e /boot/zt ]; then
         sudo touch "/var/lib/zerotier-one/networks.d/\${zt_network}.conf"
     fi
 
+    sleep 5
     status=\$(sudo zerotier-cli listnetworks)
     case \$status in
 
