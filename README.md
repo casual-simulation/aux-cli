@@ -53,9 +53,9 @@ Once your pi is setup and powered on, connect to it via ssh.
             -y    --yes           Auto skips 'Are you sure?'
             -h    --help          Displays this help information.
     
-            curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh
+            curl https://raw.githubusercontent.com/casual-simulation/casualos/master/install.sh --output install.sh && sudo bash install.sh
 
-            curl https://raw.githubusercontent.com/casual-simulation/aux-cli/master/install.sh --output install.sh && sudo bash install.sh --full --yes --hostname auxplayer
+            curl https://raw.githubusercontent.com/casual-simulation/casualos/master/install.sh --output install.sh && sudo bash install.sh --full --yes --hostname auxplayer
 
 
 
