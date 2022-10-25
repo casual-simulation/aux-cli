@@ -28,6 +28,8 @@ auxcli is a collection of tools to help expedite and control your environment on
             }
 
    * Modify the values of "ssid" and "psk" to a local network name and it's password. Make sure to save the file.
+   * Create another file named "userconf" if you want the default user `pi` and default password `raspberry` and put it in the root of the MicroSD 
+            pi:$6$ZqM3kgIcLwgAE9./$q4H1ifcn3V2wvzoRPBXxw7/ghLzFCkyWh7LTjuL0R8tJwAleBe6KSyf4mPn.hKdKBRkUWueaKMK/3rMILclDP0
 
 3. Setup the Raspberry Pi  
    * Put the MicroSD card into the Raspberry Pi 
