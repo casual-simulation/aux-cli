@@ -8,7 +8,7 @@ auxcli is a collection of tools to help expedite and control your environment on
 
 ## Hardware Prep:
 1. Flash Raspberry Pi OS Lite  
-   * Download the Raspberry Pi OS Lite image from [ here. ](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip)  
+   * Download the 32-bit Raspberry Pi OS Lite image from [ here. ](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-09-26/2022-09-22-raspios-bullseye-armhf-lite.img.xz)  
    * Flash onto the MicroSD card using Balena Etcher.  
       * On macOS - You can install Etcher with Homebrew `brew cask install balenaetcher`
       * On Win10 - You can install Etcher with Chocolatey `choco install etcher -y`
