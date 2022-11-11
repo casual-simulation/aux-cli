@@ -20,7 +20,7 @@ usage() {
     done
     printf "\nCOMPONENTS:\n"
     for ((i = 0; i < ${#components_e[@]}; i++)); do
-        if . $path_to_helper/enabled ${components_e[$i]}; then
+        if [[ " ${components_e_true[*]} " =~ " ${components_e[$i]} " ]]; then #"
             printf "\t[x] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
         else
             printf "\t[ ] %-24s\t%s\n" "${components_e[$i]}" "${components_e_desc[$i]}"
