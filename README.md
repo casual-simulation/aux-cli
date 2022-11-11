@@ -66,6 +66,11 @@ Once your pi is setup and powered on, connect to it via ssh.
 
 8. Once it completes, restart the pi.
 9. You maybe have to wait 10-15 minutes for casualOS to finish pulling/installing in the background after the reboot.
+10. OPTIONAL: If you opted for the full install, it will boot back in AP Mode, which means it won't be on your network anymore unless you are hard wired. This lets you connect directly to the pi if you don't want it on your network and would rather have it isolated. You should see the pi broadcasting a wifi signal with its hostname and last 4 digits of its MAC address. Example: auxplayer_A1B2
+    * Connect to the pi wifi
+    * Open a web browser with whatever device you connected with
+    * Go to 10.0.0.1 or raspiwifisetup.com
+    * Follow the prompts to connect the pi to your wifi and it will reboot back on the network
 
 ## Authors
 Created & Maintained by [ Wesley Mayle ](mailto:wesley@yeticgi.com)
